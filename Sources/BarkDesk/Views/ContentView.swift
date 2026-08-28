@@ -33,6 +33,39 @@ struct ContentView: View {
             }
             .animation(.easeInOut(duration: 0.2), value: model.banner)
         }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if model.cliInstallationStatus == .missing {
+                CLIInstallPrompt()
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.easeInOut(duration: 0.2), value: model.cliInstallationStatus)
+    }
+}
+
+private struct CLIInstallPrompt: View {
+    @EnvironmentObject private var model: AppModel
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "terminal.fill")
+                .font(.title3)
+                .foregroundStyle(.tint)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Install the notify command").fontWeight(.semibold)
+                Text("Send Bark notifications from any terminal with a short command.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button("Install") { Task { await model.installCLI() } }
+                .buttonStyle(.borderedProminent)
+                .disabled(model.isWorking)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(.bar)
+        .overlay(alignment: .bottom) { Divider() }
     }
 }
 

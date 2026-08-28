@@ -73,6 +73,8 @@ make install
 4. 选择默认 Group、Level、Sound 与 Archive 行为。
 5. 依次使用 Test Connection 和 Send Test Notification 验证完整链路。
 
+应用启动时会自动检查 `notify` 是否已经安装。如果没有检测到，主窗口顶部会显示安装提示条。点击 Install 后，BarkDesk 会优先使用当前用户可写的 Homebrew 或 `/usr/local/bin` 目录；如果没有合适的公共命令目录，则安装到 `~/.local/bin/notify`。Settings 的 Command Line Tool 区域可以查看实际安装路径和状态，也可以重新执行检查。
+
 Device Key、Basic Auth 用户名和密码保存在 macOS Keychain。普通默认设置保存在：
 
 ```text

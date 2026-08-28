@@ -1,7 +1,8 @@
 import BarkCore
+import Darwin
+import NotifySupport
 import SwiftUI
 
-@main
 struct BarkDeskApp: App {
     @StateObject private var model = AppModel()
 
@@ -31,6 +32,18 @@ struct BarkDeskApp: App {
                 .environmentObject(model)
                 .frame(width: 560, height: 620)
         }
+    }
+}
+
+@main
+enum BarkDeskMain {
+    @MainActor
+    static func main() async {
+        let executableName = URL(fileURLWithPath: CommandLine.arguments[0]).lastPathComponent
+        if executableName == "notify" {
+            Darwin.exit(Int32(await NotifyRunner.run()))
+        }
+        BarkDeskApp.main()
     }
 }
 

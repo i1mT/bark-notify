@@ -29,6 +29,31 @@ struct SettingsView: View {
                 Toggle("Archive messages in Bark", isOn: $model.configuration.archiveMessages)
             }
 
+            Section("Command Line Tool") {
+                switch model.cliInstallationStatus {
+                case .checking:
+                    LabeledContent("notify") { ProgressView().controlSize(.small) }
+                case .missing:
+                    LabeledContent("notify", value: "Not installed")
+                    Button("Install notify") { Task { await model.installCLI() } }
+                        .buttonStyle(.borderedProminent)
+                case .installed(let url):
+                    LabeledContent("notify") {
+                        Label("Installed", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                    }
+                    LabeledContent("Path", value: url.path)
+                    if !model.cliInstallDirectoryIsInPath {
+                        Text("If your terminal cannot find notify, add ~/.local/bin to your shell PATH.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                case .unavailable(let reason):
+                    Label(reason, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                    Button("Try Again") { Task { await model.installCLI() } }
+                }
+                Button("Check Again") { Task { await model.checkCLIInstallation() } }
+            }
+
             Section("Connection") {
                 ForEach(model.connectionResults) { result in
                     Label(result.label, systemImage: result.success ? "checkmark.circle.fill" : "exclamationmark.circle.fill")

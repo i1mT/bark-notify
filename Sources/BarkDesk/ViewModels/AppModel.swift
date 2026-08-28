@@ -31,8 +31,10 @@ final class AppModel: ObservableObject {
     @Published var isWorking = false
     @Published var banner: Banner?
     @Published var connectionResults: [ConnectionResult] = []
+    @Published var cliInstallationStatus = CLIInstallationStatus.checking
 
     private let configurationStore = ConfigurationStore()
+    private let cliInstaller = CLIInstaller()
     private var history: HistoryStore?
     private var initialized = false
 
@@ -50,7 +52,31 @@ final class AppModel: ObservableObject {
             draft.applyDefaults(configuration)
             history = try HistoryStore()
             await refreshHistory()
+            await checkCLIInstallation()
         } catch {
+            showError(error)
+            await checkCLIInstallation()
+        }
+    }
+
+    var cliInstallDirectoryIsInPath: Bool { cliInstaller.installDirectoryIsInPath }
+
+    func checkCLIInstallation() async {
+        cliInstallationStatus = .checking
+        let installer = cliInstaller
+        cliInstallationStatus = await Task.detached { installer.detect() }.value
+    }
+
+    func installCLI() async {
+        isWorking = true
+        defer { isWorking = false }
+        let installer = cliInstaller
+        do {
+            let url = try await Task.detached { try installer.install() }.value
+            cliInstallationStatus = .installed(url)
+            banner = Banner(style: .success, message: "notify installed at \(url.path)")
+        } catch {
+            cliInstallationStatus = .unavailable(error.localizedDescription)
             showError(error)
         }
     }

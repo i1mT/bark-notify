@@ -10,11 +10,14 @@ ICON_SOURCE="${PROJECT_DIR}/Assets/BarkDeskIcon.png"
 
 cd "${PROJECT_DIR}"
 swift build -c "${CONFIGURATION}" --product BarkDesk
+swift build -c "${CONFIGURATION}" --product notify
 BIN_DIR="$(swift build -c "${CONFIGURATION}" --show-bin-path)"
 
 rm -rf "${APP_DIR}"
 mkdir -p "${APP_DIR}/Contents/MacOS" "${APP_DIR}/Contents/Resources"
 ditto "${BIN_DIR}/BarkDesk" "${APP_DIR}/Contents/MacOS/BarkDesk"
+ditto "${BIN_DIR}/notify" "${APP_DIR}/Contents/Resources/notify"
+chmod 755 "${APP_DIR}/Contents/Resources/notify"
 rm -rf "${ICONSET_DIR}"
 mkdir -p "${ICONSET_DIR}"
 sips -z 16 16 "${ICON_SOURCE}" --out "${ICONSET_DIR}/icon_16x16.png" >/dev/null
