@@ -10,6 +10,8 @@ struct ContentView: View {
                 Label(item.title, systemImage: item.icon)
                     .tag(item)
             }
+            .listStyle(.sidebar)
+            .padding(.horizontal, 10)
             .navigationTitle("BarkDesk")
             .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 260)
         } detail: {

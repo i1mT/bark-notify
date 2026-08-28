@@ -47,7 +47,7 @@ struct NotificationsView: View {
                     }
                 }
             }
-            .frame(minWidth: 280, idealWidth: 340)
+            .frame(minWidth: 260, idealWidth: 330, maxWidth: 420)
             .searchable(text: $model.searchText, prompt: "搜索标题、内容或分组")
             .onSubmit(of: .search) { Task { await model.refreshHistory() } }
             .onChange(of: model.searchText) { _, _ in
@@ -64,7 +64,7 @@ struct NotificationsView: View {
                     ContentUnavailableView("请选择一条通知", systemImage: "bell")
                 }
             }
-            .frame(minWidth: 400, maxWidth: .infinity, maxHeight: .infinity)
+            .frame(minWidth: 340, idealWidth: 460, maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
@@ -105,19 +105,10 @@ private struct HistoryDetail: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(record.title?.nilIfEmpty ?? "无标题通知").font(.largeTitle).fontWeight(.semibold)
-                        if let subtitle = record.subtitle { Text(subtitle).font(.title3).foregroundStyle(.secondary) }
-                    }
-                    Spacer()
-                    Label(record.deliveryStatus == .success ? "发送成功" : "发送失败",
-                          systemImage: record.deliveryStatus == .success ? "checkmark.circle.fill" : "xmark.circle.fill")
-                        .foregroundStyle(record.deliveryStatus == .success ? .green : .red)
-                }
+                detailHeader
                 Text(record.body).font(.body).textSelection(.enabled)
                 Divider()
-                Grid(alignment: .leading, horizontalSpacing: 22, verticalSpacing: 10) {
+                VStack(alignment: .leading, spacing: 10) {
                     detailRow("发送时间", record.createdAt.formatted(date: .abbreviated, time: .standard))
                     detailRow("来源", sourceName(record.source))
                     detailRow("分组", record.group ?? "—")
@@ -128,22 +119,73 @@ private struct HistoryDetail: View {
                     if let command = record.metadata?.command { detailRow("命令", command) }
                     if let duration = record.metadata?.duration { detailRow("耗时", duration.formatted(.number.precision(.fractionLength(1))) + " 秒") }
                 }
-                HStack {
-                    Button("重新发送") { Task { await model.resend(record) } }.buttonStyle(.borderedProminent)
-                    Button("复制内容") { model.copy(record.body) }
-                    if let raw = record.url, let url = URL(string: raw) {
-                        Link("打开链接", destination: url)
-                    }
-                    Spacer()
-                    Button("删除", role: .destructive) { Task { await model.delete(record) } }
-                }
+                detailActions
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(28)
         }
     }
 
+    private var detailHeader: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 16) {
+            title
+                .layoutPriority(1)
+            Spacer(minLength: 12)
+            deliveryStatus
+        }
+    }
+
+    private var title: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(record.title?.nilIfEmpty ?? "无标题通知")
+                .font(.largeTitle)
+                .fontWeight(.semibold)
+            if let subtitle = record.subtitle {
+                Text(subtitle).font(.title3).foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private var deliveryStatus: some View {
+        Label(
+            record.deliveryStatus == .success ? "发送成功" : "发送失败",
+            systemImage: record.deliveryStatus == .success ? "checkmark.circle.fill" : "xmark.circle.fill"
+        )
+        .foregroundStyle(record.deliveryStatus == .success ? .green : .red)
+        .fixedSize()
+    }
+
+    private var detailActions: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            primaryActions
+            deleteButton
+        }
+    }
+
+    private var primaryActions: some View {
+        HStack(spacing: 10) {
+            Button("重新发送") { Task { await model.resend(record) } }
+                .buttonStyle(.borderedProminent)
+            Button("复制内容") { model.copy(record.body) }
+            if let raw = record.url, let url = URL(string: raw) {
+                Link("打开链接", destination: url)
+            }
+        }
+    }
+
+    private var deleteButton: some View {
+        Button("删除", role: .destructive) { Task { await model.delete(record) } }
+    }
+
     private func detailRow(_ label: String, _ value: String) -> some View {
-        GridRow { Text(label).foregroundStyle(.secondary); Text(value).textSelection(.enabled) }
+        HStack(alignment: .firstTextBaseline, spacing: 18) {
+            Text(label)
+                .foregroundStyle(.secondary)
+                .frame(width: 72, alignment: .leading)
+            Text(value)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 
     private func sourceName(_ source: NotificationSource) -> String {

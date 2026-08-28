@@ -16,6 +16,7 @@ public struct CLIInstaller: Sendable {
     public let installDirectory: URL
     private let sourceURL: URL?
     private let searchPath: String
+    private let commonDetectionURLs: [URL]
 
     public init(
         installDirectory: URL? = nil,
@@ -25,6 +26,19 @@ public struct CLIInstaller: Sendable {
         self.installDirectory = installDirectory ?? Self.preferredInstallDirectory()
         self.sourceURL = sourceURL
         self.searchPath = searchPath
+        self.commonDetectionURLs = Self.commonDetectionURLs
+    }
+
+    init(
+        installDirectory: URL,
+        sourceURL: URL?,
+        searchPath: String,
+        commonDetectionURLs: [URL]
+    ) {
+        self.installDirectory = installDirectory
+        self.sourceURL = sourceURL
+        self.searchPath = searchPath
+        self.commonDetectionURLs = commonDetectionURLs
     }
 
     public var installURL: URL {
@@ -85,16 +99,19 @@ public struct CLIInstaller: Sendable {
             .appendingPathComponent(".local/bin", isDirectory: true)
     }
 
-    private var detectionCandidates: [URL] {
-        let common = [
-            installURL,
+    private static var commonDetectionURLs: [URL] {
+        [
             FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("bin/notify"),
             URL(fileURLWithPath: "/opt/homebrew/bin/notify"),
             URL(fileURLWithPath: "/usr/local/bin/notify"),
         ]
+    }
+
+    private var detectionCandidates: [URL] {
         let fromPath = pathDirectories.map { $0.appendingPathComponent("notify") }
         var seen = Set<String>()
-        return (common + fromPath).filter { seen.insert($0.standardizedFileURL.path).inserted }
+        return ([installURL] + commonDetectionURLs + fromPath)
+            .filter { seen.insert($0.standardizedFileURL.path).inserted }
     }
 
     private func resolvedSourceURL() -> URL? {

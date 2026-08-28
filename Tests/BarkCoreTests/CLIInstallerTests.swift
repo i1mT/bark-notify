@@ -16,7 +16,8 @@ func cliInstallerLifecycle() throws {
     let installer = CLIInstaller(
         installDirectory: installDirectory,
         sourceURL: source,
-        searchPath: ""
+        searchPath: "",
+        commonDetectionURLs: []
     )
     #expect(installer.detect() == .missing)
 
