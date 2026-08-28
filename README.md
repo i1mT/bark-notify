@@ -26,6 +26,22 @@ BarkDesk 是一个使用 Swift 和 SwiftUI 编写的 macOS 原生 Bark 控制中
 
 ## 构建与安装
 
+### 使用 Xcode 运行
+
+请打开仓库根目录的 `BarkDesk.xcodeproj`，选择 `BarkDesk` scheme，然后按下 Run。这个 scheme 构建并运行真正的 macOS `BarkDesk.app`，同时会把独立的 `notify` 可执行文件复制到 App 的 Resources 中，因此引导页输入、键盘焦点和“安装 notify 命令”都使用完整的 macOS App 生命周期。
+
+不要把 `Package.swift` 作为工程打开后直接运行 Swift Package 中的 `BarkDesk` executable；那个产物是裸命令行可执行文件，不是 macOS App bundle，不能用于 GUI 调试。
+
+修改 `Xcode/project.yml` 后，可以重新生成工程：
+
+```bash
+make xcode-project
+```
+
+这一步需要本机安装 `xcodegen`；普通开发不需要重复生成，仓库已经包含生成好的 `BarkDesk.xcodeproj`。
+
+### 使用命令行构建
+
 开发构建和测试：
 
 ```bash

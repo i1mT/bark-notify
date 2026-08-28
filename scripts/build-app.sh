@@ -42,6 +42,7 @@ plutil -insert CFBundleShortVersionString -string "1.0.0" "${APP_DIR}/Contents/I
 plutil -insert CFBundleVersion -string "1" "${APP_DIR}/Contents/Info.plist"
 plutil -insert LSMinimumSystemVersion -string "14.0" "${APP_DIR}/Contents/Info.plist"
 plutil -insert NSHighResolutionCapable -bool true "${APP_DIR}/Contents/Info.plist"
+plutil -insert NSPrincipalClass -string "NSApplication" "${APP_DIR}/Contents/Info.plist"
 codesign --force --deep --sign - "${APP_DIR}"
 
 echo "Built ${APP_DIR}"

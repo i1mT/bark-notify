@@ -14,7 +14,7 @@ let package = Package(
         .target(name: "BarkCore", dependencies: ["CSQLite"]),
         .target(name: "NotifySupport", dependencies: ["BarkCore"]),
         .executableTarget(name: "NotifyCLI", dependencies: ["NotifySupport"]),
-        .executableTarget(name: "BarkDesk", dependencies: ["BarkCore", "NotifySupport"]),
+        .executableTarget(name: "BarkDesk", dependencies: ["BarkCore"]),
         .testTarget(name: "BarkCoreTests", dependencies: ["BarkCore"]),
         .testTarget(name: "BarkDeskTests", dependencies: ["BarkDesk"]),
     ]

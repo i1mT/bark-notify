@@ -90,6 +90,7 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 9) {
                 Text("Bark Server 地址").fontWeight(.medium)
                 TextField("https://bark.example.com", text: $model.configuration.serverURL)
+                    .accessibilityIdentifier("onboarding.serverURL")
                     .focused($focusedField, equals: .server)
                     .textFieldStyle(.barkDeskLarge)
                 validationLine(issue: model.serverURLIssue, success: "地址格式正确")
@@ -97,6 +98,7 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 9) {
                 Text("Device Key").fontWeight(.medium)
                 SecureField("从 iPhone Bark App 复制", text: $model.credentials.deviceKey)
+                    .accessibilityIdentifier("onboarding.deviceKey")
                     .focused($focusedField, equals: .deviceKey)
                     .textFieldStyle(.barkDeskLarge)
                 validationLine(issue: model.deviceKeyIssue, success: "Device Key 已填写")

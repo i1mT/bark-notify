@@ -4,8 +4,10 @@ import Security
 public struct KeychainStore: Sendable {
     private let service: String
 
-    public init(service: String = "app.barkdesk.shared") {
+    public init(service: String? = nil) {
         self.service = service
+            ?? ProcessInfo.processInfo.environment["BARKDESK_KEYCHAIN_SERVICE"]
+            ?? "app.barkdesk.shared"
     }
 
     public func read(account: String) throws -> String {

@@ -98,12 +98,10 @@ public struct CLIInstaller: Sendable {
     }
 
     private func resolvedSourceURL() -> URL? {
-        let executable = Bundle.main.executableURL
         let candidates = [
             sourceURL,
             Bundle.main.resourceURL?.appendingPathComponent("notify"),
-            executable?.deletingLastPathComponent().appendingPathComponent("notify"),
-            executable,
+            Bundle.main.executableURL?.deletingLastPathComponent().appendingPathComponent("notify"),
         ].compactMap { $0 }
         return candidates.first { url in
             FileManager.default.isExecutableFile(atPath: url.path) && url.standardizedFileURL != installURL.standardizedFileURL
