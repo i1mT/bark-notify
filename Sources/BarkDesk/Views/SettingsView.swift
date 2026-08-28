@@ -19,11 +19,13 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 7) {
                     TextField("Server 地址", text: $model.configuration.serverURL, prompt: Text("https://bark.example.com"))
                         .textContentType(.URL)
+                        .textFieldStyle(.barkDeskLarge)
                         .onSubmit { model.saveConfiguration() }
                     validationLine(issue: model.serverURLIssue, success: "地址格式正确")
                 }
                 VStack(alignment: .leading, spacing: 7) {
                     SecureField("Device Key", text: $model.credentials.deviceKey)
+                        .textFieldStyle(.barkDeskLarge)
                     validationLine(issue: model.deviceKeyIssue, success: "Device Key 已填写")
                 }
                 Picker("认证方式", selection: $model.configuration.authenticationMode) {
@@ -32,7 +34,9 @@ struct SettingsView: View {
                 }
                 if model.configuration.authenticationMode == .basic {
                     TextField("用户名", text: $model.credentials.username)
+                        .textFieldStyle(.barkDeskLarge)
                     SecureField("密码", text: $model.credentials.password)
+                        .textFieldStyle(.barkDeskLarge)
                     validationLine(issue: model.authenticationIssue, success: "认证信息已填写")
                 }
             }

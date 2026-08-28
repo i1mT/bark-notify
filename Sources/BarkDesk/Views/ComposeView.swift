@@ -59,8 +59,7 @@ struct ComposeView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("标题（选填）").font(.subheadline.weight(.medium))
                 TextField("例如：构建已经完成", text: $model.draft.title)
-                    .textFieldStyle(.roundedBorder)
-                    .controlSize(.large)
+                    .textFieldStyle(.barkDeskLarge)
             }
 
             kindFields
@@ -133,7 +132,7 @@ struct ComposeView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("需要复制的文字").font(.subheadline.weight(.medium))
                 TextField("验证码、命令或其他文字", text: $model.draft.copy)
-                    .textFieldStyle(.roundedBorder).controlSize(.large)
+                    .textFieldStyle(.barkDeskLarge)
             }
         case .markdown:
             messageEditor(label: "Markdown 正文", placeholder: "## 构建结果\n\n**已完成**")
@@ -191,8 +190,7 @@ struct ComposeView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label).font(.subheadline.weight(.medium))
             TextField(placeholder, text: text)
-                .textFieldStyle(.roundedBorder)
-                .controlSize(.large)
+                .textFieldStyle(.barkDeskLarge)
         }
     }
 }

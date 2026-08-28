@@ -4,6 +4,7 @@ import SwiftUI
 struct OnboardingView: View {
     @EnvironmentObject private var model: AppModel
     @State private var step = 0
+    @FocusState private var focusedField: SetupField?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -50,6 +51,10 @@ struct OnboardingView: View {
         }
         .frame(width: 700, height: 570)
         .interactiveDismissDisabled()
+        .onChange(of: step) { _, newStep in
+            guard newStep == 1 else { focusedField = nil; return }
+            DispatchQueue.main.async { focusedField = .server }
+        }
     }
 
     private var welcome: some View {
@@ -85,13 +90,15 @@ struct OnboardingView: View {
             VStack(alignment: .leading, spacing: 9) {
                 Text("Bark Server 地址").fontWeight(.medium)
                 TextField("https://bark.example.com", text: $model.configuration.serverURL)
-                    .textFieldStyle(.roundedBorder).controlSize(.large)
+                    .focused($focusedField, equals: .server)
+                    .textFieldStyle(.barkDeskLarge)
                 validationLine(issue: model.serverURLIssue, success: "地址格式正确")
             }
             VStack(alignment: .leading, spacing: 9) {
                 Text("Device Key").fontWeight(.medium)
                 SecureField("从 iPhone Bark App 复制", text: $model.credentials.deviceKey)
-                    .textFieldStyle(.roundedBorder).controlSize(.large)
+                    .focused($focusedField, equals: .deviceKey)
+                    .textFieldStyle(.barkDeskLarge)
                 validationLine(issue: model.deviceKeyIssue, success: "Device Key 已填写")
             }
             Picker("服务器认证", selection: $model.configuration.authenticationMode) {
@@ -102,9 +109,12 @@ struct OnboardingView: View {
                 VStack(alignment: .leading, spacing: 7) {
                     HStack {
                         TextField("用户名", text: $model.credentials.username)
+                            .focused($focusedField, equals: .username)
+                            .textFieldStyle(.barkDeskLarge)
                         SecureField("密码", text: $model.credentials.password)
+                            .focused($focusedField, equals: .password)
+                            .textFieldStyle(.barkDeskLarge)
                     }
-                    .textFieldStyle(.roundedBorder)
                     validationLine(issue: model.authenticationIssue, success: "认证信息已填写")
                 }
             }
@@ -170,4 +180,11 @@ struct OnboardingView: View {
             .font(.caption)
             .foregroundStyle(issue == nil ? .green : .secondary)
     }
+}
+
+private enum SetupField: Hashable {
+    case server
+    case deviceKey
+    case username
+    case password
 }
