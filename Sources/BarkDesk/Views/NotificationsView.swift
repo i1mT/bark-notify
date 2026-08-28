@@ -5,6 +5,31 @@ struct NotificationsView: View {
     @EnvironmentObject private var model: AppModel
 
     var body: some View {
+        Group {
+            if model.records.isEmpty {
+                if model.searchText.isEmpty {
+                    ContentUnavailableView {
+                        Label("还没有发送记录", systemImage: "bell.slash")
+                    } description: {
+                        Text("从 BarkDesk 或 notify CLI 发送的通知会显示在这里。")
+                    } actions: {
+                        Button("发送第一条通知") { model.selection = .compose }
+                            .buttonStyle(.borderedProminent)
+                    }
+                } else {
+                    ContentUnavailableView.search(text: model.searchText)
+                }
+            } else {
+                historyBrowser
+            }
+        }
+        .navigationTitle("通知记录")
+        .toolbar {
+            Button { Task { await model.refreshHistory() } } label: { Label("刷新", systemImage: "arrow.clockwise") }
+        }
+    }
+
+    private var historyBrowser: some View {
         HSplitView {
             List(selection: $model.selectedRecordID) {
                 ForEach(groupedRecords, id: \.title) { group in
@@ -12,18 +37,18 @@ struct NotificationsView: View {
                         ForEach(group.records) { record in
                             HistoryRow(record: record).tag(record.id)
                                 .contextMenu {
-                                    Button("Copy Message") { model.copy(record.body) }
-                                    if let url = record.url { Button("Copy URL") { model.copy(url) } }
-                                    Button("Resend") { Task { await model.resend(record) } }
+                                    Button("复制内容") { model.copy(record.body) }
+                                    if let url = record.url { Button("复制链接") { model.copy(url) } }
+                                    Button("重新发送") { Task { await model.resend(record) } }
                                     Divider()
-                                    Button("Delete", role: .destructive) { Task { await model.delete(record) } }
+                                    Button("删除", role: .destructive) { Task { await model.delete(record) } }
                                 }
                         }
                     }
                 }
             }
             .frame(minWidth: 280, idealWidth: 340)
-            .searchable(text: $model.searchText, prompt: "Search history")
+            .searchable(text: $model.searchText, prompt: "搜索标题、内容或分组")
             .onSubmit(of: .search) { Task { await model.refreshHistory() } }
             .onChange(of: model.searchText) { _, _ in
                 Task {
@@ -36,25 +61,21 @@ struct NotificationsView: View {
                 if let record = model.selectedRecord {
                     HistoryDetail(record: record)
                 } else {
-                    ContentUnavailableView("No Notification Selected", systemImage: "bell")
+                    ContentUnavailableView("请选择一条通知", systemImage: "bell")
                 }
             }
             .frame(minWidth: 400, maxWidth: .infinity, maxHeight: .infinity)
-        }
-        .navigationTitle("Notifications")
-        .toolbar {
-            Button { Task { await model.refreshHistory() } } label: { Label("Refresh", systemImage: "arrow.clockwise") }
         }
     }
 
     private var groupedRecords: [(title: String, records: [NotificationRecord])] {
         let calendar = Calendar.current
         let groups = Dictionary(grouping: model.records) { record -> String in
-            if calendar.isDateInToday(record.createdAt) { return "Today" }
-            if calendar.isDateInYesterday(record.createdAt) { return "Yesterday" }
-            return "Earlier"
+            if calendar.isDateInToday(record.createdAt) { return "今天" }
+            if calendar.isDateInYesterday(record.createdAt) { return "昨天" }
+            return "更早"
         }
-        return ["Today", "Yesterday", "Earlier"].compactMap { title in
+        return ["今天", "昨天", "更早"].compactMap { title in
             groups[title].map { (title, $0) }
         }
     }
@@ -68,7 +89,7 @@ private struct HistoryRow: View {
             Image(systemName: record.deliveryStatus == .success ? "checkmark.circle.fill" : "xmark.circle.fill")
                 .foregroundStyle(record.deliveryStatus == .success ? .green : .red)
             VStack(alignment: .leading, spacing: 3) {
-                Text(record.title?.nilIfEmpty ?? "Notification").fontWeight(.medium).lineLimit(1)
+                Text(record.title?.nilIfEmpty ?? "无标题通知").fontWeight(.medium).lineLimit(1)
                 Text(record.body).foregroundStyle(.secondary).lineLimit(2)
                 Text(record.createdAt, style: .time).font(.caption).foregroundStyle(.tertiary)
             }
@@ -86,35 +107,35 @@ private struct HistoryDetail: View {
             VStack(alignment: .leading, spacing: 20) {
                 HStack {
                     VStack(alignment: .leading, spacing: 5) {
-                        Text(record.title?.nilIfEmpty ?? "Notification").font(.largeTitle).fontWeight(.semibold)
+                        Text(record.title?.nilIfEmpty ?? "无标题通知").font(.largeTitle).fontWeight(.semibold)
                         if let subtitle = record.subtitle { Text(subtitle).font(.title3).foregroundStyle(.secondary) }
                     }
                     Spacer()
-                    Label(record.deliveryStatus.rawValue.capitalized,
+                    Label(record.deliveryStatus == .success ? "发送成功" : "发送失败",
                           systemImage: record.deliveryStatus == .success ? "checkmark.circle.fill" : "xmark.circle.fill")
                         .foregroundStyle(record.deliveryStatus == .success ? .green : .red)
                 }
                 Text(record.body).font(.body).textSelection(.enabled)
                 Divider()
                 Grid(alignment: .leading, horizontalSpacing: 22, verticalSpacing: 10) {
-                    detailRow("Sent", record.createdAt.formatted(date: .abbreviated, time: .standard))
-                    detailRow("Source", record.source.rawValue.capitalized)
-                    detailRow("Group", record.group ?? "—")
-                    detailRow("Level", record.level?.displayName ?? "—")
-                    detailRow("Sound", record.sound ?? "Default")
+                    detailRow("发送时间", record.createdAt.formatted(date: .abbreviated, time: .standard))
+                    detailRow("来源", sourceName(record.source))
+                    detailRow("分组", record.group ?? "—")
+                    detailRow("提醒方式", record.level?.displayName ?? "—")
+                    detailRow("提示音", record.sound ?? "默认")
                     if let code = record.httpStatusCode { detailRow("HTTP", String(code)) }
-                    if let error = record.errorMessage { detailRow("Error", error) }
-                    if let command = record.metadata?.command { detailRow("Command", command) }
-                    if let duration = record.metadata?.duration { detailRow("Duration", duration.formatted(.number.precision(.fractionLength(1))) + " s") }
+                    if let error = record.errorMessage { detailRow("错误", error) }
+                    if let command = record.metadata?.command { detailRow("命令", command) }
+                    if let duration = record.metadata?.duration { detailRow("耗时", duration.formatted(.number.precision(.fractionLength(1))) + " 秒") }
                 }
                 HStack {
-                    Button("Resend") { Task { await model.resend(record) } }.buttonStyle(.borderedProminent)
-                    Button("Copy Message") { model.copy(record.body) }
+                    Button("重新发送") { Task { await model.resend(record) } }.buttonStyle(.borderedProminent)
+                    Button("复制内容") { model.copy(record.body) }
                     if let raw = record.url, let url = URL(string: raw) {
-                        Link("Open URL", destination: url)
+                        Link("打开链接", destination: url)
                     }
                     Spacer()
-                    Button("Delete", role: .destructive) { Task { await model.delete(record) } }
+                    Button("删除", role: .destructive) { Task { await model.delete(record) } }
                 }
             }
             .padding(28)
@@ -123,5 +144,13 @@ private struct HistoryDetail: View {
 
     private func detailRow(_ label: String, _ value: String) -> some View {
         GridRow { Text(label).foregroundStyle(.secondary); Text(value).textSelection(.enabled) }
+    }
+
+    private func sourceName(_ source: NotificationSource) -> String {
+        switch source {
+        case .gui: "BarkDesk"
+        case .cli: "notify CLI"
+        case .command: "命令结束提醒"
+        }
     }
 }

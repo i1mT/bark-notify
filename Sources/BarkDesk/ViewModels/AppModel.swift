@@ -3,12 +3,20 @@ import BarkCore
 import Foundation
 
 enum SidebarItem: String, CaseIterable, Identifiable {
-    case notifications = "Notifications"
-    case compose = "Compose"
-    case integrations = "Integrations"
-    case settings = "Settings"
+    case notifications
+    case compose
+    case integrations
+    case settings
 
     var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .notifications: "通知记录"
+        case .compose: "发送通知"
+        case .integrations: "开发者接入"
+        case .settings: "设置"
+        }
+    }
     var icon: String {
         switch self {
         case .notifications: "clock"
@@ -32,6 +40,8 @@ final class AppModel: ObservableObject {
     @Published var banner: Banner?
     @Published var connectionResults: [ConnectionResult] = []
     @Published var cliInstallationStatus = CLIInstallationStatus.checking
+    @Published var isOnboardingPresented = false
+    @Published var connectionTestPassed = false
 
     private let configurationStore = ConfigurationStore()
     private let cliInstaller = CLIInstaller()
@@ -50,16 +60,43 @@ final class AppModel: ObservableObject {
             configuration = loaded.settings
             credentials = loaded.credentials
             draft.applyDefaults(configuration)
+            isOnboardingPresented = !configurationInputIsValid
             history = try HistoryStore()
             await refreshHistory()
             await checkCLIInstallation()
         } catch {
+            isOnboardingPresented = true
             showError(error)
             await checkCLIInstallation()
         }
     }
 
     var cliInstallDirectoryIsInPath: Bool { cliInstaller.installDirectoryIsInPath }
+
+    var configurationInputIsValid: Bool {
+        (try? ResolvedConfiguration(settings: configuration, credentials: credentials).validated()) != nil
+    }
+
+    var serverURLIssue: String? {
+        if configuration.serverURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return "请输入 Bark Server 地址"
+        }
+        guard let url = URL(string: configuration.serverURL),
+              let scheme = url.scheme?.lowercased(), ["http", "https"].contains(scheme),
+              url.host != nil else { return "地址需要以 http:// 或 https:// 开头" }
+        return nil
+    }
+
+    var deviceKeyIssue: String? {
+        credentials.deviceKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "请输入 iPhone Bark 中显示的 Device Key" : nil
+    }
+
+    var authenticationIssue: String? {
+        guard configuration.authenticationMode == .basic else { return nil }
+        return credentials.username.isEmpty || credentials.password.isEmpty
+            ? "请同时填写 Basic Auth 用户名和密码" : nil
+    }
 
     func checkCLIInstallation() async {
         cliInstallationStatus = .checking
@@ -74,7 +111,7 @@ final class AppModel: ObservableObject {
         do {
             let url = try await Task.detached { try installer.install() }.value
             cliInstallationStatus = .installed(url)
-            banner = Banner(style: .success, message: "notify installed at \(url.path)")
+            banner = Banner(style: .success, message: "notify 已经安装到 \(url.path)")
         } catch {
             cliInstallationStatus = .unavailable(error.localizedDescription)
             showError(error)
@@ -89,18 +126,38 @@ final class AppModel: ObservableObject {
         } catch { showError(error) }
     }
 
-    func saveConfiguration() {
+    @discardableResult
+    func saveConfiguration() -> Bool {
+        guard configurationInputIsValid else {
+            banner = Banner(style: .error, message: serverURLIssue ?? deviceKeyIssue ?? "请检查认证信息")
+            return false
+        }
         do {
+            configuration.serverURL = configuration.serverURL
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            credentials.deviceKey = credentials.deviceKey.trimmingCharacters(in: .whitespacesAndNewlines)
             try configurationStore.save(
                 ResolvedConfiguration(settings: configuration, credentials: credentials)
             )
-            banner = Banner(style: .success, message: "Settings saved")
-        } catch { showError(error) }
+            banner = Banner(style: .success, message: "设置已经保存")
+            return true
+        } catch {
+            showError(error)
+            return false
+        }
+    }
+
+    func finishOnboarding() {
+        guard saveConfiguration() else { return }
+        isOnboardingPresented = false
+        selection = .compose
+        draft.applyDefaults(configuration)
     }
 
     func sendDraft() async {
-        guard !draft.message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            banner = Banner(style: .error, message: "Message is required")
+        guard draft.isValid else {
+            banner = Banner(style: .error, message: draft.validationHint ?? "请检查通知内容")
             return
         }
         await send(request: draft.request(deviceKey: credentials.deviceKey), source: .gui)
@@ -134,13 +191,15 @@ final class AppModel: ObservableObject {
     func testConnection() async {
         isWorking = true
         connectionResults = []
+        connectionTestPassed = false
         defer { isWorking = false }
         do {
             let resolved = try resolvedConfiguration()
             let client = BarkClient(configuration: resolved)
             do {
                 try await client.ping()
-                connectionResults.append(.init(success: true, label: "Server reachable"))
+                connectionTestPassed = true
+                connectionResults.append(.init(success: true, label: "服务器连接成功"))
             } catch {
                 connectionResults.append(.init(success: false, label: error.localizedDescription))
                 return
@@ -148,21 +207,21 @@ final class AppModel: ObservableObject {
             do {
                 let info = try await client.info()
                 let version = info.fields["version"].map { " (\($0))" } ?? ""
-                connectionResults.append(.init(success: true, label: "Server info available\(version)"))
+                connectionResults.append(.init(success: true, label: "服务器信息可用\(version)"))
             } catch {
-                connectionResults.append(.init(success: false, label: "Info unavailable: \(error.localizedDescription)"))
+                connectionResults.append(.init(success: false, label: "无法读取服务器信息（可能是版本差异）"))
             }
             do {
                 _ = try await client.health()
-                connectionResults.append(.init(success: true, label: "Health check passed"))
+                connectionResults.append(.init(success: true, label: "健康检查通过"))
             } catch {
-                connectionResults.append(.init(success: false, label: "Health endpoint unavailable"))
+                connectionResults.append(.init(success: false, label: "服务器未提供健康检查接口"))
             }
             do {
                 _ = try await client.checkDevice(deviceKey: credentials.deviceKey)
-                connectionResults.append(.init(success: true, label: "Device registered"))
+                connectionResults.append(.init(success: true, label: "Device Key 已经注册"))
             } catch {
-                connectionResults.append(.init(success: false, label: "Device check unavailable"))
+                connectionResults.append(.init(success: false, label: "无法验证 Device Key（仍可发送测试通知）"))
             }
         } catch { showError(error) }
     }
@@ -170,7 +229,7 @@ final class AppModel: ObservableObject {
     func sendTest() async {
         let request = BarkPushRequest(
             deviceKey: credentials.deviceKey,
-            title: "BarkDesk", body: "Connection successful",
+            title: "BarkDesk", body: "连接成功，可以开始发送通知了",
             level: configuration.defaultLevel,
             group: configuration.defaultGroup.nilIfEmpty,
             isArchive: configuration.archiveMessages ? "1" : nil
@@ -181,7 +240,7 @@ final class AppModel: ObservableObject {
     func copy(_ value: String) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(value, forType: .string)
-        banner = Banner(style: .success, message: "Copied")
+        banner = Banner(style: .success, message: "已经复制")
     }
 
     func endpoint(_ suffix: String) -> String {
@@ -198,7 +257,7 @@ final class AppModel: ObservableObject {
             history = activeHistory
             let service = NotificationService(client: BarkClient(configuration: resolved), history: activeHistory)
             try await service.send(request, source: source)
-            banner = Banner(style: .success, message: "Notification sent")
+            banner = Banner(style: .success, message: "通知已经发送")
             await refreshHistory()
         } catch { showError(error) }
     }

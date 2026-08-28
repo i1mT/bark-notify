@@ -143,11 +143,11 @@ public enum CLIInstallerError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .sourceUnavailable:
-            "The notify executable is not available in this BarkDesk build."
+            "当前 BarkDesk 构建中没有可安装的 notify 命令。"
         case .conflictingExecutable(let path):
-            "Another executable already exists at \(path). Move it before installing BarkDesk CLI."
+            "\(path) 已经存在其他同名命令。请先移动它，再安装 BarkDesk CLI。"
         case .validationFailed:
-            "The installed notify executable could not be validated."
+            "notify 安装后未能通过可执行检查。"
         }
     }
 }

@@ -76,9 +76,9 @@ public enum ConfigurationError: LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .invalidServerURL: "Please configure a valid Bark Server URL."
-        case .missingDeviceKey: "Please configure a Device Key."
-        case .missingBasicAuth: "Basic Auth requires both username and password."
+        case .invalidServerURL: "请输入有效的 Bark Server 地址。"
+        case .missingDeviceKey: "请输入 Device Key。"
+        case .missingBasicAuth: "Basic Auth 需要同时填写用户名和密码。"
         }
     }
 }

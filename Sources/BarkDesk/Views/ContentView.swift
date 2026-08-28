@@ -2,44 +2,46 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var model: AppModel
+    @State private var columnVisibility = NavigationSplitViewVisibility.all
 
     var body: some View {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: $columnVisibility) {
             List(SidebarItem.allCases, selection: $model.selection) { item in
-                Label(item.rawValue, systemImage: item.icon)
+                Label(item.title, systemImage: item.icon)
                     .tag(item)
             }
             .navigationTitle("BarkDesk")
-            .navigationSplitViewColumnWidth(min: 180, ideal: 205)
+            .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 260)
         } detail: {
-            Group {
-                switch model.selection {
-                case .notifications: NotificationsView()
-                case .compose: ComposeView()
-                case .integrations: IntegrationsView()
-                case .settings: SettingsView()
+            VStack(spacing: 0) {
+                if model.cliInstallationStatus == .missing { CLIInstallPrompt() }
+                Group {
+                    switch model.selection {
+                    case .notifications: NotificationsView()
+                    case .compose: ComposeView()
+                    case .integrations: IntegrationsView()
+                    case .settings: SettingsView()
+                    }
                 }
-            }
-            .overlay(alignment: .bottom) {
-                if let banner = model.banner {
-                    BannerView(banner: banner)
-                        .padding()
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                        .task {
-                            try? await Task.sleep(for: .seconds(3))
-                            if model.banner == banner { withAnimation { model.banner = nil } }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(alignment: .bottom) {
+                    if let banner = model.banner {
+                        BannerView(banner: banner)
+                            .padding()
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                            .task {
+                                try? await Task.sleep(for: .seconds(3))
+                                if model.banner == banner { withAnimation { model.banner = nil } }
+                            }
                         }
-                }
-            }
-            .animation(.easeInOut(duration: 0.2), value: model.banner)
-        }
-        .safeAreaInset(edge: .top, spacing: 0) {
-            if model.cliInstallationStatus == .missing {
-                CLIInstallPrompt()
-                    .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                    .animation(.easeInOut(duration: 0.2), value: model.banner)
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: model.cliInstallationStatus)
+        .navigationSplitViewStyle(.balanced)
+        .sheet(isPresented: $model.isOnboardingPresented) {
+            OnboardingView().environmentObject(model)
+        }
     }
 }
 
@@ -52,13 +54,13 @@ private struct CLIInstallPrompt: View {
                 .font(.title3)
                 .foregroundStyle(.tint)
             VStack(alignment: .leading, spacing: 2) {
-                Text("Install the notify command").fontWeight(.semibold)
-                Text("Send Bark notifications from any terminal with a short command.")
+                Text("安装 notify 命令").fontWeight(.semibold)
+                Text("安装后可以在任意终端中使用简短命令发送通知。")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Button("Install") { Task { await model.installCLI() } }
+            Button("安装") { Task { await model.installCLI() } }
                 .buttonStyle(.borderedProminent)
                 .disabled(model.isWorking)
         }

@@ -6,29 +6,29 @@ struct IntegrationsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
-                Text("Use your Bark configuration from scripts and developer tools.")
+                Text("把当前 Bark 配置接入脚本、终端和开发工具。")
                     .foregroundStyle(.secondary)
                 endpointCard(
-                    title: "Bark Push URL",
-                    description: "Compatible URL for quick GET requests",
+                    title: "Bark 快捷推送地址",
+                    description: "适合临时脚本使用的兼容地址",
                     value: model.endpoint(model.credentials.deviceKey)
                 )
                 endpointCard(
                     title: "REST API",
-                    description: "Recommended Bark API V2 endpoint",
+                    description: "推荐使用的 Bark API V2 地址",
                     value: model.endpoint("push")
                 )
                 endpointCard(
                     title: "MCP",
-                    description: "Use Bark Server's built-in MCP endpoint with AI tools",
+                    description: "在 AI 工具中使用 Bark Server 自带的 MCP",
                     value: model.endpoint("mcp/\(model.credentials.deviceKey)")
                 )
 
-                GroupBox("Examples") {
+                GroupBox("调用示例") {
                     VStack(alignment: .leading, spacing: 16) {
-                        example(title: "Shell", text: "some-command && notify \"Done\"")
+                        example(title: "Shell", text: "some-command && notify \"执行完成\"")
                         Divider()
-                        example(title: "Command wrapper", text: "notify run pnpm build")
+                        example(title: "命令结束提醒", text: "notify run pnpm build")
                         Divider()
                         example(title: "Claude Code", text: "claude mcp add bark --transport http \(model.endpoint("mcp/\(model.credentials.deviceKey)"))")
                         Divider()
@@ -39,7 +39,7 @@ struct IntegrationsView: View {
             }
             .padding(28)
         }
-        .navigationTitle("Integrations")
+        .navigationTitle("开发者接入")
     }
 
     private func endpointCard(title: String, description: String, value: String) -> some View {
@@ -51,7 +51,7 @@ struct IntegrationsView: View {
                     Text(value).font(.system(.body, design: .monospaced)).textSelection(.enabled)
                 }
                 Spacer()
-                Button("Copy") { model.copy(value) }
+                Button("复制") { model.copy(value) }
             }
             .padding(8)
         }
@@ -59,7 +59,7 @@ struct IntegrationsView: View {
 
     private func example(title: String, text: String) -> some View {
         VStack(alignment: .leading, spacing: 7) {
-            HStack { Text(title).font(.headline); Spacer(); Button("Copy") { model.copy(text) } }
+            HStack { Text(title).font(.headline); Spacer(); Button("复制") { model.copy(text) } }
             Text(text)
                 .font(.system(.callout, design: .monospaced))
                 .textSelection(.enabled)
@@ -71,7 +71,7 @@ struct IntegrationsView: View {
         """
         curl -X POST "\(model.endpoint("push"))" \\
           -H "Content-Type: application/json" \\
-          -d '{"device_key":"\(model.credentials.deviceKey)","title":"Hello","body":"World"}'
+          -d '{"device_key":"\(model.credentials.deviceKey)","title":"测试","body":"你好"}'
         """
     }
 }

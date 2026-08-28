@@ -8,10 +8,10 @@ public enum BarkLevel: String, Codable, CaseIterable, Sendable {
 
     public var displayName: String {
         switch self {
-        case .active: "Active"
-        case .timeSensitive: "Time Sensitive"
-        case .passive: "Passive"
-        case .critical: "Critical"
+        case .active: "普通提醒"
+        case .timeSensitive: "时效提醒"
+        case .passive: "静默提醒"
+        case .critical: "重要警告"
         }
     }
 }

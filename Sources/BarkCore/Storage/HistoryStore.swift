@@ -177,8 +177,8 @@ public enum HistoryStoreError: LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .open(let message): "Could not open history database: \(message)"
-        case .query(let message): "History database error: \(message)"
+        case .open(let message): "无法打开通知记录数据库：\(message)"
+        case .query(let message): "通知记录数据库发生错误：\(message)"
         }
     }
 }

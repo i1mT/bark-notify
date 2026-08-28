@@ -16,5 +16,6 @@ let package = Package(
         .executableTarget(name: "NotifyCLI", dependencies: ["NotifySupport"]),
         .executableTarget(name: "BarkDesk", dependencies: ["BarkCore", "NotifySupport"]),
         .testTarget(name: "BarkCoreTests", dependencies: ["BarkCore"]),
+        .testTarget(name: "BarkDeskTests", dependencies: ["BarkDesk"]),
     ]
 )

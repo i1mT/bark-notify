@@ -10,13 +10,13 @@ struct BarkDeskApp: App {
         WindowGroup("BarkDesk", id: "main") {
             ContentView()
                 .environmentObject(model)
-                .frame(minWidth: 880, minHeight: 600)
+                .frame(minWidth: 980, minHeight: 640)
                 .task { await model.start() }
         }
         .defaultSize(width: 1050, height: 700)
         .commands {
             CommandGroup(after: .newItem) {
-                Button("New Notification") { model.selection = .compose }
+                Button("发送新通知") { model.selection = .compose }
                     .keyboardShortcut("n", modifiers: .command)
             }
         }
@@ -52,18 +52,18 @@ struct MenuBarView: View {
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        Button("New Notification") {
+        Button("发送新通知") {
             model.selection = .compose
             openWindow(id: "main")
         }
-        Button("Recent Notifications") {
+        Button("最近通知") {
             model.selection = .notifications
             openWindow(id: "main")
         }
         Divider()
-        Button("Open BarkDesk") { openWindow(id: "main") }
-        SettingsLink { Text("Settings…") }
+        Button("打开 BarkDesk") { openWindow(id: "main") }
+        SettingsLink { Text("设置…") }
         Divider()
-        Button("Quit BarkDesk") { NSApplication.shared.terminate(nil) }
+        Button("退出 BarkDesk") { NSApplication.shared.terminate(nil) }
     }
 }

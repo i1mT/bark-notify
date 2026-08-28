@@ -114,8 +114,8 @@ public enum BarkClientError: LocalizedError, Sendable {
 
     public var errorDescription: String? {
         switch self {
-        case .invalidResponse: "Bark Server returned an invalid HTTP response."
-        case .server(let statusCode, let message): "Bark returned HTTP \(statusCode): \(message)"
+        case .invalidResponse: "Bark Server 返回了无效的 HTTP 响应。"
+        case .server(let statusCode, let message): "Bark 返回 HTTP \(statusCode)：\(message)"
         }
     }
 }

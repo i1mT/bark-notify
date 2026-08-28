@@ -65,15 +65,15 @@ make install
 
 ## 首次配置
 
-推荐先打开 BarkDesk，在 Settings 中填写：
+第一次打开 BarkDesk 时，应用会自动显示三步配置引导，不需要先寻找设置页面：
 
 1. Bark Server Base URL，例如 `https://bark.example.com` 或带 URL Prefix 的 `https://example.com/bark`。
 2. iPhone Bark App 已经注册的 Device Key。
 3. 如果服务器启用了 Basic Auth，请填写用户名和密码。
-4. 选择默认 Group、Level、Sound 与 Archive 行为。
-5. 依次使用 Test Connection 和 Send Test Notification 验证完整链路。
+4. 选择默认分组、提醒方式、提示音与归档行为。
+5. 使用“检查连接”和“发送测试通知”验证完整链路。
 
-应用启动时会自动检查 `notify` 是否已经安装。如果没有检测到，主窗口顶部会显示安装提示条。点击 Install 后，BarkDesk 会优先使用当前用户可写的 Homebrew 或 `/usr/local/bin` 目录；如果没有合适的公共命令目录，则安装到 `~/.local/bin/notify`。Settings 的 Command Line Tool 区域可以查看实际安装路径和状态，也可以重新执行检查。
+应用启动时也会自动检查 `notify` 是否已经安装。如果没有检测到，主窗口内容区顶部会显示安装提示条。点击“安装”后，BarkDesk 会优先使用当前用户可写的 Homebrew 或 `/usr/local/bin` 目录；如果没有合适的公共命令目录，则安装到 `~/.local/bin/notify`。“设置”的“命令行工具”区域可以查看实际安装路径和状态，也可以重新执行检查。
 
 Device Key、Basic Auth 用户名和密码保存在 macOS Keychain。普通默认设置保存在：
 
@@ -170,10 +170,12 @@ notify --help
 
 ## GUI 页面
 
-- Notifications：按照 Today、Yesterday、Earlier 分组，支持搜索、复制、重新发送、打开 URL 和删除。
-- Compose：提供 Title、Subtitle、Message、Group、Level、Sound、URL，以及 Markdown、Icon、Image、Copy、Badge、Critical Volume、Call、Auto Copy、Archive、TTL 和 No Action。
-- Settings：保存服务器和默认设置，执行 ping、healthz、info、device check 与完整测试通知。
-- Integrations：生成 Push URL、REST API、Bark Server MCP URL、curl、Shell 和 Claude Code 示例。
+- 通知记录：按照今天、昨天、更早分组，支持搜索、复制、重新发送、打开链接和删除，并且为首次使用与无搜索结果提供明确引导。
+- 发送通知：先选择普通通知、图片通知、链接通知、重要警告、快捷复制或 Markdown，再根据类型只显示必要字段；分组、提醒方式、提示音与归档位于可展开的发送选项中。
+- 设置：实时校验 Server 地址、Device Key 与 Basic Auth，保存默认设置，并执行 ping、healthz、info、Device Key 检查和完整测试通知。
+- 开发者接入：生成 Push URL、REST API、Bark Server MCP URL、curl、Shell 和 Claude Code 示例。
+
+图片通知使用 Bark 官方的 `image` URL 参数。官方 Bark Server 没有文件上传接口，因此 GUI 会校验、预览并发送可以公开访问的图片链接，不会发送 iPhone 无法访问的 Mac 本地文件路径。
 
 ## 数据与架构
 
