@@ -18,6 +18,7 @@
 		4BC56538B49E9CA5456F924F /* notify in Resources */ = {isa = PBXBuildFile; fileRef = B21D0D748AA86ADF6A41F5CC /* notify */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5F0EC8F72DA0184E7FF77307 /* NotifyRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 556DFD1A0AF1D11B23C90C54 /* NotifyRunner.swift */; };
 		6472DB271CE28F8E28E8C245 /* IntegrationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19954A84027C55AE9BEFF7FD /* IntegrationsView.swift */; };
+		65D81FAA0FFE5A419CF799FB /* BarkDesk.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1D8ABCB13CDB60658E9453AC /* BarkDesk.icns */; };
 		684401B3AD8FA6657DD9E2F1 /* NotifySupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95646D0C2D4E4665D6A27CF9 /* NotifySupport.framework */; };
 		7A3762CB8C856A39127B7E16 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F803DD6080DD36C7D4BAC74 /* NotificationService.swift */; };
 		7F422EB83AD6A0E15E3DE803 /* ComposeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531E49AD94AFB365ABFD545A /* ComposeView.swift */; };
@@ -101,6 +102,7 @@
 		0D33B52FE6B59A9762691134 /* SharedStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedStorage.swift; sourceTree = "<group>"; };
 		0F803DD6080DD36C7D4BAC74 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		19954A84027C55AE9BEFF7FD /* IntegrationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationsView.swift; sourceTree = "<group>"; };
+		1D8ABCB13CDB60658E9453AC /* BarkDesk.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = BarkDesk.icns; sourceTree = "<group>"; };
 		274CED8EAE2CC2DE122F1B16 /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
 		29671F658BCB153F454CA066 /* CLIParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIParser.swift; sourceTree = "<group>"; };
 		3D0E30CBE67B0A66B8353D6F /* NotifyMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyMain.swift; sourceTree = "<group>"; };
@@ -194,6 +196,14 @@
 				E8F44D6B47F20A266B4A7105 /* LargeTextFieldStyle.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		2DAE25E5BECC030621F105F4 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				1D8ABCB13CDB60658E9453AC /* BarkDesk.icns */,
+			);
+			path = Assets;
 			sourceTree = "<group>";
 		};
 		32DA1E0B884253FECC0EF91B /* API */ = {
@@ -303,6 +313,7 @@
 		9EAD0079E4A832D88741E7B1 = {
 			isa = PBXGroup;
 			children = (
+				2DAE25E5BECC030621F105F4 /* Assets */,
 				9E5393D551DA354EEF5F592A /* BarkCore */,
 				DACEB17600A6097E976CF2F6 /* BarkCoreTests */,
 				213023685F32EFF8E8B661C0 /* BarkDesk */,
@@ -558,6 +569,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65D81FAA0FFE5A419CF799FB /* BarkDesk.icns in Resources */,
 				4BC56538B49E9CA5456F924F /* notify in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

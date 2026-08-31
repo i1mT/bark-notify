@@ -77,7 +77,38 @@ APP_INSTALL_DIR=/Applications \
 make install
 ```
 
-`build-app.sh` 会创建 ad-hoc 签名的本地应用。正式分发时，应当使用 Apple Developer ID 完成签名和 notarization。
+### 制作可以分享的 DMG
+
+在本机生成用于测试的 DMG：
+
+```bash
+make dmg
+```
+
+生成结果位于 `build/BarkDesk-1.0.0.dmg`。打开后，把 `BarkDesk` 拖入 `Applications` 即可安装。也可以指定版本号：
+
+```bash
+make dmg VERSION=1.1.0
+```
+
+这个默认产物使用 ad-hoc 签名，适合你自己的 Mac 或受信任的小范围测试。要把 DMG 正式发给其他用户，并且避免 Gatekeeper 显示“无法验证开发者”，需要加入 Apple Developer Program、安装 `Developer ID Application` 证书，并且先把公证凭据保存到 Keychain：
+
+```bash
+xcrun notarytool store-credentials "BarkDesk-Notary" \
+  --apple-id "你的 Apple ID" \
+  --team-id "你的 Team ID" \
+  --password "App 专用密码"
+```
+
+随后执行签名、公证和 stapling：
+
+```bash
+SIGN_IDENTITY="Developer ID Application: 你的姓名 (TEAMID)" \
+NOTARY_PROFILE="BarkDesk-Notary" \
+make dmg VERSION=1.0.0
+```
+
+脚本会构建 App、签署 App 内的 `notify`、创建 DMG、等待 Apple 公证、附加公证票据，并且挂载 DMG 检查 App 与 CLI 是否完整。公证凭据只保存在 macOS Keychain，不会写入仓库。
 
 ## 首次配置
 

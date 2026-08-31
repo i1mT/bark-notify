@@ -7,6 +7,9 @@ OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_DIR}/build}"
 APP_DIR="${OUTPUT_DIR}/BarkDesk.app"
 ICONSET_DIR="${OUTPUT_DIR}/BarkDesk.iconset"
 ICON_SOURCE="${PROJECT_DIR}/Assets/BarkDeskIcon.png"
+SIGN_IDENTITY="${SIGN_IDENTITY:--}"
+APP_VERSION="${APP_VERSION:-1.0.0}"
+BUILD_NUMBER="${BUILD_NUMBER:-1}"
 
 cd "${PROJECT_DIR}"
 swift build -c "${CONFIGURATION}" --product BarkDesk
@@ -38,11 +41,21 @@ plutil -insert CFBundleDisplayName -string "BarkDesk" "${APP_DIR}/Contents/Info.
 plutil -insert CFBundleExecutable -string "BarkDesk" "${APP_DIR}/Contents/Info.plist"
 plutil -insert CFBundleIconFile -string "BarkDesk" "${APP_DIR}/Contents/Info.plist"
 plutil -insert CFBundlePackageType -string "APPL" "${APP_DIR}/Contents/Info.plist"
-plutil -insert CFBundleShortVersionString -string "1.0.0" "${APP_DIR}/Contents/Info.plist"
-plutil -insert CFBundleVersion -string "1" "${APP_DIR}/Contents/Info.plist"
+plutil -insert CFBundleShortVersionString -string "${APP_VERSION}" "${APP_DIR}/Contents/Info.plist"
+plutil -insert CFBundleVersion -string "${BUILD_NUMBER}" "${APP_DIR}/Contents/Info.plist"
 plutil -insert LSMinimumSystemVersion -string "14.0" "${APP_DIR}/Contents/Info.plist"
 plutil -insert NSHighResolutionCapable -bool true "${APP_DIR}/Contents/Info.plist"
 plutil -insert NSPrincipalClass -string "NSApplication" "${APP_DIR}/Contents/Info.plist"
-codesign --force --deep --sign - "${APP_DIR}"
+if [[ "${SIGN_IDENTITY}" == "-" ]]; then
+  codesign --force --sign - "${APP_DIR}/Contents/Resources/notify"
+  codesign --force --sign - "${APP_DIR}"
+else
+  codesign --force --options runtime --timestamp --sign "${SIGN_IDENTITY}" \
+    "${APP_DIR}/Contents/Resources/notify"
+  codesign --force --options runtime --timestamp --sign "${SIGN_IDENTITY}" "${APP_DIR}"
+fi
+
+codesign --verify --strict --verbose=2 "${APP_DIR}/Contents/Resources/notify"
+codesign --verify --strict --verbose=2 "${APP_DIR}"
 
 echo "Built ${APP_DIR}"

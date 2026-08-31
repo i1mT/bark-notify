@@ -57,12 +57,13 @@ targets:
     platform: macOS
     sources:
       - path: ../Sources/BarkDesk
-    resources:
-      - path: ../Assets/BarkDeskIcon.png
+      - path: ../Assets/BarkDesk.icns
+        buildPhase: resources
     info:
       path: BarkDesk-Info.plist
       properties:
         CFBundleDisplayName: BarkDesk
+        CFBundleIconFile: BarkDesk
         CFBundleName: BarkDesk
         CFBundleShortVersionString: "1.0.0"
         CFBundleVersion: "1"
