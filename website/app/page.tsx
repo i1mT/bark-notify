@@ -2,7 +2,6 @@ import {
   ArrowDown,
   ArrowRight,
   BellRinging,
-  ClockCounterClockwise,
   GithubLogo,
   Key,
   ShieldCheck,
@@ -24,13 +23,13 @@ export default function Home() {
         <section id="top" className="hero-section">
           <div className="hero-grid">
             <HeroEntrance className="hero-copy">
-              <p className="hero-eyebrow">开源 macOS Bark 客户端</p>
-              <h1>把 Bark 通知，放进 Mac 和终端。</h1>
-              <p className="hero-summary">原生 macOS 客户端，加上一条足够短的 notify 命令。</p>
+              <p className="hero-eyebrow">macOS App + 跨平台 CLI</p>
+              <h1>把 Bark 通知，放进 Mac、服务器和终端。</h1>
+              <p className="hero-summary">原生 macOS 客户端，加上可以通过 npm 安装的 notify 命令。</p>
               <div className="hero-actions">
                 <a className="primary-button" href={siteConfig.downloadUrl}>
                   <ArrowDown aria-hidden size={20} weight="bold" />
-                  下载 DMG
+                  下载 macOS App
                 </a>
                 <a className="secondary-button" href={siteConfig.githubUrl} target="_blank" rel="noreferrer">
                   <GithubLogo aria-hidden size={20} weight="bold" />
@@ -56,14 +55,14 @@ export default function Home() {
 
         <section className="fact-strip" aria-label="项目特点">
           <div><BellRinging aria-hidden size={24} /><span>SwiftUI 原生界面</span></div>
-          <div><ClockCounterClockwise aria-hidden size={24} /><span>GUI 与 CLI 共享历史</span></div>
-          <div><Key aria-hidden size={24} /><span>凭据只进入 Keychain</span></div>
+          <div><TerminalWindow aria-hidden size={24} /><span>Linux、macOS、Windows</span></div>
+          <div><Key aria-hidden size={24} /><span>App Keychain / Server Secret</span></div>
         </section>
 
         <section id="features" className="section-shell">
           <Reveal className="section-heading">
             <h2>发送、追踪、重新发送。</h2>
-            <p>所有操作都围绕同一份本机配置与历史记录，不增加新的服务。</p>
+            <p>App 与 CLI 各自管理本机配置和历史，但都直接连接你的 Bark Server。</p>
           </Reveal>
 
           <div className="feature-grid">
@@ -83,6 +82,7 @@ export default function Home() {
             <Reveal className="feature-cell command-cell">
               <TerminalWindow aria-hidden size={34} weight="duotone" />
               <h3>命令足够短</h3>
+              <pre><code>npm i -g barkdesk-notify</code></pre>
               <pre><code>notify &quot;构建完成&quot;</code></pre>
               <p>也可以用 notify run 包裹任何命令，并保留原命令退出码。</p>
             </Reveal>
@@ -116,9 +116,10 @@ export default function Home() {
         <section id="cli" className="cli-section">
           <Reveal className="cli-copy">
             <h2>终端结束时，让手机知道。</h2>
-            <p>用于构建、部署、备份或任何需要离开屏幕等待的任务。</p>
+            <p>在 Ubuntu 服务器、macOS 或 Windows 中使用，用于构建、部署和备份任务。</p>
             <div className="cli-notes">
               <span>stdin 输入</span>
+              <span>npm 独立安装</span>
               <span>完整 Bark 参数</span>
               <span>原样返回退出码</span>
             </div>
@@ -141,11 +142,11 @@ export default function Home() {
           <Reveal className="privacy-copy">
             <ShieldCheck aria-hidden size={42} weight="duotone" />
             <h2>不增加新的中间服务。</h2>
-            <p>BarkDesk 直接连接你配置的 Bark Server。Device Key 与 Basic Auth 保存在 macOS Keychain，发送历史保存在本机 SQLite。</p>
+            <p>App 使用 macOS Keychain；CLI 支持环境变量、secret file 和权限受限的配置文件。两者都不会增加中间转发服务。</p>
           </Reveal>
 
           <Reveal className="delivery-flow">
-            <div><strong>BarkDesk / notify</strong><span>你的 Mac</span></div>
+            <div><strong>BarkDesk / notify</strong><span>Mac / Linux / Windows</span></div>
             <ArrowRight aria-hidden size={24} />
             <div><strong>Bark Server</strong><span>你的地址</span></div>
             <ArrowRight aria-hidden size={24} />
@@ -156,13 +157,19 @@ export default function Home() {
         <section id="download" className="download-section">
           <Reveal className="download-panel">
             <div>
-              <h2>下载，拖入 Applications，开始发送。</h2>
-              <p>需要 macOS 14 或更高版本。正式版本使用 Developer ID 签名并通过 Apple 公证。</p>
+              <h2>macOS 下载 App，服务器安装 npm CLI。</h2>
+              <p>App 需要 macOS 14 或更高版本；CLI 需要 Node.js 20.9 或更高版本。</p>
             </div>
-            <a className="primary-button" href={siteConfig.downloadUrl}>
-              <ArrowDown aria-hidden size={20} weight="bold" />
-              下载 DMG
-            </a>
+            <div className="download-actions">
+              <a className="primary-button" href={siteConfig.downloadUrl}>
+                <ArrowDown aria-hidden size={20} weight="bold" />
+                下载 DMG
+              </a>
+              <a className="secondary-button" href={siteConfig.npmUrl} target="_blank" rel="noreferrer">
+                <TerminalWindow aria-hidden size={20} weight="bold" />
+                查看 npm
+              </a>
+            </div>
           </Reveal>
         </section>
       </main>

@@ -28,32 +28,6 @@ targets:
     dependencies:
       - sdk: libsqlite3.tbd
 
-  NotifySupport:
-    type: framework
-    platform: macOS
-    sources:
-      - path: ../Sources/NotifySupport
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: app.barkdesk.notify-support
-        MACH_O_TYPE: staticlib
-        DEFINES_MODULE: YES
-    dependencies:
-      - target: BarkCore
-
-  notify:
-    type: tool
-    platform: macOS
-    sources:
-      - path: ../Sources/NotifyCLI
-    settings:
-      base:
-        ENABLE_HARDENED_RUNTIME: YES
-        PRODUCT_NAME: notify
-        SKIP_INSTALL: YES
-    dependencies:
-      - target: NotifySupport
-
   BarkDesk:
     type: application
     platform: macOS
@@ -82,7 +56,6 @@ targets:
         ENABLE_DEBUG_DYLIB: NO
     dependencies:
       - target: BarkCore
-      - target: notify
 
   BarkCoreTests:
     type: bundle.unit-test
@@ -113,7 +86,6 @@ schemes:
     build:
       targets:
         BarkDesk: all
-        notify: all
         BarkCoreTests: [test]
         BarkDeskTests: [test]
         BarkDeskUITests: [test]
@@ -127,10 +99,3 @@ schemes:
         - BarkDeskUITests
     archive:
       config: Release
-
-  notify:
-    build:
-      targets:
-        notify: all
-    run:
-      config: Debug

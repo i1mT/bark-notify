@@ -10,6 +10,7 @@
 
 - Device Key 或 Bark Server 访问凭据
 - Apple ID、Team ID、API Key 或公证凭据
+- npm access token 或发布凭据
 - 能够访问私人服务的完整 URL
 - Keychain 导出、签名证书或私钥
 

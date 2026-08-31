@@ -1,4 +1,4 @@
-.PHONY: build test app dmg release-dmg xcode-project install website-install website-dev website-build clean
+.PHONY: build test app dmg release-dmg xcode-project install cli-install cli-build cli-test cli-pack website-install website-dev website-build clean
 
 VERSION ?= 1.0.0
 
@@ -23,6 +23,18 @@ xcode-project:
 install:
 	./scripts/install-local.sh
 
+cli-install:
+	npm --prefix cli install
+
+cli-build:
+	npm --prefix cli run build
+
+cli-test:
+	npm --prefix cli test
+
+cli-pack:
+	npm --prefix cli pack --dry-run
+
 website-install:
 	npm --prefix website install
 
@@ -35,4 +47,5 @@ website-build:
 clean:
 	swift package clean
 	rm -rf build
+	rm -rf cli/dist
 	rm -rf website/.next website/out

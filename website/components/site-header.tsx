@@ -29,7 +29,7 @@ export function SiteHeader({ githubUrl, downloadUrl }: SiteHeaderProps) {
             查看 GitHub
           </a>
           <a className="nav-download" href={downloadUrl}>
-            下载 DMG
+            下载 App
           </a>
         </nav>
 
@@ -51,7 +51,7 @@ export function SiteHeader({ githubUrl, downloadUrl }: SiteHeaderProps) {
           <a href="#cli" onClick={() => setOpen(false)}>CLI</a>
           <a href="#privacy" onClick={() => setOpen(false)}>隐私</a>
           <a href={githubUrl} target="_blank" rel="noreferrer">查看 GitHub</a>
-          <a className="nav-download" href={downloadUrl}>下载 DMG</a>
+          <a className="nav-download" href={downloadUrl}>下载 App</a>
         </nav>
       ) : null}
     </header>

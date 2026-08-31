@@ -18,15 +18,15 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://barkdesk.example.co
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "BarkDesk - macOS Bark 客户端与 notify CLI",
-  description: "从原生 macOS 界面或一条短命令发送 Bark 通知，并在本机查看完整发送历史。",
+  title: "BarkDesk - macOS Bark 客户端与跨平台 notify CLI",
+  description: "使用原生 macOS App，或在 Linux、macOS 与 Windows 上通过一条短命令发送 Bark 通知。",
   icons: {
     icon: "/brand/barkdesk-icon.png",
     apple: "/brand/barkdesk-icon.png",
   },
   openGraph: {
     title: "BarkDesk",
-    description: "原生 macOS Bark 客户端与简洁的 notify CLI。",
+    description: "原生 macOS Bark 客户端与通过 npm 发布的跨平台 notify CLI。",
     type: "website",
     locale: "zh_CN",
     images: ["/visuals/barkdesk-product.webp"],
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "BarkDesk",
-    description: "原生 macOS Bark 客户端与简洁的 notify CLI。",
+    description: "原生 macOS Bark 客户端与通过 npm 发布的跨平台 notify CLI。",
     images: ["/visuals/barkdesk-product.webp"],
   },
 };

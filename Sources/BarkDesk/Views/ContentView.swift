@@ -16,7 +16,6 @@ struct ContentView: View {
             .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 260)
         } detail: {
             VStack(spacing: 0) {
-                if model.cliInstallationStatus == .missing { CLIInstallPrompt() }
                 Group {
                     switch model.selection {
                     case .notifications: NotificationsView()
@@ -44,32 +43,6 @@ struct ContentView: View {
         .sheet(isPresented: $model.isOnboardingPresented) {
             OnboardingView().environmentObject(model)
         }
-    }
-}
-
-private struct CLIInstallPrompt: View {
-    @EnvironmentObject private var model: AppModel
-
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "terminal.fill")
-                .font(.title3)
-                .foregroundStyle(.tint)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("安装 notify 命令").fontWeight(.semibold)
-                Text("安装后可以在任意终端中使用简短命令发送通知。")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            Button("安装") { Task { await model.installCLI() } }
-                .buttonStyle(.borderedProminent)
-                .disabled(model.isWorking)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .background(.bar)
-        .overlay(alignment: .bottom) { Divider() }
     }
 }
 

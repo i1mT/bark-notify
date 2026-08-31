@@ -13,14 +13,11 @@ BUILD_NUMBER="${BUILD_NUMBER:-1}"
 
 cd "${PROJECT_DIR}"
 swift build -c "${CONFIGURATION}" --product BarkDesk
-swift build -c "${CONFIGURATION}" --product notify
 BIN_DIR="$(swift build -c "${CONFIGURATION}" --show-bin-path)"
 
 rm -rf "${APP_DIR}"
 mkdir -p "${APP_DIR}/Contents/MacOS" "${APP_DIR}/Contents/Resources"
 ditto "${BIN_DIR}/BarkDesk" "${APP_DIR}/Contents/MacOS/BarkDesk"
-ditto "${BIN_DIR}/notify" "${APP_DIR}/Contents/Resources/notify"
-chmod 755 "${APP_DIR}/Contents/Resources/notify"
 rm -rf "${ICONSET_DIR}"
 mkdir -p "${ICONSET_DIR}"
 sips -z 16 16 "${ICON_SOURCE}" --out "${ICONSET_DIR}/icon_16x16.png" >/dev/null
@@ -47,15 +44,11 @@ plutil -insert LSMinimumSystemVersion -string "14.0" "${APP_DIR}/Contents/Info.p
 plutil -insert NSHighResolutionCapable -bool true "${APP_DIR}/Contents/Info.plist"
 plutil -insert NSPrincipalClass -string "NSApplication" "${APP_DIR}/Contents/Info.plist"
 if [[ "${SIGN_IDENTITY}" == "-" ]]; then
-  codesign --force --sign - "${APP_DIR}/Contents/Resources/notify"
   codesign --force --sign - "${APP_DIR}"
 else
-  codesign --force --options runtime --timestamp --sign "${SIGN_IDENTITY}" \
-    "${APP_DIR}/Contents/Resources/notify"
   codesign --force --options runtime --timestamp --sign "${SIGN_IDENTITY}" "${APP_DIR}"
 fi
 
-codesign --verify --strict --verbose=2 "${APP_DIR}/Contents/Resources/notify"
 codesign --verify --strict --verbose=2 "${APP_DIR}"
 
 echo "Built ${APP_DIR}"

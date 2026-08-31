@@ -39,12 +39,10 @@ final class AppModel: ObservableObject {
     @Published var isWorking = false
     @Published var banner: Banner?
     @Published var connectionResults: [ConnectionResult] = []
-    @Published var cliInstallationStatus = CLIInstallationStatus.checking
     @Published var isOnboardingPresented = false
     @Published var connectionTestPassed = false
 
     private let configurationStore = ConfigurationStore()
-    private let cliInstaller = CLIInstaller()
     private var history: HistoryStore?
     private var initialized = false
 
@@ -63,15 +61,11 @@ final class AppModel: ObservableObject {
             isOnboardingPresented = !configurationInputIsValid
             history = try HistoryStore()
             await refreshHistory()
-            await checkCLIInstallation()
         } catch {
             isOnboardingPresented = true
             showError(error)
-            await checkCLIInstallation()
         }
     }
-
-    var cliInstallDirectoryIsInPath: Bool { cliInstaller.installDirectoryIsInPath }
 
     var configurationInputIsValid: Bool {
         (try? ResolvedConfiguration(settings: configuration, credentials: credentials).validated()) != nil
@@ -98,25 +92,6 @@ final class AppModel: ObservableObject {
             ? "请同时填写 Basic Auth 用户名和密码" : nil
     }
 
-    func checkCLIInstallation() async {
-        cliInstallationStatus = .checking
-        let installer = cliInstaller
-        cliInstallationStatus = await Task.detached { installer.detect() }.value
-    }
-
-    func installCLI() async {
-        isWorking = true
-        defer { isWorking = false }
-        let installer = cliInstaller
-        do {
-            let url = try await Task.detached { try installer.install() }.value
-            cliInstallationStatus = .installed(url)
-            banner = Banner(style: .success, message: "notify 已经安装到 \(url.path)")
-        } catch {
-            cliInstallationStatus = .unavailable(error.localizedDescription)
-            showError(error)
-        }
-    }
 
     func refreshHistory() async {
         guard let history else { return }

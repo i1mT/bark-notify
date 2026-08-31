@@ -1,12 +1,19 @@
 # BarkDesk
 
-BarkDesk 是一个使用 Swift 和 SwiftUI 编写的 macOS 原生 Bark 控制中心，同时提供简洁的 `notify` CLI。它直接连接现有 Bark Server，不需要部署代理服务，也不会修改 Bark Server。
+BarkDesk 包含两个独立产品：使用 SwiftUI 编写的 macOS 原生 Bark 控制中心，以及通过 npm 发布的跨平台 `notify` CLI。两者都直接连接现有 Bark Server，不需要部署代理服务，也不会修改 Bark Server。
 
 ![BarkDesk 应用图标](Assets/BarkDeskIcon.png)
 
 ## 快速开始
 
-普通用户可以从 GitHub Releases 下载最新的、经过 Developer ID 签名和 Apple 公证的 DMG，把 `BarkDesk` 拖入 `Applications` 后打开。首次运行会引导填写 Bark Server 地址与 Device Key，并且可以在应用内安装 `notify` 命令。
+macOS 用户可以从 GitHub Releases 下载经过 Developer ID 签名和 Apple 公证的 DMG，把 `BarkDesk` 拖入 `Applications` 后打开。首次运行会引导填写 Bark Server 地址与 Device Key。
+
+Linux、macOS 和 Windows 用户可以独立安装 CLI：
+
+```bash
+npm install -g barkdesk-notify
+notify "任务完成"
+```
 
 从源码运行时，请打开 `BarkDesk.xcodeproj`，选择 `BarkDesk` scheme，然后按下 Run。
 
@@ -14,27 +21,27 @@ BarkDesk 是一个使用 Swift 和 SwiftUI 编写的 macOS 原生 Bark 控制中
 
 - 使用 macOS 原生界面配置 Bark Server、Device Key 和 Basic Auth。
 - 从 GUI 发送通知，并且支持 Bark 的常用与高级参数。
-- 使用 `notify "完成"`、stdin 或 `notify run command` 从终端发送通知。
-- 使用同一份 SQLite 数据库查看 GUI 和 CLI 的本机发送历史，包括失败记录。
+- 使用独立 npm package 在 Linux、macOS 或 Windows 执行 `notify "完成"`、stdin 或 `notify run command`。
+- macOS App 与 CLI 分别记录自己的本机发送历史，包括失败记录。
 - 在 Integrations 页面复制 REST、兼容 Push URL、MCP URL 和调用示例。
 - 提供菜单栏入口，可以快速打开发送页面和历史记录。
 
-> Bark Server 没有历史查询 API。BarkDesk 的历史仅包含这台 Mac 通过 BarkDesk GUI 或 `notify` CLI 发出的消息。
+> Bark Server 没有历史查询 API。macOS App 与 CLI 的历史都是各自设备上的本机记录，不会互相同步。
 
 ## 系统要求
 
-- macOS 14 或更高版本
-- Xcode 16 或更高版本，或者对应的 Swift toolchain
+- macOS App：macOS 14 或更高版本；源码构建需要 Xcode 16 或对应的 Swift toolchain
+- npm CLI：Node.js 20.9 或更高版本，支持 Linux、macOS 和 Windows
 - 已经运行并且可以访问的 Bark Server
 - 已经由 iPhone Bark App 注册的 Device Key
 
-项目仅依赖 Apple 系统框架与系统 SQLite，不需要下载第三方 Swift package。
+macOS App 仅依赖 Apple 系统框架与系统 SQLite，不需要下载第三方 Swift package。CLI 使用 Node.js 内置 API，发布产物没有第三方 runtime dependency。
 
 ## 构建与安装
 
 ### 使用 Xcode 运行
 
-请打开仓库根目录的 `BarkDesk.xcodeproj`，选择 `BarkDesk` scheme，然后按下 Run。这个 scheme 构建并运行真正的 macOS `BarkDesk.app`，同时会把独立的 `notify` 可执行文件复制到 App 的 Resources 中，因此引导页输入、键盘焦点和“安装 notify 命令”都使用完整的 macOS App 生命周期。
+请打开仓库根目录的 `BarkDesk.xcodeproj`，选择 `BarkDesk` scheme，然后按下 Run。这个 scheme 只构建并运行真正的 macOS `BarkDesk.app`；跨平台 CLI 位于 `cli` 目录，不属于 Xcode 工程或 App bundle。
 
 不要把 `Package.swift` 作为工程打开后直接运行 Swift Package 中的 `BarkDesk` executable；那个产物是裸命令行可执行文件，不是 macOS App bundle，不能用于 GUI 调试。
 
@@ -71,14 +78,12 @@ make install
 默认安装位置：
 
 ```text
-~/.local/bin/notify
 ~/Applications/BarkDesk.app
 ```
 
-请确保 `~/.local/bin` 已经加入 `PATH`。也可以在安装时修改路径：
+也可以在安装时修改路径：
 
 ```bash
-BIN_INSTALL_DIR=/opt/homebrew/bin \
 APP_INSTALL_DIR=/Applications \
 make install
 ```
@@ -114,7 +119,7 @@ xcrun notarytool store-credentials "BarkDesk-Notary" \
 make release-dmg VERSION=1.0.0
 ```
 
-`release-dmg` 会自动选择 Keychain 中的 `Developer ID Application` 证书，并使用 `BarkDesk-Notary` 公证 profile。脚本会构建 App、签署 App 与内置的 `notify`、创建并签署 DMG、等待 Apple 公证、附加公证票据，并且挂载 DMG 检查 App 与 CLI 是否完整。证书和公证凭据只保存在 macOS Keychain，不会写入仓库。
+`release-dmg` 会自动选择 Keychain 中的 `Developer ID Application` 证书，并使用 `BarkDesk-Notary` 公证 profile。脚本会构建并签署 App、创建并签署 DMG、等待 Apple 公证、附加公证票据，并且挂载 DMG 检查 App 是否完整。证书和公证凭据只保存在 macOS Keychain，不会写入仓库。
 
 发布前的完整检查步骤请参阅 [开源与发布检查表](docs/OPEN_SOURCE_CHECKLIST.md)。
 
@@ -128,15 +133,13 @@ make release-dmg VERSION=1.0.0
 4. 选择默认分组、提醒方式、提示音与归档行为。
 5. 使用“检查连接”和“发送测试通知”验证完整链路。
 
-应用启动时也会自动检查 `notify` 是否已经安装。如果没有检测到，主窗口内容区顶部会显示安装提示条。点击“安装”后，BarkDesk 会优先使用当前用户可写的 Homebrew 或 `/usr/local/bin` 目录；如果没有合适的公共命令目录，则安装到 `~/.local/bin/notify`。“设置”的“命令行工具”区域可以查看实际安装路径和状态，也可以重新执行检查。
-
 Device Key、Basic Auth 用户名和密码保存在 macOS Keychain。普通默认设置保存在：
 
 ```text
 ~/Library/Application Support/BarkDesk/configuration.json
 ```
 
-CLI 也可以执行基础配置：
+CLI 需要通过 npm 单独安装，并且拥有自己的跨平台配置：
 
 ```bash
 notify config set \
@@ -150,9 +153,23 @@ notify config show
 notify config test
 ```
 
-为了避免密码进入 shell 历史，推荐通过 GUI 配置 Basic Auth。
+Linux 服务器、容器和 CI 推荐使用环境变量：
+
+```bash
+export BARK_SERVER=https://bark.example.com
+export BARK_DEVICE_KEY=DEVICE_KEY
+notify "部署完成"
+```
+
+CLI 还支持 `BARK_DEVICE_KEY_FILE`、`BARK_PASSWORD_FILE` 等 secret file。完整配置方式请参阅 [CLI README](cli/README.md)。
 
 ## CLI 用法
+
+安装或升级：
+
+```bash
+npm install -g barkdesk-notify
+```
 
 最短用法：
 
@@ -210,7 +227,7 @@ notify run -g deploy --level timeSensitive -- ./deploy.sh --production
 
 `notify run` 会继承命令的标准输入、标准输出和标准错误，等待命令结束，然后发送包含命令、耗时与退出码的通知。最终返回值始终是原命令的退出码；即使 Bark 发送失败，也不会将失败命令误报为成功。
 
-查看历史：
+查看 CLI 自己的本机历史：
 
 ```bash
 notify history
@@ -222,6 +239,8 @@ notify history --search deploy --limit 50
 ```bash
 notify --help
 ```
+
+CLI 的完整开发、配置、环境变量和发布说明位于 [cli/README.md](cli/README.md)。
 
 ## GUI 页面
 
@@ -235,20 +254,16 @@ notify --help
 ## 数据与架构
 
 ```text
-BarkDesk GUI ─┐
-              ├─ BarkCore ─ HTTP ─ Existing Bark Server ─ APNs ─ iPhone
-notify CLI ───┘    │
-                   ├─ macOS Keychain
-                   └─ ~/Library/Application Support/BarkDesk/barkdesk.sqlite
+BarkDesk macOS App ─ BarkCore ─┐
+  ├─ macOS Keychain            ├─ HTTP ─ Bark Server ─ APNs ─ iPhone
+  └─ App SQLite history        │
+                               │
+notify npm CLI ─ Node.js ──────┘
+  ├─ BARK_* / private config
+  └─ cross-platform JSONL history
 ```
 
-`BarkCore` 统一实现 API、参数编码、配置、Keychain、SQLite 和发送历史。SwiftUI View 不直接调用 `URLSession`，CLI 也不重复实现网络或存储逻辑。
-
-测试时可以通过 `BARKDESK_HOME` 使用隔离的数据目录：
-
-```bash
-BARKDESK_HOME=/tmp/barkdesk-test .build/debug/notify history
-```
+`BarkCore` 统一实现 macOS App 的 API、参数编码、配置、Keychain、SQLite 和发送历史。`cli` 是独立 Node.js package，不导入 Swift 模块，也不依赖 macOS App、Keychain 或 Apple 专属框架。
 
 ## Bark 支持范围
 
@@ -285,6 +300,7 @@ npm run build
 NEXT_PUBLIC_SITE_URL=https://你的官网地址
 NEXT_PUBLIC_GITHUB_URL=https://github.com/你的账号/你的仓库
 NEXT_PUBLIC_DOWNLOAD_URL=https://github.com/你的账号/你的仓库/releases/latest
+NEXT_PUBLIC_NPM_URL=https://www.npmjs.com/package/barkdesk-notify
 ```
 
 这些值只包含公开链接。Apple 开发者凭据、Device Key 和 Bark Server 凭据不属于官网环境变量。

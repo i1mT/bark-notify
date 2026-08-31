@@ -7,7 +7,23 @@
 - [ ] 在 `website/.env.local` 中配置 GitHub、下载和站点地址，并且确认该文件不会提交。
 - [ ] 确认 `LICENSE`、`PRIVACY.md`、贡献指南、行为准则和安全政策符合当前项目。
 - [ ] 在 GitHub 开启 Private vulnerability reporting、分支保护和 Actions。
-- [ ] 确认 CI 的 Swift 与 Website 两个 Job 全部通过。
+- [ ] 确认 CI 的 Swift、CLI 三系统矩阵与 Website Job 全部通过。
+
+## 发布 npm CLI
+
+1. 确认 `barkdesk-notify` 的版本号、README 和 package 文件列表；GitHub 仓库公开后，在 `cli/package.json` 中补充真实的 `repository`、`homepage` 和 `bugs` 地址。
+2. 在 `cli` 目录执行：
+
+```bash
+npm ci
+npm test
+npm run typecheck
+npm pack --dry-run
+```
+
+3. 使用 npm 账号登录后执行 `npm publish`。
+4. 不要把 npm token 写入仓库、`.npmrc` 或 shell 脚本；CI 发布时应当使用 npm trusted publishing 或仓库 Secret。
+5. 在 Linux、macOS 和 Windows 分别确认 `npm install -g barkdesk-notify` 后可以执行 `notify --version`。
 
 ## 发布签名 DMG
 
@@ -32,6 +48,7 @@ spctl --assess --type open --context context:primary-signature -v build/BarkDesk
 NEXT_PUBLIC_SITE_URL
 NEXT_PUBLIC_GITHUB_URL
 NEXT_PUBLIC_DOWNLOAD_URL
+NEXT_PUBLIC_NPM_URL
 ```
 
 `NEXT_PUBLIC_DOWNLOAD_URL` 建议指向 GitHub Releases 的 latest 地址。每次发布 DMG 后检查首页下载按钮是否能够直接打开最新版本。

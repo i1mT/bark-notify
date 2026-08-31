@@ -69,7 +69,6 @@ hdiutil verify "${DMG_PATH}"
 hdiutil attach -readonly -nobrowse -mountpoint "${MOUNT_DIR}" "${DMG_PATH}" >/dev/null
 MOUNTED=true
 test -x "${MOUNT_DIR}/BarkDesk.app/Contents/MacOS/BarkDesk"
-test -x "${MOUNT_DIR}/BarkDesk.app/Contents/Resources/notify"
 test -L "${MOUNT_DIR}/Applications"
 codesign --verify --strict --verbose=2 "${MOUNT_DIR}/BarkDesk.app"
 hdiutil detach "${MOUNT_DIR}" -quiet

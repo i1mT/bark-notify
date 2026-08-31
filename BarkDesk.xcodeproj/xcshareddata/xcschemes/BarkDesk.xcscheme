@@ -63,20 +63,6 @@
                ReferencedContainer = "container:BarkDesk.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "10A5541FEA353B2CEE932D0F"
-               BuildableName = "notify"
-               BlueprintName = "notify"
-               ReferencedContainer = "container:BarkDesk.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

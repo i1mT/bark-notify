@@ -52,28 +52,18 @@ struct SettingsView: View {
                 Toggle("默认保存在 Bark 历史记录中", isOn: $model.configuration.archiveMessages)
             }
 
-            Section("命令行工具") {
-                switch model.cliInstallationStatus {
-                case .checking:
-                    LabeledContent("notify") { ProgressView().controlSize(.small) }
-                case .missing:
-                    LabeledContent("notify", value: "尚未安装")
-                    Button("安装 notify") { Task { await model.installCLI() } }
-                        .buttonStyle(.borderedProminent)
-                case .installed(let url):
-                    LabeledContent("notify") {
-                        Label("已经安装", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
-                    }
-                    LabeledContent("安装位置", value: url.path)
-                    if !model.cliInstallDirectoryIsInPath {
-                        Text("如果终端找不到 notify，请把它所在的目录加入 shell PATH。")
-                            .font(.caption).foregroundStyle(.secondary)
-                    }
-                case .unavailable(let reason):
-                    Label(reason, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-                    Button("重新安装") { Task { await model.installCLI() } }
+            Section("跨平台命令行工具") {
+                Text("notify CLI 通过 npm 独立发布，可在 Linux、macOS 和 Windows 使用，不依赖 BarkDesk App。")
+                    .foregroundStyle(.secondary)
+                LabeledContent("安装命令") {
+                    Text("npm install -g barkdesk-notify")
+                        .font(.system(.body, design: .monospaced))
+                        .textSelection(.enabled)
                 }
-                Button("重新检查") { Task { await model.checkCLIInstallation() } }
+                HStack {
+                    Button("复制安装命令") { model.copy("npm install -g barkdesk-notify") }
+                    Link("查看 npm package", destination: URL(string: "https://www.npmjs.com/package/barkdesk-notify")!)
+                }
             }
 
             Section("连接检查") {

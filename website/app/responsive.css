@@ -59,7 +59,8 @@
   .delivery-flow > svg { transform: rotate(90deg); justify-self: center; }
   .download-section { padding-top: 32px; }
   .download-panel { grid-template-columns: 1fr; gap: 30px; }
-  .download-panel .primary-button { width: 100%; }
+  .download-actions,
+  .download-actions a { width: 100%; }
   .site-footer { grid-template-columns: 1fr; gap: 18px; width: min(100% - 32px, 1280px); }
 }
 

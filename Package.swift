@@ -6,14 +6,11 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [
         .library(name: "BarkCore", targets: ["BarkCore"]),
-        .executable(name: "notify", targets: ["NotifyCLI"]),
         .executable(name: "BarkDesk", targets: ["BarkDesk"]),
     ],
     targets: [
         .systemLibrary(name: "CSQLite"),
         .target(name: "BarkCore", dependencies: ["CSQLite"]),
-        .target(name: "NotifySupport", dependencies: ["BarkCore"]),
-        .executableTarget(name: "NotifyCLI", dependencies: ["NotifySupport"]),
         .executableTarget(name: "BarkDesk", dependencies: ["BarkCore"]),
         .testTarget(name: "BarkCoreTests", dependencies: ["BarkCore"]),
         .testTarget(name: "BarkDeskTests", dependencies: ["BarkDesk"]),

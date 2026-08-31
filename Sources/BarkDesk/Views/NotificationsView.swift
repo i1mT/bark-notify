@@ -11,7 +11,7 @@ struct NotificationsView: View {
                     ContentUnavailableView {
                         Label("还没有发送记录", systemImage: "bell.slash")
                     } description: {
-                        Text("从 BarkDesk 或 notify CLI 发送的通知会显示在这里。")
+                        Text("从这台 Mac 的 BarkDesk App 发送的通知会显示在这里。")
                     } actions: {
                         Button("发送第一条通知") { model.selection = .compose }
                             .buttonStyle(.borderedProminent)

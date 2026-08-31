@@ -4,12 +4,21 @@
 
 ## 本机开发
 
-macOS App 与 CLI：
+macOS App：
 
 ```bash
 swift test
 swift build
 open BarkDesk.xcodeproj
+```
+
+跨平台 CLI：
+
+```bash
+npm --prefix cli ci
+npm --prefix cli run typecheck
+npm --prefix cli test
+npm --prefix cli pack --dry-run
 ```
 
 官网：
@@ -23,8 +32,9 @@ npm run dev
 
 ## 架构约束
 
-- GUI 与 CLI 的业务能力需要在 `BarkCore` 中实现，避免重复网络、配置和存储逻辑。
-- Device Key 与 Basic Auth 必须保存在 Keychain 中。
+- macOS App 的业务能力需要在 `BarkCore` 中实现，避免 SwiftUI View 重复网络、配置和存储逻辑。
+- npm CLI 必须保持独立，不得依赖 Swift、App bundle、Keychain 或 Apple 专属框架。
+- macOS App 的 Device Key 与 Basic Auth 必须保存在 Keychain；CLI 需要支持环境变量与 secret file。
 - 所有发送尝试都需要写入本机历史。
 - 官网保持静态导出能力，不得依赖仅能在常驻 Node.js Server 中运行的功能。
 
@@ -37,6 +47,10 @@ npm run dev
 ```bash
 swift test
 swift build
+npm --prefix cli ci
+npm --prefix cli run typecheck
+npm --prefix cli test
+npm --prefix cli pack --dry-run
 npm --prefix website ci
 npm --prefix website run lint
 npm --prefix website run typecheck

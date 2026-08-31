@@ -14,12 +14,8 @@
 		1A22E2C4241B71FB554FC083 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0DD422E1702FB104B8007E /* AppConfiguration.swift */; };
 		2971CF15D14B3892E60F7800 /* ComposeDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAD4EB61AB64F71062FD059 /* ComposeDraft.swift */; };
 		334DC52BF1EC39EFA2B1528D /* ComposeDraftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 807B647AE9D6E9214BDC6DDF /* ComposeDraftTests.swift */; };
-		33E0E68175EC28029838F0FF /* CLIInstallerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC90D8A8F72DE8E9A279B6E7 /* CLIInstallerTests.swift */; };
-		4BC56538B49E9CA5456F924F /* notify in Resources */ = {isa = PBXBuildFile; fileRef = B21D0D748AA86ADF6A41F5CC /* notify */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		5F0EC8F72DA0184E7FF77307 /* NotifyRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 556DFD1A0AF1D11B23C90C54 /* NotifyRunner.swift */; };
 		6472DB271CE28F8E28E8C245 /* IntegrationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19954A84027C55AE9BEFF7FD /* IntegrationsView.swift */; };
 		65D81FAA0FFE5A419CF799FB /* BarkDesk.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1D8ABCB13CDB60658E9453AC /* BarkDesk.icns */; };
-		684401B3AD8FA6657DD9E2F1 /* NotifySupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 95646D0C2D4E4665D6A27CF9 /* NotifySupport.framework */; };
 		7A3762CB8C856A39127B7E16 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F803DD6080DD36C7D4BAC74 /* NotificationService.swift */; };
 		7F422EB83AD6A0E15E3DE803 /* ComposeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531E49AD94AFB365ABFD545A /* ComposeView.swift */; };
 		8A87280D6EB171A0FD1A8B34 /* BarkDeskApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6798A179BDA020DC9985D4 /* BarkDeskApp.swift */; };
@@ -29,14 +25,11 @@
 		C1A2E42D2C2E4573A50C16F2 /* HistoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CC81B071ACD11055EC200FD /* HistoryStoreTests.swift */; };
 		CC299318D2890367F92A17B8 /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274CED8EAE2CC2DE122F1B16 /* NotificationsView.swift */; };
 		CC7C5109BB00C8628A144886 /* HistoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08BE8B724AD9B6A48CE0C6FF /* HistoryModels.swift */; };
-		DA7B8A03810F3EEE497D2D82 /* NotifyMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0E30CBE67B0A66B8353D6F /* NotifyMain.swift */; };
-		E1AC0BAAE09902EE7EC5901E /* CLIParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29671F658BCB153F454CA066 /* CLIParser.swift */; };
 		E53ADD6A6C6E8A9B82B304E5 /* BarkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A63CF67420639B87671BE8 /* BarkClient.swift */; };
 		E63037BF5E6E1836F0CC9BC4 /* LargeTextFieldStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F44D6B47F20A266B4A7105 /* LargeTextFieldStyle.swift */; };
 		E68F112619304358762CAAE5 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45E2A8B77BEBD0640E9D95C4 /* SettingsView.swift */; };
 		F1EB7B3B541787FD5F65E740 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB57D2DE761B4670328C840 /* ContentView.swift */; };
 		F2A839CB62A8157AF854A836 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = CD02057DEA0A72452D86F5D2 /* libsqlite3.tbd */; };
-		F340646C1541E5284CBE2635 /* CLIInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72BE5B7766EB096516310EED /* CLIInstaller.swift */; };
 		F50AACDC46E83739BE3B998E /* BarkCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FD31AF952984D5737CF548E1 /* BarkCore.framework */; };
 		F644EE98E6439AD80A186180 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63779FECC98A3738A3D7D4B7 /* KeychainStore.swift */; };
 		F8FC1F212E98BA208312F901 /* OnboardingInputUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B08C8E661EFF6DA46067F738 /* OnboardingInputUITests.swift */; };
@@ -44,33 +37,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		0002030753A3F75A7BE8AD52 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2C753675D54A570EF2D8A6D5 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B5A79335E768B5D3C034C869;
-			remoteInfo = BarkCore;
-		};
-		324B0196A6B5485B45E184A8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2C753675D54A570EF2D8A6D5 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DF7D02A15514D98EAD938C88;
-			remoteInfo = NotifySupport;
-		};
 		6A04CA5258E89184A39BF2FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2C753675D54A570EF2D8A6D5 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = B5A79335E768B5D3C034C869;
 			remoteInfo = BarkCore;
-		};
-		6E6B86B1BFDBE45EA3E1DA3C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2C753675D54A570EF2D8A6D5 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 10A5541FEA353B2CEE932D0F;
-			remoteInfo = notify;
 		};
 		82EC7CD0CBDBCD0EA8B4BD06 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -104,29 +76,22 @@
 		19954A84027C55AE9BEFF7FD /* IntegrationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationsView.swift; sourceTree = "<group>"; };
 		1D8ABCB13CDB60658E9453AC /* BarkDesk.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = BarkDesk.icns; sourceTree = "<group>"; };
 		274CED8EAE2CC2DE122F1B16 /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
-		29671F658BCB153F454CA066 /* CLIParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIParser.swift; sourceTree = "<group>"; };
-		3D0E30CBE67B0A66B8353D6F /* NotifyMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyMain.swift; sourceTree = "<group>"; };
 		43885481861822159162BA3D /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		45E2A8B77BEBD0640E9D95C4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4BB57D2DE761B4670328C840 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4CAD4EB61AB64F71062FD059 /* ComposeDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposeDraft.swift; sourceTree = "<group>"; };
 		4ECD3C9F54D1ADDED6FB3AC0 /* BarkDeskTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarkDeskTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		531E49AD94AFB365ABFD545A /* ComposeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposeView.swift; sourceTree = "<group>"; };
-		556DFD1A0AF1D11B23C90C54 /* NotifyRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotifyRunner.swift; sourceTree = "<group>"; };
 		633089E2E9F023E43BF9762B /* BarkModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarkModels.swift; sourceTree = "<group>"; };
 		63779FECC98A3738A3D7D4B7 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		6CC81B071ACD11055EC200FD /* HistoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStoreTests.swift; sourceTree = "<group>"; };
-		72BE5B7766EB096516310EED /* CLIInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIInstaller.swift; sourceTree = "<group>"; };
 		75EBD4C2BA77E749DAB7D205 /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
 		7F0DD422E1702FB104B8007E /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		807B647AE9D6E9214BDC6DDF /* ComposeDraftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposeDraftTests.swift; sourceTree = "<group>"; };
 		8F7613796EEAE1EBE4373656 /* BarkDesk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarkDesk.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		95646D0C2D4E4665D6A27CF9 /* NotifySupport.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NotifySupport.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C6798A179BDA020DC9985D4 /* BarkDeskApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarkDeskApp.swift; sourceTree = "<group>"; };
 		B08C8E661EFF6DA46067F738 /* OnboardingInputUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingInputUITests.swift; sourceTree = "<group>"; };
-		B21D0D748AA86ADF6A41F5CC /* notify */ = {isa = PBXFileReference; includeInIndex = 0; path = notify; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC4B390B7E178B59C5F14291 /* BarkDeskUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarkDeskUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		BC90D8A8F72DE8E9A279B6E7 /* CLIInstallerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIInstallerTests.swift; sourceTree = "<group>"; };
 		C257DDD48209F94FBE6D64F9 /* BarkCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarkCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD02057DEA0A72452D86F5D2 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		E8F44D6B47F20A266B4A7105 /* LargeTextFieldStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeTextFieldStyle.swift; sourceTree = "<group>"; };
@@ -141,14 +106,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F2A839CB62A8157AF854A836 /* libsqlite3.tbd in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		67E3A3E07B7A22FC030E3512 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				684401B3AD8FA6657DD9E2F1 /* NotifySupport.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,19 +211,8 @@
 				8F7613796EEAE1EBE4373656 /* BarkDesk.app */,
 				4ECD3C9F54D1ADDED6FB3AC0 /* BarkDeskTests.xctest */,
 				BC4B390B7E178B59C5F14291 /* BarkDeskUITests.xctest */,
-				B21D0D748AA86ADF6A41F5CC /* notify */,
-				95646D0C2D4E4665D6A27CF9 /* NotifySupport.framework */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		61BB6D0E7582F2DEA798A264 /* NotifyCLI */ = {
-			isa = PBXGroup;
-			children = (
-				3D0E30CBE67B0A66B8353D6F /* NotifyMain.swift */,
-			);
-			name = NotifyCLI;
-			path = Sources/NotifyCLI;
 			sourceTree = "<group>";
 		};
 		670551542A6EA7F682E6F9A0 /* ViewModels */ = {
@@ -291,7 +237,6 @@
 			isa = PBXGroup;
 			children = (
 				7F0DD422E1702FB104B8007E /* AppConfiguration.swift */,
-				72BE5B7766EB096516310EED /* CLIInstaller.swift */,
 				EC2C5FABDFB9569CD5106D58 /* ConfigurationStore.swift */,
 				63779FECC98A3738A3D7D4B7 /* KeychainStore.swift */,
 			);
@@ -319,8 +264,6 @@
 				213023685F32EFF8E8B661C0 /* BarkDesk */,
 				9F65BD08CDB34F2F65F355C8 /* BarkDeskTests */,
 				C50DC62767D05EAE0FFAA56C /* BarkDeskUITests */,
-				61BB6D0E7582F2DEA798A264 /* NotifyCLI */,
-				AFFE441D7C9FC2AAFBF02A35 /* NotifySupport */,
 				3E5D5B2CA333D9C6DEA77018 /* Frameworks */,
 				5A50AB81E2D07D12831FA14D /* Products */,
 			);
@@ -333,16 +276,6 @@
 			);
 			name = BarkDeskTests;
 			path = Tests/BarkDeskTests;
-			sourceTree = "<group>";
-		};
-		AFFE441D7C9FC2AAFBF02A35 /* NotifySupport */ = {
-			isa = PBXGroup;
-			children = (
-				29671F658BCB153F454CA066 /* CLIParser.swift */,
-				556DFD1A0AF1D11B23C90C54 /* NotifyRunner.swift */,
-			);
-			name = NotifySupport;
-			path = Sources/NotifySupport;
 			sourceTree = "<group>";
 		};
 		C50DC62767D05EAE0FFAA56C /* BarkDeskUITests */ = {
@@ -358,7 +291,6 @@
 			isa = PBXGroup;
 			children = (
 				0BF9FE29AACC2BD676ECE6B8 /* BarkModelsTests.swift */,
-				BC90D8A8F72DE8E9A279B6E7 /* CLIInstallerTests.swift */,
 				6CC81B071ACD11055EC200FD /* HistoryStoreTests.swift */,
 			);
 			name = BarkCoreTests;
@@ -368,25 +300,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		10A5541FEA353B2CEE932D0F /* notify */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 1F484A51AAF0061E743D0A2C /* Build configuration list for PBXNativeTarget "notify" */;
-			buildPhases = (
-				9F3EDC9EA3757337C11AF1EC /* Sources */,
-				67E3A3E07B7A22FC030E3512 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				D0AF7BC31BFB2AF4A082AB0A /* PBXTargetDependency */,
-			);
-			name = notify;
-			packageProductDependencies = (
-			);
-			productName = notify;
-			productReference = B21D0D748AA86ADF6A41F5CC /* notify */;
-			productType = "com.apple.product-type.tool";
-		};
 		3B77B885BC5E5AC60175594A /* BarkDeskTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A7D8B839B22CEE0690250838 /* Build configuration list for PBXNativeTarget "BarkDeskTests" */;
@@ -454,7 +367,6 @@
 			);
 			dependencies = (
 				D9AD70548D3E0F1F33B5AE78 /* PBXTargetDependency */,
-				897BE092ADFB03E8EA006A7B /* PBXTargetDependency */,
 			);
 			name = BarkDesk;
 			packageProductDependencies = (
@@ -481,24 +393,6 @@
 			productReference = FD31AF952984D5737CF548E1 /* BarkCore.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		DF7D02A15514D98EAD938C88 /* NotifySupport */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B9EA5CA28F9452621359875F /* Build configuration list for PBXNativeTarget "NotifySupport" */;
-			buildPhases = (
-				9FD05E6896E47C233D06B1F1 /* Sources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				67E37B2D327BF36B6EEE7E34 /* PBXTargetDependency */,
-			);
-			name = NotifySupport;
-			packageProductDependencies = (
-			);
-			productName = NotifySupport;
-			productReference = 95646D0C2D4E4665D6A27CF9 /* NotifySupport.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -508,10 +402,6 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
-					10A5541FEA353B2CEE932D0F = {
-						DevelopmentTeam = "";
-						ProvisioningStyle = Automatic;
-					};
 					3B77B885BC5E5AC60175594A = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
@@ -530,10 +420,6 @@
 						ProvisioningStyle = Automatic;
 					};
 					B5A79335E768B5D3C034C869 = {
-						DevelopmentTeam = "";
-						ProvisioningStyle = Automatic;
-					};
-					DF7D02A15514D98EAD938C88 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
@@ -558,8 +444,6 @@
 				A95AF93AFDD7CAA54DEB9D8E /* BarkDesk */,
 				3B77B885BC5E5AC60175594A /* BarkDeskTests */,
 				578C57DFE4B072D964F26AD2 /* BarkDeskUITests */,
-				DF7D02A15514D98EAD938C88 /* NotifySupport */,
-				10A5541FEA353B2CEE932D0F /* notify */,
 			);
 		};
 /* End PBXProject section */
@@ -570,7 +454,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				65D81FAA0FFE5A419CF799FB /* BarkDesk.icns in Resources */,
-				4BC56538B49E9CA5456F924F /* notify in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -584,7 +467,6 @@
 				1A22E2C4241B71FB554FC083 /* AppConfiguration.swift in Sources */,
 				E53ADD6A6C6E8A9B82B304E5 /* BarkClient.swift in Sources */,
 				1485A293AB7721A460165DF6 /* BarkModels.swift in Sources */,
-				F340646C1541E5284CBE2635 /* CLIInstaller.swift in Sources */,
 				BF2BF7CD776E1D0033824457 /* ConfigurationStore.swift in Sources */,
 				CC7C5109BB00C8628A144886 /* HistoryModels.swift in Sources */,
 				FEA3104B5F0015C576D8335F /* HistoryStore.swift in Sources */,
@@ -599,7 +481,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				189E744E6F15C6DEED8DC36F /* BarkModelsTests.swift in Sources */,
-				33E0E68175EC28029838F0FF /* CLIInstallerTests.swift in Sources */,
 				C1A2E42D2C2E4573A50C16F2 /* HistoryStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -609,23 +490,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8FC1F212E98BA208312F901 /* OnboardingInputUITests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9F3EDC9EA3757337C11AF1EC /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				DA7B8A03810F3EEE497D2D82 /* NotifyMain.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9FD05E6896E47C233D06B1F1 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E1AC0BAAE09902EE7EC5901E /* CLIParser.swift in Sources */,
-				5F0EC8F72DA0184E7FF77307 /* NotifyRunner.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -657,16 +521,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		67E37B2D327BF36B6EEE7E34 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B5A79335E768B5D3C034C869 /* BarkCore */;
-			targetProxy = 0002030753A3F75A7BE8AD52 /* PBXContainerItemProxy */;
-		};
-		897BE092ADFB03E8EA006A7B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 10A5541FEA353B2CEE932D0F /* notify */;
-			targetProxy = 6E6B86B1BFDBE45EA3E1DA3C /* PBXContainerItemProxy */;
-		};
 		9798395F705CBDC35198F103 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A95AF93AFDD7CAA54DEB9D8E /* BarkDesk */;
@@ -681,11 +535,6 @@
 			isa = PBXTargetDependency;
 			target = A95AF93AFDD7CAA54DEB9D8E /* BarkDesk */;
 			targetProxy = D9C7CFBF661EC4A68F292AD6 /* PBXContainerItemProxy */;
-		};
-		D0AF7BC31BFB2AF4A082AB0A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DF7D02A15514D98EAD938C88 /* NotifySupport */;
-			targetProxy = 324B0196A6B5485B45E184A8 /* PBXContainerItemProxy */;
 		};
 		D9AD70548D3E0F1F33B5AE78 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -708,22 +557,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = app.barkdesk.BarkDeskTests;
 				SDKROOT = macosx;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BarkDesk.app/Contents/MacOS/BarkDesk";
-			};
-			name = Debug;
-		};
-		19423C1F24161154548762B6 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_HARDENED_RUNTIME = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = app.barkdesk.notify;
-				PRODUCT_NAME = notify;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -821,29 +654,6 @@
 				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
-		};
-		4F6C2A9626D8B263C51D58E0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACH_O_TYPE = staticlib;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.barkdesk.notify-support";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Debug;
 		};
 		66CE0BF5070D60C265A07FF8 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -964,45 +774,6 @@
 			};
 			name = Release;
 		};
-		8EBA75C4FF30673BE14DEC76 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACH_O_TYPE = staticlib;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.barkdesk.notify-support";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Release;
-		};
-		8F367C11D8A1CD00AFDB42D6 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_HARDENED_RUNTIME = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = app.barkdesk.notify;
-				PRODUCT_NAME = notify;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
 		953CF290100B587A4C18FAD3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1083,15 +854,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1F484A51AAF0061E743D0A2C /* Build configuration list for PBXNativeTarget "notify" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				19423C1F24161154548762B6 /* Debug */,
-				8F367C11D8A1CD00AFDB42D6 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
 		1FEA435AB9B10BED6B8EC16C /* Build configuration list for PBXProject "BarkDesk" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1142,15 +904,6 @@
 			buildConfigurations = (
 				953CF290100B587A4C18FAD3 /* Debug */,
 				6B384E490B9212077988D858 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
-		B9EA5CA28F9452621359875F /* Build configuration list for PBXNativeTarget "NotifySupport" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4F6C2A9626D8B263C51D58E0 /* Debug */,
-				8EBA75C4FF30673BE14DEC76 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
