@@ -5,7 +5,7 @@ import { useState } from "react";
 
 type CopyState = "idle" | "copied" | "error";
 
-export function CopyCommand({ command }: { command: string }) {
+export function CopyCommand({ command, compact = false }: { command: string; compact?: boolean }) {
   const [state, setState] = useState<CopyState>("idle");
 
   async function copy() {
@@ -22,7 +22,7 @@ export function CopyCommand({ command }: { command: string }) {
   const Icon = state === "copied" ? Check : state === "error" ? WarningCircle : Copy;
 
   return (
-    <button className="copy-button" type="button" onClick={copy} aria-live="polite">
+    <button className={`copy-button${compact ? " compact" : ""}`} type="button" onClick={copy} aria-live="polite">
       <Icon aria-hidden size={18} weight="bold" />
       <span>{label}</span>
     </button>

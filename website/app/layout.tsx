@@ -29,13 +29,11 @@ export const metadata: Metadata = {
     description: "原生 macOS Bark 客户端与通过 npm 发布的跨平台 notify CLI。",
     type: "website",
     locale: "zh_CN",
-    images: ["/visuals/barkdesk-product.webp"],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "BarkDesk",
     description: "原生 macOS Bark 客户端与通过 npm 发布的跨平台 notify CLI。",
-    images: ["/visuals/barkdesk-product.webp"],
   },
 };
 

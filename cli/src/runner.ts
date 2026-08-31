@@ -5,6 +5,7 @@ import { getConfigPath, loadStoredConfig, masked, resolveConfig, saveStoredConfi
 import { BarkHttpError, makePayload, push, testConnection } from "./bark.js";
 import { parseArguments } from "./parser.js";
 import { CliError, type CliCommand, type ConfigUpdates, type HistoryRecord, type SendOptions, type StoredConfig } from "./types.js";
+import { packageVersion } from "./version.js";
 
 export async function run(arguments_: string[]): Promise<number> {
   try { return await execute(parseArguments(arguments_)); }
@@ -18,7 +19,7 @@ export async function run(arguments_: string[]): Promise<number> {
 async function execute(command: CliCommand): Promise<number> {
   switch (command.kind) {
     case "help": console.log(helpText); return 0;
-    case "version": console.log("notify 1.0.0"); return 0;
+    case "version": console.log(`notify ${packageVersion}`); return 0;
     case "config-show": await showConfig(); return 0;
     case "config-path": console.log(getConfigPath()); return 0;
     case "config-test": for (const line of await testConnection(await resolveConfig())) console.log(line); return 0;

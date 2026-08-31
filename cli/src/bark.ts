@@ -1,5 +1,6 @@
 import { Buffer } from "node:buffer";
 import { CliError, type BarkPayload, type ResolvedConfig, type SendOptions } from "./types.js";
+import { packageVersion } from "./version.js";
 
 export interface PushResult {
   httpStatus: number;
@@ -66,7 +67,7 @@ export class BarkHttpError extends CliError {
 
 async function barkFetch(config: ResolvedConfig, path: string, init: RequestInit = {}, authenticated = true): Promise<Response> {
   const headers = new Headers(init.headers);
-  headers.set("User-Agent", "barkdesk-notify/1.0");
+  headers.set("User-Agent", `barkdesk-notify/${packageVersion}`);
   if (authenticated && config.username && config.password) {
     headers.set("Authorization", `Basic ${Buffer.from(`${config.username}:${config.password}`).toString("base64")}`);
   }

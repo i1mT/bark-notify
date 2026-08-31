@@ -16,6 +16,7 @@
 		334DC52BF1EC39EFA2B1528D /* ComposeDraftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 807B647AE9D6E9214BDC6DDF /* ComposeDraftTests.swift */; };
 		6472DB271CE28F8E28E8C245 /* IntegrationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19954A84027C55AE9BEFF7FD /* IntegrationsView.swift */; };
 		65D81FAA0FFE5A419CF799FB /* BarkDesk.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1D8ABCB13CDB60658E9453AC /* BarkDesk.icns */; };
+		6D8917825C6D23D18A94630D /* BarkDeskStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED702AE8D4A799F3D0B60C0C /* BarkDeskStyles.swift */; };
 		7A3762CB8C856A39127B7E16 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F803DD6080DD36C7D4BAC74 /* NotificationService.swift */; };
 		7F422EB83AD6A0E15E3DE803 /* ComposeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 531E49AD94AFB365ABFD545A /* ComposeView.swift */; };
 		8A87280D6EB171A0FD1A8B34 /* BarkDeskApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6798A179BDA020DC9985D4 /* BarkDeskApp.swift */; };
@@ -96,6 +97,7 @@
 		CD02057DEA0A72452D86F5D2 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		E8F44D6B47F20A266B4A7105 /* LargeTextFieldStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeTextFieldStyle.swift; sourceTree = "<group>"; };
 		EC2C5FABDFB9569CD5106D58 /* ConfigurationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationStore.swift; sourceTree = "<group>"; };
+		ED702AE8D4A799F3D0B60C0C /* BarkDeskStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarkDeskStyles.swift; sourceTree = "<group>"; };
 		FADA4E521A04A3182B0AE7A8 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		FD31AF952984D5737CF548E1 /* BarkCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BarkCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -150,6 +152,7 @@
 		2A76AFFED7C754CB2AABEE3F /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				ED702AE8D4A799F3D0B60C0C /* BarkDeskStyles.swift */,
 				E8F44D6B47F20A266B4A7105 /* LargeTextFieldStyle.swift */,
 			);
 			path = Components;
@@ -499,6 +502,7 @@
 			files = (
 				08AF0F9BB095DCCCA9075C45 /* AppModel.swift in Sources */,
 				8A87280D6EB171A0FD1A8B34 /* BarkDeskApp.swift in Sources */,
+				6D8917825C6D23D18A94630D /* BarkDeskStyles.swift in Sources */,
 				2971CF15D14B3892E60F7800 /* ComposeDraft.swift in Sources */,
 				7F422EB83AD6A0E15E3DE803 /* ComposeView.swift in Sources */,
 				F1EB7B3B541787FD5F65E740 /* ContentView.swift in Sources */,

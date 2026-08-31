@@ -98,7 +98,7 @@ make install
 make dmg
 ```
 
-生成结果位于 `build/BarkDesk-1.0.0.dmg`。打开后，把 `BarkDesk` 拖入 `Applications` 即可安装。也可以指定版本号：
+生成结果位于 `build/BarkDesk-1.1.0.dmg`。打开后，把 `BarkDesk` 拖入 `Applications` 即可安装。也可以指定版本号：
 
 ```bash
 make dmg VERSION=1.1.0
@@ -118,7 +118,7 @@ xcrun notarytool store-credentials "BarkDesk-Notary" \
 随后执行签名、公证和 stapling：
 
 ```bash
-make release-dmg VERSION=1.0.0
+make release-dmg VERSION=1.1.0
 ```
 
 `release-dmg` 会自动选择 Keychain 中的 `Developer ID Application` 证书，并使用 `BarkDesk-Notary` 公证 profile。脚本会构建并签署 App、创建并签署 DMG、等待 Apple 公证、附加公证票据，并且挂载 DMG 检查 App 是否完整。证书和公证凭据只保存在 macOS Keychain，不会写入仓库。
@@ -139,7 +139,7 @@ CLI tarball 也可以从 GitHub Release 直接安装，例如：
 
 ```bash
 npm install -g \
-  https://github.com/i1mT/bark-notify/releases/download/v1.0.0/barkdesk-notify-1.0.0.tgz
+  https://github.com/i1mT/bark-notify/releases/download/v1.1.0/barkdesk-notify-1.1.0.tgz
 ```
 
 发布前的完整检查步骤请参阅 [开源与发布检查表](docs/OPEN_SOURCE_CHECKLIST.md)。
@@ -151,8 +151,9 @@ npm install -g \
 1. Bark Server Base URL，例如 `https://bark.example.com` 或带 URL Prefix 的 `https://example.com/bark`。
 2. iPhone Bark App 已经注册的 Device Key。
 3. 如果服务器启用了 Basic Auth，请填写用户名和密码。
-4. 选择默认分组、提醒方式、提示音与归档行为。
-5. 使用“检查连接”和“发送测试通知”验证完整链路。
+4. 使用“检查连接”和“发送测试通知”验证完整链路。
+
+进入应用以后，可以在“设置”中选择默认分组、提醒方式、提示音与归档行为。
 
 Device Key、Basic Auth 用户名和密码保存在 macOS Keychain。普通默认设置保存在：
 

@@ -29,7 +29,8 @@ struct BarkDeskApp: App {
         Settings {
             SettingsView()
                 .environmentObject(model)
-                .frame(width: 560, height: 620)
+                .frame(width: 680, height: 720)
+                .tint(.barkRed)
         }
     }
 }

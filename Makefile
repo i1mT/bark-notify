@@ -1,6 +1,6 @@
 .PHONY: build test app dmg release-dmg xcode-project install cli-install cli-build cli-test cli-pack website-install website-dev website-build clean
 
-VERSION ?= 1.0.0
+VERSION ?= 1.1.0
 
 build:
 	swift build
