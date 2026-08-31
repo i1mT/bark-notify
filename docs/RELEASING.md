@@ -116,3 +116,14 @@ npm view barkdesk-notify@1.0.1 version
 ```
 
 npm 已经发布的版本不能覆盖。如果 GitHub Release 创建失败，可以在修复 workflow 后重新运行同一次 Actions run；workflow 会跳过已经存在的 npm 版本，并且重新上传 Release assets。
+
+如果失败原因需要修改 workflow，可以在修复并推送 `main` 后，针对已有 tag 手动启动恢复流程：
+
+```bash
+gh workflow run Release \
+  --repo i1mT/bark-notify \
+  --ref main \
+  -f tag=v1.0.1
+```
+
+这个入口会先确认远端 tag 存在，并且再次检查 tag 版本与当前 `cli/package.json` 一致，因此不需要删除或强制移动已经推送的 tag。

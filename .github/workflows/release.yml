@@ -4,10 +4,19 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing vMAJOR.MINOR.PATCH tag to publish or recover
+        required: true
+        type: string
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ inputs.tag || github.ref }}
   cancel-in-progress: false
+
+env:
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
   cli-package:
@@ -31,16 +40,17 @@ jobs:
         id: version
         shell: bash
         run: |
-          if [[ ! "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ ! "${RELEASE_TAG}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Release tag must use vMAJOR.MINOR.PATCH, for example v1.0.0." >&2
             exit 1
           fi
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${RELEASE_TAG#v}"
           PACKAGE_VERSION="$(node -p "require('./cli/package.json').version")"
           if [[ "${VERSION}" != "${PACKAGE_VERSION}" ]]; then
-            echo "Tag ${GITHUB_REF_NAME} does not match cli/package.json version ${PACKAGE_VERSION}." >&2
+            echo "Tag ${RELEASE_TAG} does not match cli/package.json version ${PACKAGE_VERSION}." >&2
             exit 1
           fi
+          git ls-remote --exit-code --tags origin "refs/tags/${RELEASE_TAG}" >/dev/null
           echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
 
       - name: Test and package CLI
@@ -113,6 +123,15 @@ jobs:
           registry-url: https://registry.npmjs.org/
           package-manager-cache: false
 
+      - name: Verify release assets
+        env:
+          VERSION: ${{ needs.cli-package.outputs.version }}
+        shell: bash
+        run: |
+          test -s "release-assets/BarkDesk-${VERSION}.dmg"
+          test -s "release-assets/barkdesk-notify-${VERSION}.tgz"
+          tar -tzf "release-assets/barkdesk-notify-${VERSION}.tgz" >/dev/null
+
       - name: Publish CLI to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -123,7 +142,7 @@ jobs:
           if npm view "${PACKAGE}" version >/dev/null 2>&1; then
             echo "${PACKAGE} is already published; skipping npm publish."
           else
-            npm publish "release-assets/barkdesk-notify-${VERSION}.tgz" \
+            npm publish "./release-assets/barkdesk-notify-${VERSION}.tgz" \
               --access public \
               --provenance
           fi
@@ -147,10 +166,10 @@ jobs:
             release-assets/barkdesk-notify-${{ needs.cli-package.outputs.version }}.tgz
             release-assets/SHA256SUMS.txt
           )
-          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
-            gh release upload "${GITHUB_REF_NAME}" "${ASSETS[@]}" --clobber
+          if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
+            gh release upload "${RELEASE_TAG}" "${ASSETS[@]}" --clobber
           else
-            gh release create "${GITHUB_REF_NAME}" "${ASSETS[@]}" \
+            gh release create "${RELEASE_TAG}" "${ASSETS[@]}" \
               --verify-tag \
               --generate-notes \
               --latest
