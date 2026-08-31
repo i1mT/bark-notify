@@ -1,4 +1,4 @@
-.PHONY: build test app dmg xcode-project install clean
+.PHONY: build test app dmg release-dmg xcode-project install clean
 
 VERSION ?= 1.0.0
 
@@ -13,6 +13,9 @@ app:
 
 dmg:
 	VERSION="$(VERSION)" ./scripts/build-dmg.sh
+
+release-dmg:
+	VERSION="$(VERSION)" SIGN_IDENTITY=auto NOTARY_PROFILE="BarkDesk-Notary" ./scripts/build-dmg.sh
 
 xcode-project:
 	xcodegen generate --spec Xcode/project.yml --project .

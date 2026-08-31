@@ -20,6 +20,16 @@ cleanup() {
 }
 trap cleanup EXIT
 
+if [[ "${SIGN_IDENTITY}" == "auto" ]]; then
+  SIGN_IDENTITY="$(security find-identity -v -p codesigning 2>/dev/null \
+    | sed -n 's/.*"\(Developer ID Application:[^"]*\)".*/\1/p' \
+    | head -n 1)"
+  if [[ -z "${SIGN_IDENTITY}" ]]; then
+    echo "Keychain 中没有可用的 Developer ID Application 证书。" >&2
+    exit 1
+  fi
+fi
+
 if [[ -n "${NOTARY_PROFILE}" && "${SIGN_IDENTITY}" == "-" ]]; then
   echo "NOTARY_PROFILE 需要配合 Developer ID Application 签名使用。" >&2
   exit 1
@@ -41,6 +51,11 @@ hdiutil create \
   -format UDZO \
   -ov \
   "${DMG_PATH}"
+
+if [[ "${SIGN_IDENTITY}" != "-" ]]; then
+  codesign --force --timestamp --sign "${SIGN_IDENTITY}" "${DMG_PATH}"
+  codesign --verify --verbose=2 "${DMG_PATH}"
+fi
 
 if [[ -n "${NOTARY_PROFILE}" ]]; then
   xcrun notarytool submit "${DMG_PATH}" \

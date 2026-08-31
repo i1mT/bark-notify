@@ -103,12 +103,10 @@ xcrun notarytool store-credentials "BarkDesk-Notary" \
 随后执行签名、公证和 stapling：
 
 ```bash
-SIGN_IDENTITY="Developer ID Application: 你的姓名 (TEAMID)" \
-NOTARY_PROFILE="BarkDesk-Notary" \
-make dmg VERSION=1.0.0
+make release-dmg VERSION=1.0.0
 ```
 
-脚本会构建 App、签署 App 内的 `notify`、创建 DMG、等待 Apple 公证、附加公证票据，并且挂载 DMG 检查 App 与 CLI 是否完整。公证凭据只保存在 macOS Keychain，不会写入仓库。
+`release-dmg` 会自动选择 Keychain 中的 `Developer ID Application` 证书，并使用 `BarkDesk-Notary` 公证 profile。脚本会构建 App、签署 App 与内置的 `notify`、创建并签署 DMG、等待 Apple 公证、附加公证票据，并且挂载 DMG 检查 App 与 CLI 是否完整。证书和公证凭据只保存在 macOS Keychain，不会写入仓库。
 
 ## 首次配置
 
