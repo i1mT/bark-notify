@@ -48,7 +48,9 @@ targets:
       - path: ../Sources/NotifyCLI
     settings:
       base:
+        ENABLE_HARDENED_RUNTIME: YES
         PRODUCT_NAME: notify
+        SKIP_INSTALL: YES
     dependencies:
       - target: NotifySupport
 
@@ -74,6 +76,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.barkdesk.macos
         PRODUCT_NAME: BarkDesk
+        ENABLE_HARDENED_RUNTIME: YES
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: Xcode/BarkDesk-Info.plist
         ENABLE_DEBUG_DYLIB: NO
