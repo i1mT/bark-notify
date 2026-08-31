@@ -67,7 +67,7 @@ base64 -i AuthKey_KEY_ID.p8 | pbcopy
 
 第一次发布时，在 npm 创建 granular access token，并且保存为 GitHub Secret `NPM_TOKEN`。这个 token 必须具有 package 写入权限，并且必须在创建时启用 **Bypass 2FA**；否则非交互式 GitHub Actions 会收到 `EOTP`。建议设置较短的有效期，并且在首次发布完成后立即删除。
 
-如果不希望创建能够绕过 2FA 的临时 token，也可以从失败的 Actions run 下载 CLI tarball，在本机通过 `npm publish ./barkdesk-notify-VERSION.tgz --access public --provenance` 完成交互式首次发布。随后再次运行 Release workflow，它会识别已经存在的 npm 版本并且继续创建 GitHub Release。
+如果不希望创建能够绕过 2FA 的临时 token，也可以从失败的 Actions run 下载 CLI tarball，在本机通过 `npm publish ./barkdesk-notify-VERSION.tgz --access public` 完成交互式首次发布。随后再次运行 Release workflow，它会识别已经存在的 npm 版本并且继续创建 GitHub Release；但这个手动发布的首个版本不会包含 GitHub Actions provenance，因此仍然推荐使用短期 Bypass 2FA token 完成首次 CI 发布。
 
 第一次发布成功后，推荐在 npm package 设置中配置 Trusted Publisher：
 
