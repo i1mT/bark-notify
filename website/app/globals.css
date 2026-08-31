@@ -1,0 +1,319 @@
+@import "tailwindcss";
+
+:root {
+  --page: #f2f3f5;
+  --surface: #fafafa;
+  --surface-raised: #e8eaed;
+  --surface-strong: #d9dce1;
+  --text: #17181b;
+  --muted: #5f646d;
+  --line: rgb(23 24 27 / 0.11);
+  --accent: #c9233a;
+  --accent-text: #c9233a;
+  --accent-strong: #a91930;
+  --accent-soft: #f2dce0;
+  --button-text: #fff7f8;
+  --code: #191a1d;
+  --code-text: #f1f2f4;
+  --shadow: 0 30px 90px rgb(40 43 50 / 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #111214;
+    --surface: #191a1d;
+    --surface-raised: #222429;
+    --surface-strong: #303239;
+    --text: #f0f1f3;
+    --muted: #a8acb4;
+    --line: rgb(240 241 243 / 0.12);
+    --accent: #c9344c;
+    --accent-text: #f06476;
+    --accent-strong: #b5253c;
+    --accent-soft: #3a1d24;
+    --button-text: #fff7f8;
+    --code: #0d0e10;
+    --code-text: #f1f2f4;
+    --shadow: 0 30px 100px rgb(0 0 0 / 0.38);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--page);
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--page);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  color: var(--button-text);
+  background: var(--accent);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  outline-offset: 4px;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--page) 82%, transparent);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(100% - 40px, 1280px);
+  height: 72px;
+  margin: 0 auto;
+}
+
+.brand-link,
+.site-footer > div {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 720;
+  letter-spacing: -0.025em;
+}
+
+.brand-link img,
+.site-footer img {
+  border-radius: 10px;
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.desktop-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.desktop-nav a:hover {
+  color: var(--text);
+}
+
+.desktop-nav a:active,
+.primary-button:active,
+.secondary-button:active,
+.copy-button:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+.nav-download,
+.primary-button {
+  color: var(--button-text) !important;
+  background: var(--accent);
+}
+
+.nav-download {
+  padding: 10px 16px;
+  border-radius: 999px;
+}
+
+.mobile-menu-button,
+.mobile-nav {
+  display: none;
+}
+
+.hero-section {
+  min-height: calc(100dvh - 72px);
+  display: grid;
+  align-items: center;
+  padding: 64px 20px;
+  overflow: hidden;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(560px, 1.18fr);
+  align-items: center;
+  gap: clamp(48px, 7vw, 110px);
+  width: min(100%, 1280px);
+  margin: 0 auto;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-eyebrow {
+  margin: 0 0 24px;
+  color: var(--accent-text);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12px;
+  font-weight: 720;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.hero-copy h1 {
+  max-width: 720px;
+  margin: 0;
+  font-size: clamp(52px, 6.5vw, 92px);
+  line-height: 0.98;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
+}
+
+.hero-summary {
+  max-width: 440px;
+  margin: 28px 0 0;
+  color: var(--muted);
+  font-size: clamp(18px, 2vw, 22px);
+  line-height: 1.55;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 50px;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 720;
+  white-space: nowrap;
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.primary-button:hover {
+  background: var(--accent-strong);
+}
+
+.secondary-button {
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+.secondary-button:hover {
+  background: var(--surface-raised);
+}
+
+.hero-visual {
+  width: min(920px, 70vw);
+  margin-right: -12vw;
+}
+
+.screenshot-shell {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 28px;
+  background: #202326;
+  box-shadow: var(--shadow);
+  transform: perspective(1400px) rotateY(-5deg) rotateX(1.5deg);
+}
+
+.screenshot-shell img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.fact-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: min(100% - 40px, 1280px);
+  margin: 0 auto;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.fact-strip > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 96px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 620;
+}
+
+.fact-strip > div + div {
+  border-left: 1px solid var(--line);
+}
+
+.section-shell,
+.cli-section,
+.privacy-section,
+.download-section {
+  width: min(100% - 40px, 1280px);
+  margin: 0 auto;
+  padding: 128px 0;
+}
+
+.section-heading {
+  max-width: 690px;
+  margin-bottom: 56px;
+}
+
+.section-heading h2,
+.cli-copy h2,
+.privacy-copy h2,
+.download-panel h2 {
+  margin: 0;
+  font-size: clamp(38px, 5vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.052em;
+  text-wrap: balance;
+}
+
+.section-heading p,
+.cli-copy > p,
+.privacy-copy p,
+.download-panel p,
+.cell-copy p,
+.command-cell p {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.section-heading p {
+  max-width: 560px;
+  margin: 20px 0 0;
+  font-size: 18px;
+}

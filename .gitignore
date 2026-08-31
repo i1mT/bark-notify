@@ -4,3 +4,18 @@
 build/
 *.xcuserstate
 xcuserdata/
+
+# Next.js website
+website/node_modules/
+website/.next/
+website/out/
+website/.env
+website/.env.local
+website/.env.*.local
+website/*.tsbuildinfo
+
+# Signing and notarization secrets
+*.p8
+*.p12
+*.cer
+*.provisionprofile

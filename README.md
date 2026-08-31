@@ -2,6 +2,14 @@
 
 BarkDesk 是一个使用 Swift 和 SwiftUI 编写的 macOS 原生 Bark 控制中心，同时提供简洁的 `notify` CLI。它直接连接现有 Bark Server，不需要部署代理服务，也不会修改 Bark Server。
 
+![BarkDesk 应用图标](Assets/BarkDeskIcon.png)
+
+## 快速开始
+
+普通用户可以从 GitHub Releases 下载最新的、经过 Developer ID 签名和 Apple 公证的 DMG，把 `BarkDesk` 拖入 `Applications` 后打开。首次运行会引导填写 Bark Server 地址与 Device Key，并且可以在应用内安装 `notify` 命令。
+
+从源码运行时，请打开 `BarkDesk.xcodeproj`，选择 `BarkDesk` scheme，然后按下 Run。
+
 主要能力：
 
 - 使用 macOS 原生界面配置 Bark Server、Device Key 和 Basic Auth。
@@ -9,9 +17,7 @@ BarkDesk 是一个使用 Swift 和 SwiftUI 编写的 macOS 原生 Bark 控制中
 - 使用 `notify "完成"`、stdin 或 `notify run command` 从终端发送通知。
 - 使用同一份 SQLite 数据库查看 GUI 和 CLI 的本机发送历史，包括失败记录。
 - 在 Integrations 页面复制 REST、兼容 Push URL、MCP URL 和调用示例。
-- 提供菜单栏入口，可以快速打开 Compose 和历史记录。
-
-![BarkDesk 应用图标](Assets/BarkDeskIcon.png)
+- 提供菜单栏入口，可以快速打开发送页面和历史记录。
 
 > Bark Server 没有历史查询 API。BarkDesk 的历史仅包含这台 Mac 通过 BarkDesk GUI 或 `notify` CLI 发出的消息。
 
@@ -91,14 +97,16 @@ make dmg
 make dmg VERSION=1.1.0
 ```
 
-这个默认产物使用 ad-hoc 签名，适合你自己的 Mac 或受信任的小范围测试。要把 DMG 正式发给其他用户，并且避免 Gatekeeper 显示“无法验证开发者”，需要加入 Apple Developer Program、安装 `Developer ID Application` 证书，并且先把公证凭据保存到 Keychain：
+这个默认产物使用 ad-hoc 签名，适合你自己的 Mac 或受信任的小范围测试。要把 DMG 正式发给其他用户，并且避免 Gatekeeper 显示“无法验证开发者”，需要加入 Apple Developer Program、安装 `Developer ID Application` 证书，并且先把公证凭据保存到 Keychain。推荐使用 App Store Connect API Key：
 
 ```bash
 xcrun notarytool store-credentials "BarkDesk-Notary" \
-  --apple-id "你的 Apple ID" \
-  --team-id "你的 Team ID" \
-  --password "App 专用密码"
+  --key "/path/to/AuthKey_KEY_ID.p8" \
+  --key-id "KEY_ID" \
+  --issuer "ISSUER_ID"
 ```
+
+也可以只运行 `xcrun notarytool store-credentials "BarkDesk-Notary"`，根据交互提示使用 Apple ID 与 App 专用密码。不要把密码、API Key 或 `.p8` 文件提交到仓库，也不要把密码直接写入 shell 命令历史。
 
 随后执行签名、公证和 stapling：
 
@@ -107,6 +115,8 @@ make release-dmg VERSION=1.0.0
 ```
 
 `release-dmg` 会自动选择 Keychain 中的 `Developer ID Application` 证书，并使用 `BarkDesk-Notary` 公证 profile。脚本会构建 App、签署 App 与内置的 `notify`、创建并签署 DMG、等待 Apple 公证、附加公证票据，并且挂载 DMG 检查 App 与 CLI 是否完整。证书和公证凭据只保存在 macOS Keychain，不会写入仓库。
+
+发布前的完整检查步骤请参阅 [开源与发布检查表](docs/OPEN_SOURCE_CHECKLIST.md)。
 
 ## 首次配置
 
@@ -249,3 +259,41 @@ BARKDESK_HOME=/tmp/barkdesk-test .build/debug/notify history
 ## 当前不包含的能力
 
 BarkDesk 不注册 macOS APNs，不接收 iPhone 通知，不提供新 Server、代理、账号、云同步、定时任务，也不会尝试调用不存在的 Bark Server 历史接口。
+
+## 项目官网
+
+官网是位于 `website` 目录中的独立 Next.js 项目，使用静态导出，因此可以部署到 Cloudflare Pages、Vercel 或任何以域名根目录提供文件的静态托管服务。
+
+```bash
+cd website
+cp .env.example .env.local
+npm install
+npm run dev
+```
+
+发布构建：
+
+```bash
+npm run lint
+npm run typecheck
+npm run build
+```
+
+静态文件会生成到 `website/out`。公开部署前需要在部署平台配置以下环境变量：
+
+```text
+NEXT_PUBLIC_SITE_URL=https://你的官网地址
+NEXT_PUBLIC_GITHUB_URL=https://github.com/你的账号/你的仓库
+NEXT_PUBLIC_DOWNLOAD_URL=https://github.com/你的账号/你的仓库/releases/latest
+```
+
+这些值只包含公开链接。Apple 开发者凭据、Device Key 和 Bark Server 凭据不属于官网环境变量。
+
+## 参与开源项目
+
+- 贡献代码前请阅读 [参与贡献](.github/CONTRIBUTING.md) 与 [社区行为准则](.github/CODE_OF_CONDUCT.md)。
+- 安全漏洞请使用 GitHub Private vulnerability reporting，并且遵循 [安全政策](.github/SECURITY.md)。
+- 数据处理方式请参阅 [隐私说明](PRIVACY.md)。
+- 项目采用 [MIT License](LICENSE)。
+
+BarkDesk 是第三方开源客户端，与 Bark 官方项目没有隶属关系。Bark 名称及其相关标识归各自权利人所有。

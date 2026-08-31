@@ -22,3 +22,9 @@
 - 修改多栏界面后，必须使用窗口允许的最小宽度检查侧边栏选中背景、长文本和操作按钮，确保任何内容都不会超出窗口边界。
 - 面向其他用户分发 macOS App 时，必须使用 `Developer ID Application` 签名、`notarytool` 公证和 `stapler` 附加票据；ad-hoc 签名的 DMG 仅用于本机或内部测试。
 - 每次完成代码修改后都需要创建 Git commit，并在提交信息中说明主要改动。
+
+## 开源与发布安全
+
+- 公开仓库不得包含真实的 Apple ID、Team ID、App Store Connect API Key、Device Key、Bark Server 地址、Basic Auth、签名证书或公证凭据。
+- 官网的 GitHub 地址、DMG 下载地址和站点地址必须通过 `NEXT_PUBLIC_*` 环境变量配置，不得提交个人账号地址。
+- 签名、公证和发布使用的凭据只允许保存在 macOS Keychain、GitHub Actions Secrets 或本机未跟踪文件中。
