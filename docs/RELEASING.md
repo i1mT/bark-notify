@@ -14,7 +14,7 @@
 | `APPLE_API_KEY_BASE64` | App Store Connect team API key `.p8` 文件的 Base64 |
 | `APPLE_API_KEY_ID` | App Store Connect API Key ID |
 | `APPLE_API_ISSUER_ID` | App Store Connect API Issuer ID |
-| `NPM_TOKEN` | 第一次 npm 发布使用的 granular access token；配置 Trusted Publishing 后可以删除 |
+| `NPM_TOKEN` | 第一次 npm 发布使用的 granular access token，必须具有 package 写入权限并且在创建时启用 Bypass 2FA；配置 Trusted Publishing 后可以删除 |
 
 workflow 不需要 Apple ID、Team ID 或本机 `BarkDesk-Notary` profile。所有临时证书、API Key 文件和 Keychain 都会在 GitHub runner 构建结束时删除。
 
@@ -65,7 +65,9 @@ base64 -i AuthKey_KEY_ID.p8 | pbcopy
 
 ## 准备 npm 发布认证
 
-第一次发布时，在 npm 创建只允许发布 `barkdesk-notify` 的 granular access token，并且保存为 GitHub Secret `NPM_TOKEN`。
+第一次发布时，在 npm 创建 granular access token，并且保存为 GitHub Secret `NPM_TOKEN`。这个 token 必须具有 package 写入权限，并且必须在创建时启用 **Bypass 2FA**；否则非交互式 GitHub Actions 会收到 `EOTP`。建议设置较短的有效期，并且在首次发布完成后立即删除。
+
+如果不希望创建能够绕过 2FA 的临时 token，也可以从失败的 Actions run 下载 CLI tarball，在本机通过 `npm publish ./barkdesk-notify-VERSION.tgz --access public --provenance` 完成交互式首次发布。随后再次运行 Release workflow，它会识别已经存在的 npm 版本并且继续创建 GitHub Release。
 
 第一次发布成功后，推荐在 npm package 设置中配置 Trusted Publisher：
 
