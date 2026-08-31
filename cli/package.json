@@ -1,6 +1,6 @@
 {
   "name": "barkdesk-notify",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cross-platform Bark CLI with a short notify command.",
   "type": "module",
   "bin": {
