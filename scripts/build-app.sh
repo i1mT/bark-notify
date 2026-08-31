@@ -10,14 +10,58 @@ ICON_SOURCE="${PROJECT_DIR}/Assets/BarkDeskIcon.png"
 SIGN_IDENTITY="${SIGN_IDENTITY:--}"
 APP_VERSION="${APP_VERSION:-1.0.0}"
 BUILD_NUMBER="${BUILD_NUMBER:-1}"
+APP_ARCHS="${APP_ARCHS:-}"
+MACOS_DEPLOYMENT_TARGET="${MACOS_DEPLOYMENT_TARGET:-14.0}"
+
+build_app_binary() {
+  if [[ -z "${APP_ARCHS}" ]]; then
+    swift build -c "${CONFIGURATION}" --product BarkDesk
+    local bin_dir
+    bin_dir="$(swift build -c "${CONFIGURATION}" --show-bin-path)"
+    APP_BINARY="${bin_dir}/BarkDesk"
+    return
+  fi
+
+  local architecture
+  local scratch_dir
+  local bin_dir
+  local -a binaries
+  for architecture in ${(z)APP_ARCHS}; do
+    case "${architecture}" in
+      arm64|x86_64) ;;
+      *)
+        echo "APP_ARCHS 只支持 arm64 和 x86_64，收到：${architecture}" >&2
+        exit 1
+        ;;
+    esac
+    scratch_dir="${OUTPUT_DIR}/swift-${architecture}"
+    rm -rf "${scratch_dir}"
+    swift build \
+      -c "${CONFIGURATION}" \
+      --product BarkDesk \
+      --triple "${architecture}-apple-macosx${MACOS_DEPLOYMENT_TARGET}" \
+      --scratch-path "${scratch_dir}"
+    bin_dir="$(swift build \
+      -c "${CONFIGURATION}" \
+      --triple "${architecture}-apple-macosx${MACOS_DEPLOYMENT_TARGET}" \
+      --scratch-path "${scratch_dir}" \
+      --show-bin-path)"
+    binaries+=("${bin_dir}/BarkDesk")
+  done
+
+  local universal_binary="${OUTPUT_DIR}/BarkDesk.universal"
+  lipo -create "${binaries[@]}" -output "${universal_binary}"
+  APP_BINARY="${universal_binary}"
+}
 
 cd "${PROJECT_DIR}"
-swift build -c "${CONFIGURATION}" --product BarkDesk
-BIN_DIR="$(swift build -c "${CONFIGURATION}" --show-bin-path)"
+mkdir -p "${OUTPUT_DIR}"
+APP_BINARY=""
+build_app_binary
 
 rm -rf "${APP_DIR}"
 mkdir -p "${APP_DIR}/Contents/MacOS" "${APP_DIR}/Contents/Resources"
-ditto "${BIN_DIR}/BarkDesk" "${APP_DIR}/Contents/MacOS/BarkDesk"
+ditto "${APP_BINARY}" "${APP_DIR}/Contents/MacOS/BarkDesk"
 rm -rf "${ICONSET_DIR}"
 mkdir -p "${ICONSET_DIR}"
 sips -z 16 16 "${ICON_SOURCE}" --out "${ICONSET_DIR}/icon_16x16.png" >/dev/null
@@ -40,7 +84,7 @@ plutil -insert CFBundleIconFile -string "BarkDesk" "${APP_DIR}/Contents/Info.pli
 plutil -insert CFBundlePackageType -string "APPL" "${APP_DIR}/Contents/Info.plist"
 plutil -insert CFBundleShortVersionString -string "${APP_VERSION}" "${APP_DIR}/Contents/Info.plist"
 plutil -insert CFBundleVersion -string "${BUILD_NUMBER}" "${APP_DIR}/Contents/Info.plist"
-plutil -insert LSMinimumSystemVersion -string "14.0" "${APP_DIR}/Contents/Info.plist"
+plutil -insert LSMinimumSystemVersion -string "${MACOS_DEPLOYMENT_TARGET}" "${APP_DIR}/Contents/Info.plist"
 plutil -insert NSHighResolutionCapable -bool true "${APP_DIR}/Contents/Info.plist"
 plutil -insert NSPrincipalClass -string "NSApplication" "${APP_DIR}/Contents/Info.plist"
 if [[ "${SIGN_IDENTITY}" == "-" ]]; then

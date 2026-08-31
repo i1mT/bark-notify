@@ -28,5 +28,6 @@
 ## 开源与发布安全
 
 - 公开仓库不得包含真实的 Apple ID、Team ID、App Store Connect API Key、Device Key、Bark Server 地址、Basic Auth、签名证书或公证凭据。
-- 官网的 GitHub 地址、DMG 下载地址和站点地址必须通过 `NEXT_PUBLIC_*` 环境变量配置，不得提交个人账号地址。
+- 项目的公开仓库地址固定为 `https://github.com/i1mT/bark-notify`，官网的 GitHub 与 DMG 下载链接直接使用该地址；只有实际站点域名使用 `NEXT_PUBLIC_SITE_URL` 配置。
 - 签名、公证和发布使用的凭据只允许保存在 macOS Keychain、GitHub Actions Secrets 或本机未跟踪文件中。
+- 正式版本必须通过 `vMAJOR.MINOR.PATCH` tag 触发 GitHub Release，并且同时发布经过签名、公证的 universal DMG、npm CLI package、SHA-256 校验文件与 provenance attestation。

@@ -27,6 +27,15 @@
     "cli",
     "notify"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/i1mT/bark-notify.git",
+    "directory": "cli"
+  },
+  "homepage": "https://github.com/i1mT/bark-notify#readme",
+  "bugs": {
+    "url": "https://github.com/i1mT/bark-notify/issues"
+  },
   "license": "MIT",
   "publishConfig": {
     "access": "public"

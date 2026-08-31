@@ -7,6 +7,10 @@ VERSION="${VERSION:-1.0.0}"
 BUILD_NUMBER="${BUILD_NUMBER:-1}"
 SIGN_IDENTITY="${SIGN_IDENTITY:--}"
 NOTARY_PROFILE="${NOTARY_PROFILE:-}"
+NOTARY_KEY="${NOTARY_KEY:-}"
+NOTARY_KEY_ID="${NOTARY_KEY_ID:-}"
+NOTARY_ISSUER="${NOTARY_ISSUER:-}"
+APP_ARCHS="${APP_ARCHS:-}"
 DMG_PATH="${OUTPUT_DIR}/BarkDesk-${VERSION}.dmg"
 STAGING_DIR="$(mktemp -d "${TMPDIR:-/tmp}/BarkDesk-dmg.XXXXXX")"
 MOUNT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/BarkDesk-mount.XXXXXX")"
@@ -30,8 +34,21 @@ if [[ "${SIGN_IDENTITY}" == "auto" ]]; then
   fi
 fi
 
-if [[ -n "${NOTARY_PROFILE}" && "${SIGN_IDENTITY}" == "-" ]]; then
-  echo "NOTARY_PROFILE 需要配合 Developer ID Application 签名使用。" >&2
+DIRECT_NOTARY_VALUES=0
+[[ -n "${NOTARY_KEY}" ]] && (( DIRECT_NOTARY_VALUES += 1 ))
+[[ -n "${NOTARY_KEY_ID}" ]] && (( DIRECT_NOTARY_VALUES += 1 ))
+[[ -n "${NOTARY_ISSUER}" ]] && (( DIRECT_NOTARY_VALUES += 1 ))
+
+if (( DIRECT_NOTARY_VALUES > 0 && DIRECT_NOTARY_VALUES < 3 )); then
+  echo "直接公证需要同时提供 NOTARY_KEY、NOTARY_KEY_ID 和 NOTARY_ISSUER。" >&2
+  exit 1
+fi
+if [[ -n "${NOTARY_PROFILE}" && ${DIRECT_NOTARY_VALUES} -eq 3 ]]; then
+  echo "NOTARY_PROFILE 与直接 App Store Connect API Key 参数不能同时使用。" >&2
+  exit 1
+fi
+if [[ ( -n "${NOTARY_PROFILE}" || ${DIRECT_NOTARY_VALUES} -eq 3 ) && "${SIGN_IDENTITY}" == "-" ]]; then
+  echo "Apple 公证需要配合 Developer ID Application 签名使用。" >&2
   exit 1
 fi
 
@@ -39,6 +56,7 @@ OUTPUT_DIR="${OUTPUT_DIR}" \
 APP_VERSION="${VERSION}" \
 BUILD_NUMBER="${BUILD_NUMBER}" \
 SIGN_IDENTITY="${SIGN_IDENTITY}" \
+APP_ARCHS="${APP_ARCHS}" \
   "${PROJECT_DIR}/scripts/build-app.sh"
 
 ditto "${OUTPUT_DIR}/BarkDesk.app" "${STAGING_DIR}/BarkDesk.app"
@@ -61,8 +79,18 @@ if [[ -n "${NOTARY_PROFILE}" ]]; then
   xcrun notarytool submit "${DMG_PATH}" \
     --keychain-profile "${NOTARY_PROFILE}" \
     --wait
+elif (( DIRECT_NOTARY_VALUES == 3 )); then
+  xcrun notarytool submit "${DMG_PATH}" \
+    --key "${NOTARY_KEY}" \
+    --key-id "${NOTARY_KEY_ID}" \
+    --issuer "${NOTARY_ISSUER}" \
+    --wait
+fi
+
+if [[ -n "${NOTARY_PROFILE}" || ${DIRECT_NOTARY_VALUES} -eq 3 ]]; then
   xcrun stapler staple "${DMG_PATH}"
   xcrun stapler validate "${DMG_PATH}"
+  spctl --assess --type open --context context:primary-signature -v "${DMG_PATH}"
 fi
 
 hdiutil verify "${DMG_PATH}"

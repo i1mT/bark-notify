@@ -15,7 +15,7 @@ dmg:
 	VERSION="$(VERSION)" ./scripts/build-dmg.sh
 
 release-dmg:
-	VERSION="$(VERSION)" SIGN_IDENTITY=auto NOTARY_PROFILE="BarkDesk-Notary" ./scripts/build-dmg.sh
+	VERSION="$(VERSION)" APP_ARCHS="arm64 x86_64" SIGN_IDENTITY=auto NOTARY_PROFILE="BarkDesk-Notary" ./scripts/build-dmg.sh
 
 xcode-project:
 	xcodegen generate --spec Xcode/project.yml --project .

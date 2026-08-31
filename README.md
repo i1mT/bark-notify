@@ -2,6 +2,8 @@
 
 BarkDesk 包含两个独立产品：使用 SwiftUI 编写的 macOS 原生 Bark 控制中心，以及通过 npm 发布的跨平台 `notify` CLI。两者都直接连接现有 Bark Server，不需要部署代理服务，也不会修改 Bark Server。
 
+[GitHub](https://github.com/i1mT/bark-notify) · [Releases](https://github.com/i1mT/bark-notify/releases/latest) · [npm](https://www.npmjs.com/package/barkdesk-notify)
+
 ![BarkDesk 应用图标](Assets/BarkDeskIcon.png)
 
 ## 快速开始
@@ -120,6 +122,25 @@ make release-dmg VERSION=1.0.0
 ```
 
 `release-dmg` 会自动选择 Keychain 中的 `Developer ID Application` 证书，并使用 `BarkDesk-Notary` 公证 profile。脚本会构建并签署 App、创建并签署 DMG、等待 Apple 公证、附加公证票据，并且挂载 DMG 检查 App 是否完整。证书和公证凭据只保存在 macOS Keychain，不会写入仓库。
+
+### 使用 GitHub Release 正式发布
+
+仓库包含 `.github/workflows/release.yml`。推送 `vMAJOR.MINOR.PATCH` tag 后，GitHub Actions 会自动完成以下工作：
+
+- 构建同时支持 Apple Silicon 与 Intel Mac 的 universal DMG。
+- 使用 Developer ID 签名、Apple 公证并且附加公证票据。
+- 测试并打包 CLI，然后发布 `barkdesk-notify` 到 npm。
+- 生成 `SHA256SUMS.txt` 和 GitHub provenance attestation。
+- 创建 GitHub Release，并且上传 DMG、npm tarball 与校验文件。
+
+需要在 GitHub 仓库中配置 Apple 与 npm Secrets。完整名称、生成方式和发布命令请参阅 [自动发布指南](docs/RELEASING.md)。
+
+CLI tarball 也可以从 GitHub Release 直接安装，例如：
+
+```bash
+npm install -g \
+  https://github.com/i1mT/bark-notify/releases/download/v1.0.0/barkdesk-notify-1.0.0.tgz
+```
 
 发布前的完整检查步骤请参阅 [开源与发布检查表](docs/OPEN_SOURCE_CHECKLIST.md)。
 
@@ -294,13 +315,10 @@ npm run typecheck
 npm run build
 ```
 
-静态文件会生成到 `website/out`。公开部署前需要在部署平台配置以下环境变量：
+静态文件会生成到 `website/out`。GitHub、Releases 与 npm 地址已经使用本项目的公开地址，不需要环境变量。公开部署时只需要配置实际站点域名：
 
 ```text
 NEXT_PUBLIC_SITE_URL=https://你的官网地址
-NEXT_PUBLIC_GITHUB_URL=https://github.com/你的账号/你的仓库
-NEXT_PUBLIC_DOWNLOAD_URL=https://github.com/你的账号/你的仓库/releases/latest
-NEXT_PUBLIC_NPM_URL=https://www.npmjs.com/package/barkdesk-notify
 ```
 
 这些值只包含公开链接。Apple 开发者凭据、Device Key 和 Bark Server 凭据不属于官网环境变量。

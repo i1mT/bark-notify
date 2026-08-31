@@ -1,0 +1,157 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  cli-package:
+    name: Build CLI package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Validate release version
+        id: version
+        shell: bash
+        run: |
+          if [[ ! "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tag must use vMAJOR.MINOR.PATCH, for example v1.0.0." >&2
+            exit 1
+          fi
+          VERSION="${GITHUB_REF_NAME#v}"
+          PACKAGE_VERSION="$(node -p "require('./cli/package.json').version")"
+          if [[ "${VERSION}" != "${PACKAGE_VERSION}" ]]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match cli/package.json version ${PACKAGE_VERSION}." >&2
+            exit 1
+          fi
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+
+      - name: Test and package CLI
+        working-directory: cli
+        run: |
+          npm ci
+          npm run typecheck
+          npm test
+          mkdir -p ../release-assets
+          npm pack --pack-destination ../release-assets
+
+      - name: Upload CLI package
+        uses: actions/upload-artifact@v7
+        with:
+          name: cli-package
+          path: release-assets/barkdesk-notify-${{ steps.version.outputs.version }}.tgz
+          if-no-files-found: error
+          retention-days: 7
+
+  macos-dmg:
+    name: Build signed and notarized DMG
+    needs: cli-package
+    runs-on: macos-15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build universal DMG
+        env:
+          VERSION: ${{ needs.cli-package.outputs.version }}
+          BUILD_NUMBER: ${{ github.run_number }}
+          APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_KEYCHAIN_PASSWORD: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
+          APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+        run: ./scripts/build-ci-dmg.sh
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v7
+        with:
+          name: macos-dmg
+          path: build/BarkDesk-${{ needs.cli-package.outputs.version }}.dmg
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish npm package and GitHub Release
+    needs: [cli-package, macos-dmg]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@v8
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Set up Node.js for npm
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org/
+          package-manager-cache: false
+
+      - name: Publish CLI to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          VERSION: ${{ needs.cli-package.outputs.version }}
+        shell: bash
+        run: |
+          PACKAGE="barkdesk-notify@${VERSION}"
+          if npm view "${PACKAGE}" version >/dev/null 2>&1; then
+            echo "${PACKAGE} is already published; skipping npm publish."
+          else
+            npm publish "release-assets/barkdesk-notify-${VERSION}.tgz" \
+              --access public \
+              --provenance
+          fi
+
+      - name: Generate checksums
+        working-directory: release-assets
+        run: sha256sum *.dmg *.tgz > SHA256SUMS.txt
+
+      - name: Attest release assets
+        uses: actions/attest@v4
+        with:
+          subject-checksums: release-assets/SHA256SUMS.txt
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          ASSETS=(
+            release-assets/BarkDesk-${{ needs.cli-package.outputs.version }}.dmg
+            release-assets/barkdesk-notify-${{ needs.cli-package.outputs.version }}.tgz
+            release-assets/SHA256SUMS.txt
+          )
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" "${ASSETS[@]}" --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" "${ASSETS[@]}" \
+              --verify-tag \
+              --generate-notes \
+              --latest
+          fi

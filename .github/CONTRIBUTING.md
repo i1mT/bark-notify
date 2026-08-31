@@ -59,3 +59,7 @@ npm --prefix website run build
 
 4. 在 Pull Request 中说明用户可见变化、验证方式和界面截图。
 5. 不要提交 Device Key、服务器凭据、Apple 开发者信息、证书或 `.env.local`。
+
+## 发布
+
+维护者通过 `vMAJOR.MINOR.PATCH` tag 触发 GitHub Release，不应当在普通 Pull Request workflow 中使用签名、公证或 npm 发布凭据。完整流程请参阅 [自动发布指南](../docs/RELEASING.md)。

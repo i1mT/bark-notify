@@ -89,9 +89,25 @@ notify history --search deploy --limit 50
 
 CLI 历史与 BarkDesk macOS App 历史相互独立，不会跨设备或跨系统同步。
 
-## 发布 package
+## 自动发布 package
 
-维护者发布前需要确认 npm 账号、package 名称和版本，然后执行：
+正式版本由仓库根目录的 GitHub Actions Release workflow 发布。先更新 `cli/package.json` 的版本并且提交，然后创建完全一致的版本 tag：
+
+```bash
+git tag v1.0.0
+git push origin main v1.0.0
+```
+
+workflow 会执行测试、生成 npm tarball、发布到 npm，并且把 tarball 与 macOS DMG 一起添加到对应的 GitHub Release。npm Trusted Publishing 是推荐方式；第一次发布也可以临时配置 `NPM_TOKEN` repository secret。
+
+GitHub Release 中的 tarball 也可以直接安装，不经过 npm Registry：
+
+```bash
+npm install -g \
+  https://github.com/i1mT/bark-notify/releases/download/v1.0.0/barkdesk-notify-1.0.0.tgz
+```
+
+手动发布仅用于维护或故障恢复。发布前需要确认 npm 账号、package 名称和版本，然后执行：
 
 ```bash
 npm ci
