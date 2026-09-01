@@ -125,14 +125,6 @@ private struct SidebarNavigationButton: View {
             .frame(height: 43)
             .frame(maxWidth: .infinity)
             .background(selected ? Color.barkSurface : .clear, in: RoundedRectangle(cornerRadius: 10))
-            .overlay(alignment: .leading) {
-                if selected {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Color.barkAccent)
-                        .frame(width: 3, height: 21)
-                        .padding(.leading, 1)
-                }
-            }
             .shadow(color: selected ? Color.barkInk.opacity(0.05) : .clear, radius: 8, y: 3)
             .contentShape(RoundedRectangle(cornerRadius: 10))
         }

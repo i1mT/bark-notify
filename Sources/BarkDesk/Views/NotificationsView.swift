@@ -212,15 +212,16 @@ private struct HistoryRow: View {
                     .foregroundStyle(selected ? Color.barkAccent : Color.barkInk)
                     .lineLimit(1).fixedSize(horizontal: true, vertical: false)
                     .frame(width: 88, alignment: .leading)
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(record.deliveryStatus == .success ? Color.green : Color.orange)
-                    .frame(width: 3, height: 38)
-                    .padding(.top, 2)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(record.title?.nilIfEmpty ?? "无标题通知")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(Color.barkInk)
-                        .lineLimit(1)
+                    HStack(spacing: 7) {
+                        Circle()
+                            .fill(record.deliveryStatus == .success ? Color.green : Color.orange)
+                            .frame(width: 7, height: 7)
+                        Text(record.title?.nilIfEmpty ?? "无标题通知")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(Color.barkInk)
+                            .lineLimit(1)
+                    }
                     Text(record.body)
                         .font(.system(size: 14))
                         .foregroundStyle(.secondary)
@@ -235,11 +236,6 @@ private struct HistoryRow: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 11)
             .background(selected ? Color.barkAccentSoft : .clear, in: RoundedRectangle(cornerRadius: 9))
-            .overlay(alignment: .leading) {
-                if selected {
-                    RoundedRectangle(cornerRadius: 2).fill(Color.barkAccent).frame(width: 3, height: 44)
-                }
-            }
             .contentShape(RoundedRectangle(cornerRadius: 9))
         }
         .buttonStyle(.plain)
