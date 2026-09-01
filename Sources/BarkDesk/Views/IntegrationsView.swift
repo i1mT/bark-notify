@@ -81,9 +81,9 @@ struct IntegrationsView: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.title3)
-                .foregroundStyle(Color.barkBlue)
+                .foregroundStyle(Color.barkAccent)
                 .frame(width: 40, height: 40)
-                .background(Color.barkBlueSoft, in: RoundedRectangle(cornerRadius: 10))
+                .background(Color.barkAccentSoft, in: RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 3) {
                 Text(title).font(.headline)
                 Text(detail).font(.caption).foregroundStyle(.secondary)
@@ -111,14 +111,14 @@ struct IntegrationsView: View {
             HStack {
                 Text(title).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                 Spacer()
-                Button("复制") { model.copy(value) }.buttonStyle(.plain).foregroundStyle(Color.barkBlue)
+                Button("复制") { model.copy(value) }.buttonStyle(.plain).foregroundStyle(Color.barkAccent)
             }
             Text(value)
                 .font(.system(.callout, design: .monospaced))
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(12)
-                .background(Color.barkBlueSoft, in: RoundedRectangle(cornerRadius: 9))
+                .background(Color.barkField, in: RoundedRectangle(cornerRadius: 10))
         }
     }
 

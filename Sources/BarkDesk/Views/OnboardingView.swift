@@ -40,35 +40,35 @@ struct OnboardingView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(.white)
                     .frame(width: 36, height: 36)
-                    .overlay { Image(systemName: "bell.fill").foregroundStyle(Color.barkBlue) }
-                Text("BarkDesk").font(.headline.weight(.bold)).foregroundStyle(.white)
+                    .overlay { Image(systemName: "bell.fill").foregroundStyle(Color.barkAccentInk) }
+                Text("BarkDesk").font(.headline.weight(.bold)).foregroundStyle(Color.barkAccentInk)
             }
             Spacer()
             Text(String(format: "%02d", step + 1))
                 .font(.system(size: 54, weight: .bold, design: .monospaced))
                 .tracking(-3)
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.barkAccentInk)
             Text(stepTitle)
                 .font(.title2.weight(.bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.barkAccentInk)
                 .padding(.top, 10)
             Text(stepDetail)
                 .font(.callout)
-                .foregroundStyle(.white.opacity(0.8))
+                .foregroundStyle(Color.barkAccentInk.opacity(0.72))
                 .lineSpacing(4)
                 .padding(.top, 8)
             Spacer()
             HStack(spacing: 7) {
                 ForEach(0..<3, id: \.self) { index in
                     Rectangle()
-                        .fill(index <= step ? Color.white : Color.white.opacity(0.3))
+                        .fill(index <= step ? Color.barkAccentInk : Color.barkAccentInk.opacity(0.25))
                         .frame(width: index == step ? 28 : 10, height: 4)
                 }
             }
         }
         .padding(26)
         .frame(width: 240)
-        .background(Color.barkBlue)
+        .background(Color.barkAccent)
     }
 
     private var actionBar: some View {
@@ -144,6 +144,7 @@ struct OnboardingView: View {
                 Text("无需认证").tag(AuthenticationMode.none)
                 Text("Basic Auth").tag(AuthenticationMode.basic)
             }
+            .pickerStyle(.segmented)
             if model.configuration.authenticationMode == .basic {
                 HStack {
                     TextField("用户名", text: $model.credentials.username)
@@ -205,9 +206,9 @@ struct OnboardingView: View {
         HStack(spacing: 15) {
             Image(systemName: icon)
                 .font(.title3)
-                .foregroundStyle(Color.barkBlue)
+                .foregroundStyle(Color.barkAccent)
                 .frame(width: 42, height: 42)
-                .background(Color.barkBlueSoft, in: RoundedRectangle(cornerRadius: 10))
+                .background(Color.barkAccentSoft, in: RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 4) {
                 Text(title).fontWeight(.semibold)
                 Text(detail).font(.caption).foregroundStyle(.secondary)

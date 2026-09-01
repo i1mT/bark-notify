@@ -25,11 +25,11 @@ struct NotificationsView: View {
         HStack(alignment: .center, spacing: 18) {
             VStack(alignment: .leading, spacing: 5) {
                 Text("通知记录")
-                    .font(.system(size: 31, weight: .bold))
-                    .tracking(-0.8)
+                    .font(.system(size: 34, weight: .semibold))
+                    .tracking(-1.1)
                     .foregroundStyle(Color.barkInk)
                 Text(summary)
-                    .font(.callout)
+                    .font(.system(size: 15))
                     .foregroundStyle(.secondary)
             }
             Spacer(minLength: 12)
@@ -49,9 +49,9 @@ struct NotificationsView: View {
                     }
                 }
                 .padding(.horizontal, 12)
-                .frame(width: 220, height: 38)
-                .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 9))
-                .overlay { RoundedRectangle(cornerRadius: 9).stroke(Color.barkBorder) }
+                .frame(width: 240, height: 42)
+                .background(Color.barkField, in: RoundedRectangle(cornerRadius: 11))
+                .overlay { RoundedRectangle(cornerRadius: 11).stroke(Color.barkBorder) }
                 .transition(.move(edge: .trailing).combined(with: .opacity))
             }
             Button {
@@ -59,8 +59,8 @@ struct NotificationsView: View {
                 if searchVisible { searchFocused = true }
             } label: {
                 Image(systemName: "magnifyingglass")
-                    .frame(width: 36, height: 36)
-                    .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 9))
+                    .frame(width: 42, height: 42)
+                    .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 11))
             }
             .buttonStyle(.plain)
             .keyboardShortcut("f", modifiers: .command)
@@ -69,14 +69,12 @@ struct NotificationsView: View {
                 Button("刷新记录") { Task { await model.refreshHistory() } }
             } label: {
                 Image(systemName: "ellipsis")
-                    .frame(width: 36, height: 36)
-                    .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 9))
+                    .frame(width: 42, height: 42)
+                    .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 11))
             }
             .menuStyle(.borderlessButton)
             .fixedSize()
-            Button {
-                model.selection = .compose
-            } label: {
+            Button { model.selection = .compose } label: {
                 Label("新建通知", systemImage: "plus")
             }
             .buttonStyle(.barkPrimary)
@@ -97,7 +95,7 @@ struct NotificationsView: View {
             VStack(alignment: .leading, spacing: 20) {
                 Text("00:00:00")
                     .font(.system(size: 42, weight: .bold, design: .monospaced))
-                    .foregroundStyle(Color.barkBlue.opacity(0.3))
+                    .foregroundStyle(Color.barkAccent.opacity(0.4))
                 VStack(alignment: .leading, spacing: 7) {
                     Text("还没有发送记录").font(.title2.weight(.semibold))
                     Text("发送的成功与失败记录会按照时间出现在这里。")
@@ -204,24 +202,26 @@ private struct HistoryRow: View {
         Button(action: action) {
             HStack(alignment: .top, spacing: 12) {
                 Text(record.createdAt.formatted(.dateTime.hour().minute().second()))
-                    .font(.system(size: 16, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(selected ? Color.barkBlue : Color.barkInk)
-                    .frame(width: 82, alignment: .leading)
+                    .font(.system(size: 17, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(selected ? Color.barkAccent : Color.barkInk)
+                    .lineLimit(1).fixedSize(horizontal: true, vertical: false)
+                    .frame(width: 94, alignment: .leading)
                 RoundedRectangle(cornerRadius: 2)
                     .fill(record.deliveryStatus == .success ? Color.green : Color.orange)
                     .frame(width: 3, height: 38)
                     .padding(.top, 2)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(record.title?.nilIfEmpty ?? "无标题通知")
-                        .font(.callout.weight(.semibold))
+                        .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(Color.barkInk)
                         .lineLimit(1)
                     Text(record.body)
-                        .font(.callout)
+                        .font(.system(size: 14))
+                        .lineSpacing(2)
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
                     Text(metadata)
-                        .font(.caption2)
+                        .font(.system(size: 12))
                         .foregroundStyle(.tertiary)
                         .lineLimit(1)
                 }
@@ -229,10 +229,10 @@ private struct HistoryRow: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 11)
-            .background(selected ? Color.barkBlueSoft : .clear, in: RoundedRectangle(cornerRadius: 9))
+            .background(selected ? Color.barkAccentSoft : .clear, in: RoundedRectangle(cornerRadius: 9))
             .overlay(alignment: .leading) {
                 if selected {
-                    RoundedRectangle(cornerRadius: 2).fill(Color.barkBlue).frame(width: 3, height: 44)
+                    RoundedRectangle(cornerRadius: 2).fill(Color.barkAccent).frame(width: 3, height: 44)
                 }
             }
             .contentShape(RoundedRectangle(cornerRadius: 9))
@@ -287,7 +287,7 @@ private struct HistoryDetail: View {
         HStack(alignment: .top, spacing: 18) {
             VStack(alignment: .leading, spacing: 5) {
                 Text(record.createdAt.formatted(.dateTime.hour().minute().second()))
-                    .font(.system(size: 34, weight: .bold, design: .monospaced))
+                .font(.system(size: 38, weight: .semibold, design: .monospaced))
                     .tracking(-1)
                     .foregroundStyle(Color.barkInk)
                 Text(record.createdAt.formatted(.dateTime.year().month(.wide).day().weekday(.wide)))
@@ -307,19 +307,20 @@ private struct HistoryDetail: View {
     private var notificationContent: some View {
         VStack(alignment: .leading, spacing: 13) {
             Text(record.title?.nilIfEmpty ?? "无标题通知")
-                .font(.system(size: 25, weight: .bold))
+                .font(.system(size: 27, weight: .semibold))
                 .tracking(-0.4)
                 .foregroundStyle(Color.barkInk)
             if let subtitle = record.subtitle?.nilIfEmpty {
                 Text(subtitle).font(.callout).foregroundStyle(.secondary)
             }
             Text(record.body)
-                .font(.system(size: 16))
-                .lineSpacing(5)
+                .font(.system(size: 17))
+                .lineSpacing(6)
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(20)
-                .background(Color.barkBlueSoft, in: RoundedRectangle(cornerRadius: 12))
+                .padding(22)
+                .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 14))
+                .overlay { RoundedRectangle(cornerRadius: 14).stroke(Color.barkBorder.opacity(0.75)) }
             if let rawImage = record.image, let url = URL(string: rawImage) {
                 AsyncImage(url: url) { phase in
                     if case .success(let image) = phase {

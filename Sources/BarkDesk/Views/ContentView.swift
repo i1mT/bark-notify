@@ -8,7 +8,7 @@ struct ContentView: View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
             AppSidebar()
                 .environmentObject(model)
-                .navigationSplitViewColumnWidth(min: 190, ideal: 218, max: 238)
+                .navigationSplitViewColumnWidth(min: 200, ideal: 224, max: 242)
         } detail: {
             detail
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -26,9 +26,10 @@ struct ContentView: View {
                 .animation(.easeInOut(duration: 0.18), value: model.banner)
         }
         .navigationSplitViewStyle(.balanced)
-        .tint(.barkBlue)
+        .tint(.barkAccent)
+        .controlSize(.large)
         .sheet(isPresented: $model.isOnboardingPresented) {
-            OnboardingView().environmentObject(model).tint(.barkBlue)
+            OnboardingView().environmentObject(model).tint(.barkAccent)
         }
     }
 
@@ -74,12 +75,12 @@ private struct AppSidebar: View {
     private var brand: some View {
         HStack(spacing: 11) {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color.barkBlue)
+                .fill(Color.barkAccent)
                 .frame(width: 36, height: 36)
                 .overlay {
                     Image(systemName: "bell.fill")
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.barkAccentInk)
                 }
             Text("BarkDesk")
                 .font(.system(size: 19, weight: .bold))
@@ -104,7 +105,7 @@ private struct SidebarNavigationButton: View {
                 Image(systemName: item.icon)
                     .font(.system(size: 14, weight: .semibold))
                     .symbolVariant(selected ? .fill : .none)
-                    .foregroundStyle(selected ? Color.barkBlue : Color.secondary)
+                    .foregroundStyle(selected ? Color.barkAccent : Color.secondary)
                     .frame(width: 20)
                 Text(item.title)
                     .font(.callout.weight(selected ? .semibold : .medium))
@@ -122,12 +123,12 @@ private struct SidebarNavigationButton: View {
             .overlay(alignment: .leading) {
                 if selected {
                     RoundedRectangle(cornerRadius: 2)
-                        .fill(Color.barkBlue)
+                        .fill(Color.barkAccent)
                         .frame(width: 3, height: 21)
                         .padding(.leading, 1)
                 }
             }
-            .shadow(color: selected ? Color.barkBlue.opacity(0.08) : .clear, radius: 8, y: 3)
+            .shadow(color: selected ? Color.barkInk.opacity(0.05) : .clear, radius: 8, y: 3)
             .contentShape(RoundedRectangle(cornerRadius: 10))
         }
         .buttonStyle(.plain)
@@ -144,7 +145,7 @@ private struct ConnectionPanel: View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 8) {
                     Circle().fill(statusColor).frame(width: 8, height: 8)
-                    Text(statusTitle).font(.caption.weight(.semibold))
+                    Text(statusTitle).font(.system(size: 13, weight: .semibold))
                     Spacer(minLength: 4)
                     Image(systemName: "chevron.right")
                         .font(.caption2.weight(.bold))
@@ -152,7 +153,7 @@ private struct ConnectionPanel: View {
                 }
                 VStack(alignment: .leading, spacing: 3) {
                     Text(serverName)
-                        .font(.caption)
+                        .font(.system(size: 13))
                         .foregroundStyle(Color.barkInk)
                         .lineLimit(1)
                     Text(deviceLabel)
@@ -162,17 +163,17 @@ private struct ConnectionPanel: View {
                 }
                 Text("连接与设置")
                     .font(.caption.weight(.medium))
-                    .foregroundStyle(Color.barkBlue)
+                    .foregroundStyle(Color.barkAccent)
             }
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay {
                 if model.selection == .settings {
-                    RoundedRectangle(cornerRadius: 14).stroke(Color.barkBlue, lineWidth: 1.5)
+                    RoundedRectangle(cornerRadius: 14).stroke(Color.barkAccent, lineWidth: 1.5)
                 }
             }
-            .shadow(color: Color.barkBlue.opacity(0.07), radius: 12, y: 5)
+            .shadow(color: Color.barkInk.opacity(0.045), radius: 12, y: 5)
             .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
@@ -196,7 +197,7 @@ private struct ConnectionPanel: View {
 
     private var statusColor: Color {
         if model.connectionTestPassed { return .green }
-        return model.configurationInputIsValid ? .barkBlue : .orange
+        return model.configurationInputIsValid ? .barkAccent : .orange
     }
 
     private var serverName: String {
@@ -223,6 +224,6 @@ private struct BannerView: View {
         .padding(.horizontal, 15)
         .padding(.vertical, 10)
         .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .shadow(color: Color.barkBlue.opacity(0.12), radius: 14, y: 6)
+        .shadow(color: Color.barkInk.opacity(0.1), radius: 14, y: 6)
     }
 }

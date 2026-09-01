@@ -9,16 +9,15 @@ struct ComposeView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 26) {
                 header
                 typePicker
                 editorLayout
-                options
             }
-            .frame(maxWidth: 960)
-            .padding(.horizontal, 34)
-            .padding(.top, 28)
-            .padding(.bottom, 34)
+            .frame(maxWidth: 1020)
+            .padding(.horizontal, 28)
+            .padding(.top, 30)
+            .padding(.bottom, 38)
             .frame(maxWidth: .infinity)
         }
         .background(Color.barkCanvas)
@@ -27,11 +26,11 @@ struct ComposeView: View {
     }
 
     private var header: some View {
-        HStack(alignment: .bottom, spacing: 24) {
+        HStack(alignment: .bottom, spacing: 28) {
             PageHeader(
                 eyebrow: "新通知",
                 title: "这次想发送什么？",
-                detail: "先选择用途，页面只保留这种通知真正需要的信息。"
+                detail: "选择一种通知形式，填写内容，并在右侧确认最终效果。"
             )
             Spacer(minLength: 12)
             StatusPill(label: serverName, systemImage: "network", color: .green)
@@ -53,27 +52,26 @@ struct ComposeView: View {
     }
 
     private var editorLayout: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .top, spacing: 18) {
-                editor.frame(minWidth: 470)
-                NotificationPreview(draft: model.draft).frame(width: 280)
-            }
-            VStack(spacing: 18) {
+        HStack(alignment: .top, spacing: 20) {
+            VStack(spacing: 20) {
                 editor
-                NotificationPreview(draft: model.draft)
+                options
             }
+            .frame(minWidth: 0, maxWidth: .infinity)
+            NotificationPreview(draft: model.draft)
+                .frame(width: 260)
         }
     }
 
     private var editor: some View {
         SurfaceCard {
-            VStack(alignment: .leading, spacing: 19) {
+            VStack(alignment: .leading, spacing: 22) {
                 HStack {
                     Label(model.draft.kind.title, systemImage: model.draft.kind.icon)
-                        .font(.headline)
+                        .font(.system(size: 18, weight: .semibold))
                     Spacer()
                     Text(model.draft.kind.subtitle)
-                        .font(.caption)
+                        .font(.system(size: 13))
                         .foregroundStyle(.secondary)
                 }
 
@@ -96,10 +94,16 @@ struct ComposeView: View {
                     TextField("分组（选填）", text: $model.draft.group)
                         .textFieldStyle(.barkDeskLarge)
                     if model.draft.kind != .critical {
-                        Picker("提醒方式", selection: $model.draft.level) {
-                            ForEach(BarkLevel.allCases.filter { $0 != .critical }, id: \.self) {
-                                Text($0.displayName).tag($0)
+                        VStack(alignment: .leading, spacing: 8) {
+                            FieldCaption(title: "提醒方式")
+                            Picker("提醒方式", selection: $model.draft.level) {
+                                ForEach(BarkLevel.allCases.filter { $0 != .critical }, id: \.self) {
+                                    Text($0.displayName).tag($0)
+                                }
                             }
+                            .labelsHidden()
+                            .pickerStyle(.menu)
+                            .barkControlSurface()
                         }
                     }
                     TextField("提示音（使用默认值）", text: $model.draft.sound)
@@ -110,7 +114,7 @@ struct ComposeView: View {
             } label: {
                 HStack {
                     Label("更多发送选项", systemImage: "slider.horizontal.3")
-                        .font(.headline)
+                        .font(.system(size: 16, weight: .semibold))
                     Spacer()
                     Text(optionsExpanded ? "收起" : "分组、提示音与提醒方式")
                         .font(.caption)
@@ -142,9 +146,9 @@ struct ComposeView: View {
             .keyboardShortcut(.return, modifiers: .command)
             .disabled(model.isWorking || !model.draft.isValid)
         }
-        .frame(maxWidth: 960)
-        .padding(.horizontal, 34)
-        .padding(.vertical, 13)
+        .frame(maxWidth: 1020)
+        .padding(.horizontal, 28)
+        .padding(.vertical, 14)
         .frame(maxWidth: .infinity)
         .background(Color.barkSurface)
         .overlay(alignment: .top) { Divider().overlay(Color.barkBorder) }
@@ -220,9 +224,14 @@ struct ComposeView: View {
                     .scrollContentBackground(.hidden)
                     .padding(5)
             }
-            .frame(minHeight: model.draft.kind == .markdown ? 170 : 112)
-            .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 11))
-            .overlay { RoundedRectangle(cornerRadius: 11).stroke(Color.barkBorder) }
+            .font(.system(size: 15))
+            .frame(minHeight: model.draft.kind == .markdown ? 178 : 124)
+            .background(Color.barkField, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(messageFocused ? Color.barkAccent : Color.barkBorder, lineWidth: messageFocused ? 2 : 1)
+            }
+            .shadow(color: messageFocused ? Color.barkAccent.opacity(0.12) : .clear, radius: 7)
         }
     }
 
@@ -246,14 +255,14 @@ private struct NotificationKindButton: View {
     var body: some View {
         Button(action: action) {
             Label(kind.title, systemImage: kind.icon)
-                .font(.callout.weight(selected ? .semibold : .medium))
-                .foregroundStyle(selected ? Color.barkBlue : Color.barkInk)
-                .padding(.horizontal, 13)
-                .padding(.vertical, 9)
-                .background(selected ? Color.barkBlueSoft : Color.barkSurface, in: RoundedRectangle(cornerRadius: 8))
+                .font(.system(size: 14, weight: selected ? .semibold : .medium))
+                .foregroundStyle(selected ? Color.barkAccentInk : Color.barkInk)
+                .padding(.horizontal, 14)
+                .frame(minHeight: 42)
+                .background(selected ? Color.barkAccent : Color.barkSurface, in: RoundedRectangle(cornerRadius: 11))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(selected ? Color.barkBlue : Color.barkBorder, lineWidth: selected ? 1.5 : 1)
+                    RoundedRectangle(cornerRadius: 11)
+                        .stroke(selected ? Color.barkAccent : Color.barkBorder, lineWidth: 1)
                 }
         }
         .buttonStyle(.plain)
@@ -264,46 +273,53 @@ private struct NotificationPreview: View {
     let draft: ComposeDraft
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 18) {
             HStack {
-                Text("发送预览").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                Text("实时预览").font(.system(size: 15, weight: .semibold))
                 Spacer()
-                Image(systemName: draft.kind.icon).foregroundStyle(Color.barkBlue)
+                Image(systemName: draft.kind.icon).foregroundStyle(Color.barkAccent)
             }
             VStack(alignment: .leading, spacing: 9) {
                 HStack(spacing: 8) {
-                    RoundedRectangle(cornerRadius: 7)
-                        .fill(Color.barkBlue)
-                        .frame(width: 29, height: 29)
-                        .overlay { Image(systemName: "bell.fill").font(.caption).foregroundStyle(.white) }
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.barkAccent)
+                        .frame(width: 32, height: 32)
+                        .overlay {
+                            Image(systemName: "bell.fill")
+                                .font(.caption)
+                                .foregroundStyle(Color.barkAccentInk)
+                        }
                     Text("BARK").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
                     Spacer()
                     Text("现在").font(.caption2).foregroundStyle(.tertiary)
                 }
                 Text(draft.title.nilIfEmpty ?? "通知标题")
-                    .font(.callout.weight(.semibold))
+                    .font(.system(size: 16, weight: .semibold))
                     .lineLimit(2)
                 Text(previewBody)
-                    .font(.callout)
+                    .font(.system(size: 15))
+                    .lineSpacing(3)
                     .foregroundStyle(draft.message.nilIfEmpty == nil ? .tertiary : .primary)
                     .lineLimit(5)
                 if draft.kind == .image {
                     RoundedRectangle(cornerRadius: 9)
-                        .fill(Color.barkBlueSoft)
+                        .fill(Color.barkAccentSoft)
                         .frame(height: 74)
-                        .overlay { Image(systemName: "photo").font(.title2).foregroundStyle(Color.barkBlue) }
+                        .overlay { Image(systemName: "photo").font(.title2).foregroundStyle(Color.barkAccent) }
                 }
             }
-            .padding(14)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .padding(16)
+            .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay { RoundedRectangle(cornerRadius: 16).stroke(Color.barkBorder.opacity(0.75)) }
             Spacer(minLength: 0)
             Text("实际显示由 iPhone 通知设置和 Bark 版本决定。")
                 .font(.caption2)
                 .foregroundStyle(.tertiary)
         }
-        .padding(17)
-        .frame(minHeight: 255, alignment: .top)
-        .background(Color.barkMist, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .padding(18)
+        .frame(minHeight: 300, alignment: .top)
+        .background(Color.barkMist, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay { RoundedRectangle(cornerRadius: 18).stroke(Color.barkBorder.opacity(0.65)) }
     }
 
     private var previewBody: String {

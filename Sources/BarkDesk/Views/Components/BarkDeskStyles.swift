@@ -2,14 +2,17 @@ import AppKit
 import SwiftUI
 
 extension Color {
-    static let barkBlue = Color(red: 0.00, green: 0.38, blue: 1.00)
-    static let barkBlueSoft = adaptive(light: 0xE8F1FF, dark: 0x173052)
-    static let barkCanvas = adaptive(light: 0xF7F5F2, dark: 0x171719)
-    static let barkSurface = adaptive(light: 0xFFFFFF, dark: 0x242427)
-    static let barkSidebar = adaptive(light: 0xEAF2FD, dark: 0x1B2635)
-    static let barkMist = adaptive(light: 0xB4D0E7, dark: 0x243E57)
-    static let barkInk = adaptive(light: 0x1E1919, dark: 0xF5F2EE)
-    static let barkBorder = adaptive(light: 0xDEDAD4, dark: 0x3B3B40)
+    // A warm, paper-like palette inspired by Apple Notes and classic writing apps.
+    static let barkAccent = adaptive(light: 0xB88A16, dark: 0xE2B94F)
+    static let barkAccentInk = adaptive(light: 0x241D0C, dark: 0x201A0A)
+    static let barkAccentSoft = adaptive(light: 0xF6EDCF, dark: 0x3A321F)
+    static let barkCanvas = adaptive(light: 0xF7F6F1, dark: 0x171715)
+    static let barkSurface = adaptive(light: 0xFFFDF8, dark: 0x22221F)
+    static let barkField = adaptive(light: 0xF3F1EA, dark: 0x2B2A26)
+    static let barkSidebar = adaptive(light: 0xEFEEE8, dark: 0x1D1D1A)
+    static let barkMist = adaptive(light: 0xE7E3D8, dark: 0x2C2B26)
+    static let barkInk = adaptive(light: 0x20211E, dark: 0xF2F0E8)
+    static let barkBorder = adaptive(light: 0xDCD8CE, dark: 0x3D3B35)
 
     private static func adaptive(light: Int, dark: Int) -> Color {
         Color(nsColor: NSColor(name: nil) { appearance in
@@ -38,16 +41,16 @@ struct PageHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(eyebrow)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(Color.barkBlue)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Color.barkAccent)
             Text(title)
-                .font(.system(size: 32, weight: .bold))
-                .tracking(-0.8)
+                .font(.system(size: 34, weight: .semibold))
+                .tracking(-1.1)
                 .foregroundStyle(Color.barkInk)
             Text(detail)
-                .font(.callout)
+                .font(.system(size: 15))
                 .foregroundStyle(.secondary)
-                .lineSpacing(2)
+                .lineSpacing(3)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
@@ -62,9 +65,13 @@ struct SurfaceCard<Content: View>: View {
 
     var body: some View {
         content
-            .padding(22)
-            .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .shadow(color: Color.barkBlue.opacity(0.055), radius: 16, y: 6)
+            .padding(24)
+            .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(Color.barkBorder.opacity(0.65), lineWidth: 1)
+            }
+            .shadow(color: Color.barkInk.opacity(0.035), radius: 20, y: 8)
     }
 }
 
@@ -87,10 +94,10 @@ struct BarkPrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .fontWeight(.semibold)
-            .foregroundStyle(.white)
-            .padding(.horizontal, 17)
-            .frame(minHeight: 42)
-            .background(Color.barkBlue, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+            .foregroundStyle(Color.barkAccentInk)
+            .padding(.horizontal, 19)
+            .frame(minHeight: 46)
+            .background(Color.barkAccent, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             .opacity(configuration.isPressed ? 0.88 : 1)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .animation(.easeOut(duration: 0.14), value: configuration.isPressed)
@@ -101,16 +108,33 @@ extension ButtonStyle where Self == BarkPrimaryButtonStyle {
     static var barkPrimary: BarkPrimaryButtonStyle { BarkPrimaryButtonStyle() }
 }
 
+private struct BarkControlSurface: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(.system(size: 15, weight: .medium))
+            .padding(.horizontal, 14)
+            .frame(minHeight: 50)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.barkField, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color.barkBorder.opacity(0.85), lineWidth: 1)
+            }
+    }
+}
+
+extension View {
+    func barkControlSurface() -> some View { modifier(BarkControlSurface()) }
+}
+
 struct FieldCaption: View {
     let title: String
     var optional = false
 
     var body: some View {
         HStack(spacing: 5) {
-            Text(title).font(.subheadline.weight(.medium))
-            if optional {
-                Text("选填").font(.caption).foregroundStyle(.tertiary)
-            }
+            Text(title).font(.system(size: 15, weight: .semibold))
+            if optional { Text("选填").font(.system(size: 12)).foregroundStyle(.tertiary) }
         }
     }
 }

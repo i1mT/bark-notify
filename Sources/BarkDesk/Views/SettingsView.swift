@@ -52,6 +52,7 @@ struct SettingsView: View {
                     Text("无需认证").tag(AuthenticationMode.none)
                     Text("Basic Auth").tag(AuthenticationMode.basic)
                 }
+                .pickerStyle(.segmented)
                 if model.configuration.authenticationMode == .basic {
                     HStack(spacing: 12) {
                         TextField("用户名", text: $model.credentials.username).textFieldStyle(.barkDeskLarge)
@@ -110,8 +111,14 @@ struct SettingsView: View {
                         .textFieldStyle(.barkDeskLarge)
                     TextField("默认提示音", text: $model.configuration.defaultSound, prompt: Text("使用 Bark 默认值"))
                         .textFieldStyle(.barkDeskLarge)
-                    Picker("默认提醒方式", selection: $model.configuration.defaultLevel) {
-                        ForEach(BarkLevel.allCases, id: \.self) { Text($0.displayName).tag($0) }
+                    VStack(alignment: .leading, spacing: 8) {
+                        FieldCaption(title: "默认提醒方式")
+                        Picker("默认提醒方式", selection: $model.configuration.defaultLevel) {
+                            ForEach(BarkLevel.allCases, id: \.self) { Text($0.displayName).tag($0) }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .barkControlSurface()
                     }
                 }
                 Toggle("默认保存在 Bark 历史记录中", isOn: $model.configuration.archiveMessages)
@@ -132,7 +139,7 @@ struct SettingsView: View {
                     .textSelection(.enabled)
                     .padding(12)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.barkBlueSoft, in: RoundedRectangle(cornerRadius: 9))
+                    .background(Color.barkAccentSoft, in: RoundedRectangle(cornerRadius: 9))
                 HStack {
                     Button("复制安装命令") { model.copy("npm install -g barkdesk-notify") }
                     Link("查看 npm package", destination: URL(string: "https://www.npmjs.com/package/barkdesk-notify")!)
@@ -167,9 +174,9 @@ struct SettingsView: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.title3)
-                .foregroundStyle(Color.barkBlue)
+                .foregroundStyle(Color.barkAccent)
                 .frame(width: 38, height: 38)
-                .background(Color.barkBlueSoft, in: RoundedRectangle(cornerRadius: 10))
+                .background(Color.barkAccentSoft, in: RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 3) {
                 Text(title).font(.headline)
                 Text(detail).font(.caption).foregroundStyle(.secondary)

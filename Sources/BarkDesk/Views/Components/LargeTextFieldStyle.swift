@@ -7,16 +7,16 @@ struct LargeTextFieldStyle: TextFieldStyle {
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
             .textFieldStyle(.plain)
-            .font(.body)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 12)
-            .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 9))
+            .font(.system(size: 15, weight: .regular))
+            .padding(.horizontal, 15)
+            .frame(minHeight: 50)
+            .background(Color.barkField, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 9)
-                    .stroke(isFocused ? Color.barkBlue : Color.barkBorder,
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(isFocused ? Color.barkAccent : Color.barkBorder.opacity(0.85),
                             lineWidth: isFocused ? 2 : 1)
             }
-            .shadow(color: isFocused ? Color.barkBlue.opacity(0.12) : .clear, radius: 5)
+            .shadow(color: isFocused ? Color.barkAccent.opacity(0.14) : .clear, radius: 7)
             .animation(.easeOut(duration: 0.16), value: isFocused)
     }
 }
