@@ -8,6 +8,7 @@
 - BarkDesk 只调用现有 Bark Server，不实现推送接收、代理服务、服务器历史同步或新的后端。
 - Xcode 开发必须打开 `BarkDesk.xcodeproj` 并运行 `BarkDesk` scheme，确保 GUI 使用真正的 macOS App target；不得把 Swift Package 的裸可执行目标当作 GUI App 运行。
 - 本地 Debug App 必须显示为 `BarkDesk Dev`，并且使用独立的 bundle identifier、Application Support 目录和 Keychain service，避免与已经安装的正式版冲突；Release App 继续使用 `BarkDesk`。
+- BarkDesk UI 使用 Dropbox 官方配色体系，以 Dropbox Blue、Coconut、Graphite、Cloud、Navy 与官方暖灰阶为基础；布局调整不得擅自更换主题方向。
 - Swift 动态代码文件应当尽量少于 400 行，每层目录应当尽量不超过 8 个文件。
 
 ## 行为

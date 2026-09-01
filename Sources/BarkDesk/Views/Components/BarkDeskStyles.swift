@@ -2,17 +2,17 @@ import AppKit
 import SwiftUI
 
 extension Color {
-    // A warm, paper-like palette inspired by Apple Notes and classic writing apps.
-    static let barkAccent = adaptive(light: 0xB88A16, dark: 0xE2B94F)
-    static let barkAccentInk = adaptive(light: 0x241D0C, dark: 0x201A0A)
-    static let barkAccentSoft = adaptive(light: 0xF6EDCF, dark: 0x3A321F)
-    static let barkCanvas = adaptive(light: 0xF7F6F1, dark: 0x171715)
-    static let barkSurface = adaptive(light: 0xFFFDF8, dark: 0x22221F)
-    static let barkField = adaptive(light: 0xF3F1EA, dark: 0x2B2A26)
-    static let barkSidebar = adaptive(light: 0xEFEEE8, dark: 0x1D1D1A)
-    static let barkMist = adaptive(light: 0xE7E3D8, dark: 0x2C2B26)
-    static let barkInk = adaptive(light: 0x20211E, dark: 0xF2F0E8)
-    static let barkBorder = adaptive(light: 0xDCD8CE, dark: 0x3D3B35)
+    // Dropbox core colors: Blue, Coconut, Graphite, Cloud, Navy, and its warm grey scale.
+    static let barkAccent = adaptive(light: 0x0061FE, dark: 0x0061FE)
+    static let barkAccentInk = adaptive(light: 0xFFFFFF, dark: 0xFFFFFF)
+    static let barkAccentSoft = adaptive(light: 0xB4C8E1, dark: 0x283750)
+    static let barkCanvas = adaptive(light: 0xF7F5F2, dark: 0x1A1918)
+    static let barkSurface = adaptive(light: 0xFFFFFF, dark: 0x242321)
+    static let barkField = adaptive(light: 0xF7F6F5, dark: 0x2D2B29)
+    static let barkSidebar = adaptive(light: 0xF7F5F2, dark: 0x242321)
+    static let barkMist = adaptive(light: 0xB4C8E1, dark: 0x283750)
+    static let barkInk = adaptive(light: 0x1E1919, dark: 0xF7F5F2)
+    static let barkBorder = adaptive(light: 0xD3CEC9, dark: 0x4F4A46)
 
     private static func adaptive(light: Int, dark: Int) -> Color {
         Color(nsColor: NSColor(name: nil) { appearance in
