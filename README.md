@@ -104,6 +104,14 @@ notify "部署完成"
 
 CLI 还支持 Basic Auth、secret file 与更多 `BARK_*` 环境变量，完整说明请参阅 [`cli/README.md`](cli/README.md)。
 
+如果希望 Coding Agent 在完成任务后自动发送通知，可以让 `notify` 扫描并配置本机支持的 Agent：
+
+```bash
+notify agent-hook install
+```
+
+目前支持 Codex、Claude Code、Grok Build、Cursor、Gemini CLI、OpenCode、GitHub Copilot CLI 和 DeepSeek Harness。交互界面可以使用空格选择 Agent；无人值守环境可以使用 `--all` 或 `--agents codex,claude`。完整的配置位置和事件说明请参阅 [`cli/README.md`](cli/README.md#coding-agent-完成通知)。
+
 ## 高级使用
 
 ### 发送不同类型的 Bark 通知

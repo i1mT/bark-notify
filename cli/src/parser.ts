@@ -11,9 +11,39 @@ export function parseArguments(arguments_: string[]): CliCommand {
   if (first === "run") return parseRun(arguments_.slice(1));
   if (first === "config") return parseConfig(arguments_.slice(1));
   if (first === "history") return parseHistory(arguments_.slice(1));
+  if (first === "agent-hook") return parseAgentHook(arguments_.slice(1));
   const result = parseSend(arguments_, false);
   if (result.index !== arguments_.length) usage(`Unexpected argument: ${arguments_[result.index]}`);
   return { kind: "send", options: result.options };
+}
+
+function parseAgentHook(arguments_: string[]): CliCommand {
+  const [subcommand, ...rest] = arguments_;
+  if (subcommand === "install") {
+    let agents: string[] | undefined;
+    let all = false;
+    let dryRun = false;
+    for (let index = 0; index < rest.length;) {
+      const argument = rest[index];
+      if (argument === "--all") { all = true; index += 1; continue; }
+      if (argument === "--dry-run") { dryRun = true; index += 1; continue; }
+      if (argument === "--agents") {
+        const [raw, next] = value(rest, index, argument);
+        agents = raw.split(",").map((item) => item.trim()).filter(Boolean);
+        index = next;
+        continue;
+      }
+      usage(`Unknown agent-hook install option: ${argument}`);
+    }
+    if (all && agents) usage("Use either --all or --agents, not both");
+    return { kind: "agent-hook-install", ...(agents ? { agents } : {}), all, dryRun };
+  }
+  if (subcommand === "receive") {
+    const [agent, payloadArgument, ...extra] = rest;
+    if (!agent || extra.length > 0) usage("notify agent-hook receive requires an agent and optional JSON payload");
+    return { kind: "agent-hook-receive", agent, ...(payloadArgument ? { payloadArgument } : {}) };
+  }
+  usage("notify agent-hook requires install or receive");
 }
 
 function parseRun(arguments_: string[]): CliCommand {

@@ -6,6 +6,7 @@ import { BarkHttpError, makePayload, push, testConnection } from "./bark.js";
 import { parseArguments } from "./parser.js";
 import { CliError, type CliCommand, type ConfigUpdates, type HistoryRecord, type SendOptions, type StoredConfig } from "./types.js";
 import { packageVersion } from "./version.js";
+import { installCommand as installAgentHooksCommand, receiveCommand as receiveAgentHookCommand } from "./agent-hooks/command.js";
 
 export async function run(arguments_: string[]): Promise<number> {
   try { return await execute(parseArguments(arguments_)); }
@@ -25,6 +26,8 @@ async function execute(command: CliCommand): Promise<number> {
     case "config-test": for (const line of await testConnection(await resolveConfig())) console.log(line); return 0;
     case "config-set": await updateConfig(command.updates); return 0;
     case "history": await showHistory(command.search, command.limit); return 0;
+    case "agent-hook-install": return installAgentHooksCommand(command.agents, command.all, command.dryRun);
+    case "agent-hook-receive": return receiveAgentHookCommand(command.agent, command.payloadArgument, (options) => deliver(options, "agent-hook"));
     case "send": return sendCommand(command.options);
     case "run": return runCommand(command.options, command.command);
   }
@@ -153,6 +156,7 @@ USAGE
   notify run [notification options] -- command [arguments]
   notify config show|path|test|set [options]
   notify history [--search text] [--limit number]
+  notify agent-hook install [--all | --agents LIST] [--dry-run]
 
 COMMON OPTIONS
   -m, --message TEXT       Notification body
@@ -184,4 +188,9 @@ SERVER ENVIRONMENT
   BARK_SERVER, BARK_DEVICE_KEY, BARK_DEVICE_KEY_FILE
   BARK_USERNAME, BARK_PASSWORD, BARK_PASSWORD_FILE
   BARK_GROUP, BARK_LEVEL, BARK_SOUND, BARK_ARCHIVE
+
+CODING AGENT HOOKS
+  notify agent-hook install
+  notify agent-hook install --all
+  notify agent-hook install --agents codex,claude,opencode
 `;

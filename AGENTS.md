@@ -24,6 +24,7 @@
 - macOS App 的 Device Key、Basic Auth 用户名和密码必须存储在 macOS Keychain，不得写入普通配置文件。
 - npm CLI 在服务器环境中应当优先支持 `BARK_*` 环境变量和 secret file；写入本机配置时必须限制文件权限。
 - 新增 Bark 参数时，应当先在 `BarkPushRequest` 中实现，再由 GUI 或 CLI 调用。
+- Coding Agent 的完成通知集成由 `notify agent-hook` 负责扫描、安装和统一解析，不要求用户手工维护各家的 hook 命令；安装时必须保留现有用户配置并支持重复执行，通知失败不得影响 Agent 原本的结束流程。
 
 ## 验证与 Git
 

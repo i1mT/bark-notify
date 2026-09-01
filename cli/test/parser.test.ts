@@ -22,3 +22,13 @@ test("run separates notification options from the command", () => {
 test("invalid levels are rejected", () => {
   assert.throws(() => parseArguments(["hello", "--level", "urgent"]), /Invalid level/);
 });
+
+test("agent-hook install parses explicit agents and dry-run", () => {
+  const command = parseArguments(["agent-hook", "install", "--agents", "codex,claude", "--dry-run"]);
+  assert.deepEqual(command, { kind: "agent-hook-install", agents: ["codex", "claude"], all: false, dryRun: true });
+});
+
+test("agent-hook receive accepts an optional inline payload", () => {
+  const command = parseArguments(["agent-hook", "receive", "gemini", '{"status":"completed"}']);
+  assert.deepEqual(command, { kind: "agent-hook-receive", agent: "gemini", payloadArgument: '{"status":"completed"}' });
+});

@@ -59,6 +59,8 @@ export type CliCommand =
   | { kind: "config-test" }
   | { kind: "config-set"; updates: ConfigUpdates }
   | { kind: "history"; search?: string; limit: number }
+  | { kind: "agent-hook-install"; agents?: string[]; all: boolean; dryRun: boolean }
+  | { kind: "agent-hook-receive"; agent: string; payloadArgument?: string }
   | { kind: "help" }
   | { kind: "version" };
 
@@ -88,7 +90,7 @@ export interface BarkPayload {
 export interface HistoryRecord {
   createdAt: string;
   status: "success" | "failure";
-  source: "send" | "run";
+  source: "send" | "run" | "agent-hook";
   title?: string;
   body: string;
   group?: string;
