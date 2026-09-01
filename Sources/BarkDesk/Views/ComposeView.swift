@@ -150,8 +150,9 @@ struct ComposeView: View {
         .padding(.horizontal, 28)
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity)
-        .background(Color.barkSurface)
-        .overlay(alignment: .top) { Divider().overlay(Color.barkBorder) }
+        .barkPanelSurface(radius: 16)
+        .padding(.horizontal, 12)
+        .padding(.bottom, 10)
     }
 
     @ViewBuilder

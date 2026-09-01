@@ -7,7 +7,7 @@ struct OnboardingView: View {
     @FocusState private var focusedField: SetupField?
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 12) {
             progressPanel
             VStack(spacing: 0) {
                 ScrollView {
@@ -21,11 +21,12 @@ struct OnboardingView: View {
                     .frame(maxWidth: .infinity, minHeight: 465, alignment: .center)
                     .transition(.opacity.combined(with: .move(edge: .trailing)))
                 }
-                Divider().overlay(Color.barkBorder)
                 actionBar
             }
             .background(Color.barkCanvas)
         }
+        .padding(12)
+        .background(Color.barkCanvas)
         .frame(width: 760, height: 570)
         .interactiveDismissDisabled()
         .onChange(of: step) { _, newStep in
@@ -40,7 +41,7 @@ struct OnboardingView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(.white)
                     .frame(width: 36, height: 36)
-                    .overlay { Image(systemName: "bell.fill").foregroundStyle(Color.barkAccentInk) }
+                    .overlay { Image(systemName: "bell.fill").foregroundStyle(Color.barkAccent) }
                 Text("BarkDesk").font(.headline.weight(.bold)).foregroundStyle(Color.barkAccentInk)
             }
             Spacer()
@@ -68,7 +69,8 @@ struct OnboardingView: View {
         }
         .padding(26)
         .frame(width: 240)
-        .background(Color.barkAccent)
+        .background(Color.barkAccent, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private var actionBar: some View {
@@ -97,7 +99,9 @@ struct OnboardingView: View {
         }
         .padding(.horizontal, 22)
         .frame(height: 72)
-        .background(Color.barkSurface)
+        .barkPanelSurface(radius: 16)
+        .padding(.horizontal, 10)
+        .padding(.bottom, 10)
     }
 
     private var welcome: some View {

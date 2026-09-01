@@ -148,8 +148,27 @@ private struct BarkControlSurface: ViewModifier {
     }
 }
 
+private struct BarkPanelSurface: ViewModifier {
+    let radius: CGFloat
+
+    func body(content: Content) -> some View {
+        content
+            .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .stroke(Color.barkBorder.opacity(0.65), lineWidth: 1)
+            }
+            .shadow(color: Color.barkInk.opacity(0.035), radius: 18, y: 6)
+    }
+}
+
 extension View {
     func barkControlSurface() -> some View { modifier(BarkControlSurface()) }
+
+    func barkPanelSurface(radius: CGFloat = 18) -> some View {
+        modifier(BarkPanelSurface(radius: radius))
+    }
 
     func barkIconButtonSurface() -> some View {
         frame(width: 46, height: 46)

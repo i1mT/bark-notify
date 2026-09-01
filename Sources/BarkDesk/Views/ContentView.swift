@@ -72,7 +72,10 @@ private struct AppSidebar: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .clipped()
-        .background(Color.barkSidebar.ignoresSafeArea())
+        .background(Color.barkSidebar)
+        .barkPanelSurface(radius: 18)
+        .padding(8)
+        .background(Color.barkCanvas.ignoresSafeArea())
     }
 
     private var brand: some View {

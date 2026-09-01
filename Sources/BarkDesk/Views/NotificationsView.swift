@@ -8,11 +8,10 @@ struct NotificationsView: View {
     var body: some View {
         VStack(spacing: 0) {
             header
-            Divider().overlay(Color.barkBorder)
             if model.records.isEmpty {
                 emptyState
             } else {
-                historyBrowser
+                historyBrowser.padding(.horizontal, 14).padding(.bottom, 14)
             }
         }
         .background(Color.barkCanvas)
@@ -117,7 +116,7 @@ struct NotificationsView: View {
         }
     }
     private var historyBrowser: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 14) {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
                     ForEach(groupedRecords, id: \.day) { group in
@@ -136,11 +135,8 @@ struct NotificationsView: View {
                 .padding(.horizontal, 12)
                 .padding(.bottom, 18)
             }
-            .background(Color.barkSurface)
             .frame(width: 330)
-            Rectangle()
-                .fill(Color.barkBorder)
-                .frame(width: 1)
+            .barkPanelSurface(radius: 16)
 
             Group {
                 if let record = model.selectedRecord {
@@ -153,6 +149,7 @@ struct NotificationsView: View {
             }
             .animation(.easeOut(duration: 0.12), value: model.selectedRecordID)
             .frame(minWidth: 0, maxWidth: .infinity, maxHeight: .infinity)
+            .barkPanelSurface(radius: 16)
         }
         .clipped()
     }
@@ -263,10 +260,9 @@ private struct HistoryDetail: View {
                 .padding(.bottom, 34)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
             }
-            Divider().overlay(Color.barkBorder)
             actionBar
         }
-        .background(Color.barkCanvas)
+        .background(Color.barkSurface)
         .confirmationDialog("确定删除这条通知记录？", isPresented: $confirmDelete) {
             Button("删除", role: .destructive) { Task { await model.delete(record) } }
         } message: {
@@ -372,7 +368,9 @@ private struct HistoryDetail: View {
         }
         .padding(.horizontal, 28)
         .padding(.vertical, 13)
-        .background(Color.barkSurface)
+        .barkPanelSurface(radius: 16)
+        .padding(.horizontal, 12)
+        .padding(.bottom, 10)
     }
 
     private func detailRow(_ label: String, _ value: String, monospaced: Bool = false) -> some View {
