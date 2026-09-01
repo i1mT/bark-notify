@@ -31,3 +31,9 @@
 - 项目的公开仓库地址固定为 `https://github.com/i1mT/bark-notify`，官网的 GitHub 与 DMG 下载链接直接使用该地址；只有实际站点域名使用 `NEXT_PUBLIC_SITE_URL` 配置。
 - 签名、公证和发布使用的凭据只允许保存在 macOS Keychain、GitHub Actions Secrets 或本机未跟踪文件中。
 - 正式版本必须通过 `vMAJOR.MINOR.PATCH` tag 触发 GitHub Release，并且同时发布经过签名、公证的 universal DMG、npm CLI package、SHA-256 校验文件与 provenance attestation。
+
+## 对外文档
+
+- README 与官网必须明确说明前置要求：安装 Bark iOS App、选择官方或自建 Bark Server、在 iOS App 中完成 Server 设置与设备注册，并且先通过测试通知确认接收成功。
+- Server 说明必须同时提供无需部署的 Bark 官方服务和可信的自建方案；推荐 Cloudflare Workers 等第三方实现时，需要链接其源码与部署文档，并且说明适用范围。
+- 对外说明不得暗示 BarkDesk 或 `notify` 可以替代 Bark iOS App，也不得把 Device Key 描述成可以公开分享的信息。

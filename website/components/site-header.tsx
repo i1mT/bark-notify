@@ -21,7 +21,8 @@ export function SiteHeader({ githubUrl, downloadUrl }: SiteHeaderProps) {
         </a>
 
         <nav className="desktop-nav" aria-label="主导航">
-          <a href="#setup">如何配置</a>
+          <a href="#prerequisites">开始准备</a>
+          <a href="#setup">配置工具</a>
           <a href="#scenarios">使用场景</a>
           <a href="#features">功能</a>
           <a href={githubUrl} target="_blank" rel="noreferrer">
@@ -47,7 +48,8 @@ export function SiteHeader({ githubUrl, downloadUrl }: SiteHeaderProps) {
 
       {open ? (
         <nav id="mobile-navigation" className="mobile-nav" aria-label="移动导航">
-          <a href="#setup" onClick={() => setOpen(false)}>如何配置</a>
+          <a href="#prerequisites" onClick={() => setOpen(false)}>开始准备</a>
+          <a href="#setup" onClick={() => setOpen(false)}>配置工具</a>
           <a href="#scenarios" onClick={() => setOpen(false)}>使用场景</a>
           <a href="#features" onClick={() => setOpen(false)}>功能</a>
           <a href={githubUrl} target="_blank" rel="noreferrer">查看 GitHub</a>

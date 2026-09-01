@@ -6,4 +6,9 @@ export const siteConfig = {
   githubUrl,
   downloadUrl: `${githubUrl}/releases/latest`,
   npmUrl: "https://www.npmjs.com/package/barkdesk-notify",
+  barkAppUrl: "https://apps.apple.com/cn/app/bark-custom-notifications/id1403753865",
+  barkDocsUrl: "https://bark.day.app/",
+  barkDeployUrl: "https://bark.day.app/#/deploy",
+  barkWorkerUrl: "https://github.com/cwxiaos/bark-worker",
+  barkWorkerDeployUrl: "https://deploy.workers.cloudflare.com/?url=https://github.com/cwxiaos/bark-worker",
 };

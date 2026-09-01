@@ -1,3 +1,62 @@
+.prerequisites-section { padding-bottom: 72px; }
+
+.prerequisite-flow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+.prerequisite-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: clamp(24px, 3vw, 32px);
+  border: 1px solid var(--line);
+  border-radius: 25px;
+  background: var(--surface);
+}
+
+.prerequisite-card.server-card { background: var(--surface-muted); }
+.prerequisite-heading { display: flex; align-items: center; justify-content: space-between; color: var(--accent); }
+.prerequisite-number { font-family: var(--font-geist-mono), monospace; color: var(--muted); font-size: 12px; }
+.prerequisite-card h3 { margin: 28px 0 0; font-size: 21px; letter-spacing: -0.025em; }
+.prerequisite-card > p { margin: 12px 0 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+
+.server-choice {
+  margin-top: 16px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface);
+}
+
+.server-choice > div:first-child { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.server-choice strong { font-size: 14px; }
+.server-choice p { margin: 7px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.server-choice code { overflow-wrap: anywhere; font-family: var(--font-geist-mono), monospace; color: var(--text); }
+.server-choice.recommended { border-color: color-mix(in srgb, var(--accent) 28%, var(--line)); }
+.server-choice.recommended span { padding: 4px 7px; border-radius: 7px; color: var(--accent-strong); background: var(--accent-soft); font-size: 10px; font-weight: 680; }
+.choice-links { display: flex; justify-content: flex-start !important; gap: 14px !important; margin-top: 10px; }
+.choice-links a { color: var(--accent); font-size: 12px; font-weight: 650; }
+.prerequisite-card .prerequisite-note { font-size: 12px; }
+
+.inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin-top: auto;
+  padding-top: 22px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.inline-link:hover, .choice-links a:hover { color: var(--accent-strong); }
+.security-note { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 20px 0 0; color: var(--muted); font-size: 12px; }
+.security-note svg { flex: 0 0 auto; color: var(--accent); }
+
 .setup-section { padding-bottom: 72px; }
 
 .setup-layout {

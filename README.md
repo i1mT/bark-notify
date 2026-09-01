@@ -13,11 +13,35 @@ BarkDesk 是一套面向 [Bark](https://github.com/Finb/Bark) 的桌面与命令
 
 [下载 BarkDesk](https://github.com/i1mT/bark-notify/releases/latest) · [安装 CLI](https://www.npmjs.com/package/barkdesk-notify) · [查看源码](https://github.com/i1mT/bark-notify)
 
+### 开始前准备
+
+BarkDesk 和 `notify` 是 Bark 的发送工具，不能替代 iPhone 上负责接收通知的 Bark App。第一次使用前，请按照这个顺序准备：
+
+1. **安装 Bark iOS App**
+
+   从 [App Store 下载 Bark](https://apps.apple.com/cn/app/bark-custom-notifications/id1403753865)，打开 App 并且允许通知权限。
+
+2. **选择 Bark Server**
+
+   - **不想部署：**直接使用 Bark App 默认的官方服务 `https://api.day.app`，不需要创建服务器。
+   - **个人使用推荐：**部署 [`cwxiaos/bark-worker`](https://github.com/cwxiaos/bark-worker)。它是 Bark 官方部署文档列出的 Cloudflare Workers 实现，支持 D1 和 KV；推荐选择容量更高的 D1 版本，可以[一键部署到 Cloudflare Workers](https://deploy.workers.cloudflare.com/?url=https://github.com/cwxiaos/bark-worker)，也可以阅读[中文部署指南](https://github.com/cwxiaos/bark-worker/blob/master/doc/setup_guide.zh.md)。这个版本适合个人、低频通知，不适合高频或大规模推送；如果 `workers.dev` 在所在网络不可用，需要绑定自己的域名。
+   - **使用自己的主机：**可以按照 [Bark 官方部署文档](https://bark.day.app/#/deploy) 通过 Docker 或可执行文件运行官方 `bark-server`。
+
+3. **在 Bark iOS App 中完成设置**
+
+   如果使用官方服务，Bark App 会直接生成测试推送地址。如果使用自建 Server，请先在 Bark App 中添加 Server 地址并完成设备注册。随后发送 App 内的测试通知，确认 iPhone 能够收到消息，再复制测试推送地址。地址通常类似：
+
+   ```text
+   https://api.day.app/YOUR_DEVICE_KEY/这里改成你自己的推送内容
+   ```
+
+   其中 `https://api.day.app` 是 Server 地址，`YOUR_DEVICE_KEY` 是需要填写到 BarkDesk 或 `notify config set` 的 Device Key。请把 Device Key 当作密码保存，不要提交到仓库或粘贴到公开页面。
+
 ## 如何使用
 
 ### BarkDesk for macOS
 
-运行要求：macOS 14 或更高版本，以及已经由 iPhone Bark App 注册的 Device Key。
+运行要求：macOS 14 或更高版本，并且已经完成上面的 Bark iOS App 与 Server 设置。
 
 1. 从 [GitHub Releases](https://github.com/i1mT/bark-notify/releases/latest) 下载最新的 DMG。
 2. 打开 DMG，把 BarkDesk 拖入 `Applications`。

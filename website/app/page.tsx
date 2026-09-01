@@ -3,11 +3,14 @@ import {
   ArrowRight,
   BellRinging,
   CheckCircle,
+  Cloud,
+  DeviceMobile,
   GithubLogo,
   HardDrives,
   Key,
   Laptop,
   Package,
+  SlidersHorizontal,
   TerminalWindow,
   Wrench,
 } from "@phosphor-icons/react/dist/ssr";
@@ -70,11 +73,71 @@ export default function Home() {
           <span><CheckCircle aria-hidden size={19} weight="fill" />MIT 开源</span>
         </section>
 
+        <section id="prerequisites" className="section-shell prerequisites-section">
+          <div className="section-heading narrow">
+            <p className="eyebrow">开始前准备</p>
+            <h2>先让 iPhone 准备好接收通知。</h2>
+            <p>BarkDesk 和 notify 负责发送，iPhone 上的 Bark App 负责接收。按照下面三步准备一次即可。</p>
+          </div>
+
+          <div className="prerequisite-flow">
+            <article className="prerequisite-card">
+              <div className="prerequisite-heading">
+                <span className="prerequisite-number">01</span>
+                <DeviceMobile aria-hidden size={27} />
+              </div>
+              <h3>安装 Bark iOS App</h3>
+              <p>从 App Store 安装 Bark，第一次打开时允许通知权限。BarkDesk 不能替代这个 iOS App。</p>
+              <a className="inline-link" href={siteConfig.barkAppUrl} target="_blank" rel="noreferrer">
+                前往 App Store<ArrowRight aria-hidden size={16} />
+              </a>
+            </article>
+
+            <article className="prerequisite-card server-card">
+              <div className="prerequisite-heading">
+                <span className="prerequisite-number">02</span>
+                <Cloud aria-hidden size={27} />
+              </div>
+              <h3>选择 Bark Server</h3>
+              <div className="server-choice">
+                <strong>最快开始</strong>
+                <p>直接使用 Bark 默认的官方服务 <code>https://api.day.app</code>，不需要部署。</p>
+              </div>
+              <div className="server-choice recommended">
+                <div><strong>个人部署推荐</strong><span>Cloudflare</span></div>
+                <p>使用 Bark 官方部署文档列出的 bark-worker，个人低频使用推荐 D1 版本。</p>
+                <div className="choice-links">
+                  <a href={siteConfig.barkWorkerDeployUrl} target="_blank" rel="noreferrer">一键部署</a>
+                  <a href={siteConfig.barkWorkerUrl} target="_blank" rel="noreferrer">查看说明</a>
+                </div>
+              </div>
+              <p className="prerequisite-note">高频推送或已有主机，可以按照 Bark 官方文档部署 bark-server。</p>
+              <a className="inline-link" href={siteConfig.barkDeployUrl} target="_blank" rel="noreferrer">
+                查看全部部署方式<ArrowRight aria-hidden size={16} />
+              </a>
+            </article>
+
+            <article className="prerequisite-card">
+              <div className="prerequisite-heading">
+                <span className="prerequisite-number">03</span>
+                <SlidersHorizontal aria-hidden size={27} />
+              </div>
+              <h3>设置 Bark App</h3>
+              <p>使用自建 Server 时，先在 Bark 中添加 Server 地址并完成注册。发送 App 内的测试通知，确认接收成功。</p>
+              <p>复制测试推送地址：域名部分是 Server 地址，域名后的第一段是 Device Key。</p>
+              <a className="inline-link" href={siteConfig.barkDocsUrl} target="_blank" rel="noreferrer">
+                查看 Bark 使用文档<ArrowRight aria-hidden size={16} />
+              </a>
+            </article>
+          </div>
+          <p className="security-note"><Key aria-hidden size={17} />Device Key 相当于推送密码，请勿提交到仓库或粘贴到公开页面。</p>
+        </section>
+
         <section id="setup" className="section-shell setup-section">
           <div className="section-heading">
             <p className="eyebrow">开始使用</p>
             <h2>Desk 和 CLI，需要分别配置一次。</h2>
-            <p>准备好 Bark Server 地址和 Device Key。Device Key 是 Bark 推送地址中紧跟在域名后的那段字符。</p>
+            <p>完成上面的准备后，把 Bark Server 地址和 Device Key 分别填入需要使用的工具。</p>
           </div>
 
           <div className="setup-layout">

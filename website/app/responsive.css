@@ -2,6 +2,8 @@
   .hero-section { grid-template-columns: 1fr; gap: 58px; padding-block: 76px 88px; }
   .hero-copy { max-width: 720px; }
   .start-card { max-width: 650px; }
+  .prerequisite-flow { grid-template-columns: 1fr 1fr; }
+  .prerequisite-card.server-card { grid-row: span 2; }
   .setup-layout, .details-section { grid-template-columns: 1fr; }
   .details-section { gap: 45px; }
   .type-cloud { max-width: 620px; min-height: 230px; }
@@ -49,6 +51,9 @@
   .section-heading { margin-bottom: 34px; }
   .section-heading h2, .details-copy h2 { font-size: clamp(31px, 9vw, 41px); }
   .section-heading > p:last-child, .details-copy > p { font-size: 15px; }
+  .prerequisite-flow { grid-template-columns: 1fr; }
+  .prerequisite-card.server-card { grid-row: auto; }
+  .security-note { align-items: flex-start; justify-content: flex-start; }
   .setup-panel { padding: 23px; border-radius: 22px; }
   .mini-command { grid-template-columns: minmax(0, 1fr); }
   .copy-button.compact { justify-self: start; padding: 7px 9px; }
