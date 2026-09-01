@@ -25,6 +25,7 @@ export interface InstallResult {
   path: string;
   changed: boolean;
   detail?: string;
+  error?: string;
 }
 
 export interface NormalizedAgentEvent {

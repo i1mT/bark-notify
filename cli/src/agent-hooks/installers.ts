@@ -34,7 +34,11 @@ export async function installAgentHooks(ids: AgentId[], dryRun: boolean, environ
   for (const id of ids) {
     const detection = detections.find((item) => item.definition.id === id)!;
     const context: Context = { home, dshHome, dryRun, ...(detection.executable ? { executable: detection.executable } : {}) };
-    results.push(...await installOne(id, context));
+    try {
+      results.push(...await installOne(id, context));
+    } catch (error) {
+      results.push({ agent: id, path: failurePath(id, home, dshHome), changed: false, error: messageOf(error) });
+    }
   }
   return results;
 }
@@ -119,7 +123,13 @@ async function detectionEvidence(id: AgentId, home: string, dshHome: string): Pr
 
 async function isConfigured(id: AgentId, home: string, dshHome: string): Promise<boolean> {
   if (id === "deepseek") return deepSeekConfigured(dshHome);
-  return (await readOptional(configPath(id, home))).includes(`agent-hook receive ${id}`);
+  const current = await readOptional(configPath(id, home));
+  if (id === "opencode") return current.includes(managedMarker) && current.includes('"agent-hook","receive","opencode"');
+  return current.includes(`agent-hook receive ${id}`);
+}
+
+function failurePath(id: AgentId, home: string, dshHome: string): string {
+  return id === "deepseek" ? dshHome : configPath(id, home);
 }
 
 function object(value: unknown): Record<string, unknown> {
@@ -127,3 +137,4 @@ function object(value: unknown): Record<string, unknown> {
 }
 function array(value: unknown): unknown[] { return Array.isArray(value) ? value : []; }
 async function readOptional(path: string): Promise<string> { try { return await readFile(path, "utf8"); } catch { return ""; } }
+function messageOf(error: unknown): string { return error instanceof Error ? error.message : String(error); }

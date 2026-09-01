@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
+import { chmod, mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { installAgentHooks } from "../src/agent-hooks/installers.js";
+import { detectAgents, installAgentHooks } from "../src/agent-hooks/installers.js";
 import { deepSeekProfiles } from "../src/agent-hooks/deepseek.js";
 
 test("installs supported JSON hooks without replacing existing settings", async () => {
@@ -20,11 +20,29 @@ test("installs supported JSON hooks without replacing existing settings", async 
   assert.match(JSON.stringify(claude), /existing-hook/);
   assert.match(JSON.stringify(claude), /agent-hook receive claude/);
   assert.match(await readFile(join(home, ".config", "opencode", "plugins", "barkdesk-notify.js"), "utf8"), /session\.idle/);
+  assert.equal((await detectAgents(environment)).find((item) => item.definition.id === "opencode")?.configured, true);
 
   const second = await installAgentHooks([...ids], false, environment);
   assert(second.every((item) => !item.changed));
   const codexText = await readFile(join(home, ".codex", "hooks.json"), "utf8");
   assert.equal(codexText.match(/agent-hook receive codex/g)?.length, 1);
+});
+
+test("reports an invalid pnpm allowBuilds selector before changing a DeepSeek profile", async () => {
+  const home = await mkdtemp(join(tmpdir(), "barkdesk-dsh-pnpm-"));
+  const profile = join(home, ".dsh", "profiles", "web");
+  const bin = join(home, "bin");
+  await mkdir(profile, { recursive: true });
+  await mkdir(bin, { recursive: true });
+  await writeFile(join(profile, "package.json"), "{}");
+  await writeFile(join(profile, "cordis.patch.yml"), "[]\n");
+  await writeFile(join(profile, "pnpm-workspace.yaml"), "packages:\n- .\nallowBuilds:\n  package@https://example.com/package.tgz: true\n");
+  await writeFile(join(bin, "dsh"), "#!/bin/sh\nexit 0\n");
+  await chmod(join(bin, "dsh"), 0o755);
+
+  const results = await installAgentHooks(["deepseek"], false, { BARKDESK_AGENT_HOME: home, PATH: bin });
+  assert.match(results.find((item) => item.error)?.error ?? "", /Change it to package: true/);
+  assert.equal(await readFile(join(profile, "cordis.patch.yml"), "utf8"), "[]\n");
 });
 
 test("DeepSeek scan only returns actual profile directories", async () => {
@@ -48,8 +66,9 @@ test("installs the DeepSeek bridge configuration idempotently", async () => {
   const first = await installAgentHooks(["deepseek"], false, environment);
   assert(first.every((item) => item.changed));
   const patch = await readFile(join(profile, "cordis.patch.yml"), "utf8");
+  assert.match(patch, /- insert:\n    - id: barkdesk-notify-agent-hook/);
   assert.match(patch, /name: '@deepseek-ai\/dsh-hooks-claude-code'/);
-  assert.match(patch, /config:\n    configPath:/);
+  assert.match(patch, /config:\n        configPath:/);
   assert.match(await readFile(join(home, ".dsh", "barkdesk-notify-hooks.json"), "utf8"), /agent-hook receive deepseek/);
 
   const second = await installAgentHooks(["deepseek"], false, environment);

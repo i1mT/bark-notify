@@ -23,7 +23,12 @@ export async function deepSeekProfiles(dshHome: string): Promise<string[]> {
 
 export async function installDeepSeek(dshHome: string, executable: string | undefined, dryRun: boolean): Promise<InstallResult[]> {
   const profiles = await deepSeekProfiles(dshHome);
-  if (profiles.length === 0) throw new Error(`No DeepSeek Harness profiles were found in ${join(dshHome, "profiles")}.`);
+  if (profiles.length === 0) return [{
+    agent: "deepseek",
+    path: join(dshHome, "profiles"),
+    changed: false,
+    error: "No DeepSeek Harness profiles were found.",
+  }];
   const hookPath = join(dshHome, "barkdesk-notify-hooks.json");
   const hookConfig = {
     description: managedMarker,
@@ -35,19 +40,24 @@ export async function installDeepSeek(dshHome: string, executable: string | unde
   for (const profile of profiles) {
     const profilePath = join(dshHome, "profiles", profile);
     const patchPath = join(profilePath, "cordis.patch.yml");
-    const current = await readOptional(patchPath);
-    if (current.includes(markerStart)) {
-      results.push({ agent: "deepseek", path: patchPath, changed: false, detail: profile });
-      continue;
+    try {
+      const current = await readOptional(patchPath);
+      if (current.includes(markerStart)) {
+        results.push({ agent: "deepseek", path: patchPath, changed: false, detail: profile });
+        continue;
+      }
+      if (!dryRun && !(await hasBridgePackage(profilePath))) {
+        if (!executable) throw new Error("The dsh command was not found, so the official hook bridge cannot be installed.");
+        await validatePnpmWorkspace(profilePath);
+        await run(executable, ["plugin", "--profile", profile, "add", packageName]);
+      }
+      const block = `${markerStart}\n- insert:\n    - id: barkdesk-notify-agent-hook\n      name: ${yamlQuote(packageName)}\n      config:\n        configPath: ${yamlQuote(hookPath)}\n${markerEnd}`;
+      const base = patchBase(current, patchPath);
+      if (!dryRun) await writeText(patchPath, `${base ? `${base}\n` : ""}${block}\n`);
+      results.push({ agent: "deepseek", path: patchPath, changed: true, detail: profile });
+    } catch (error) {
+      results.push({ agent: "deepseek", path: patchPath, changed: false, detail: profile, error: messageOf(error) });
     }
-    if (!dryRun && !(await hasBridgePackage(profilePath))) {
-      if (!executable) throw new Error(`Cannot install the DeepSeek hook bridge because the dsh command was not found.`);
-      await run(executable, ["plugin", "--profile", profile, "add", packageName]);
-    }
-    const block = `${markerStart}\n- name: ${yamlQuote(packageName)}\n  config:\n    configPath: ${yamlQuote(hookPath)}\n${markerEnd}`;
-    const base = patchBase(current, patchPath);
-    if (!dryRun) await writeText(patchPath, `${base ? `${base}\n` : ""}${block}\n`);
-    results.push({ agent: "deepseek", path: patchPath, changed: true, detail: profile });
   }
   return results;
 }
@@ -63,6 +73,15 @@ async function hasBridgePackage(profilePath: string): Promise<boolean> {
   const declared = (await readOptional(join(profilePath, "package.json"))).includes(`"${packageName}"`);
   const installed = await exists(join(profilePath, "node_modules", "@deepseek-ai", "dsh-hooks-claude-code", "package.json"));
   return declared && installed;
+}
+
+async function validatePnpmWorkspace(profilePath: string): Promise<void> {
+  const path = join(profilePath, "pnpm-workspace.yaml");
+  const invalid = (await readOptional(path)).split(/\r?\n/u).find((line) => line.includes("@http") && /:\s*(?:true|false)\s*$/u.test(line));
+  if (!invalid) return;
+  const selector = invalid.trim().replace(/^['"]|['"]?:\s*(?:true|false)\s*$/gu, "");
+  const packageOnly = selector.slice(0, selector.indexOf("@http"));
+  throw new Error(`${path} contains an allowBuilds selector that pnpm 11 rejects: ${selector}. Change it to ${packageOnly}: true, then run the installer again.`);
 }
 
 async function readOptional(path: string): Promise<string> {
@@ -81,6 +100,7 @@ function run(command: string, arguments_: string[]): Promise<void> {
 }
 
 function yamlQuote(value: string): string { return `'${value.replaceAll("'", "''")}'`; }
+function messageOf(error: unknown): string { return error instanceof Error ? error.message : String(error); }
 
 function patchBase(value: string, path: string): string {
   const meaningful = value.split(/\r?\n/u).map((line) => line.trim()).filter((line) => line && !line.startsWith("#"));

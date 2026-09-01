@@ -17,11 +17,15 @@ export async function installCommand(agentNames: string[] | undefined, all: bool
   const results = await installAgentHooks(ids, dryRun);
   for (const result of results) {
     const label = definitionFor(result.agent).label;
+    if (result.error) {
+      console.error(`✗ ${label}: ${result.error} (${result.path}${result.detail ? ` · ${result.detail}` : ""})`);
+      continue;
+    }
     const action = dryRun ? (result.changed ? "would configure" : "already configured") : (result.changed ? "configured" : "already configured");
     console.log(`${result.changed ? "✓" : "="} ${label}: ${action} ${result.path}${result.detail ? ` (${result.detail})` : ""}`);
   }
   if (dryRun) console.log("Dry run complete; no files were changed.");
-  return 0;
+  return results.some((result) => result.error) ? 1 : 0;
 }
 
 export async function receiveCommand(
