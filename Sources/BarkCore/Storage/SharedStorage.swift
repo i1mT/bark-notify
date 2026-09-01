@@ -1,12 +1,22 @@
 import Foundation
 
+enum BarkRuntimeEnvironment {
+    #if DEBUG
+    static let storageDirectoryName = "BarkDesk Dev"
+    static let keychainService = "app.barkdesk.dev"
+    #else
+    static let storageDirectoryName = "BarkDesk"
+    static let keychainService = "app.barkdesk.shared"
+    #endif
+}
+
 public enum SharedStorage {
     public static var rootDirectory: URL {
         if let override = ProcessInfo.processInfo.environment["BARKDESK_HOME"], !override.isEmpty {
             return URL(fileURLWithPath: override, isDirectory: true)
         }
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return support.appendingPathComponent("BarkDesk", isDirectory: true)
+        return support.appendingPathComponent(BarkRuntimeEnvironment.storageDirectoryName, isDirectory: true)
     }
 
     public static var databaseURL: URL {

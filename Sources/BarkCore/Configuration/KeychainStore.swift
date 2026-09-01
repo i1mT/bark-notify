@@ -7,7 +7,7 @@ public struct KeychainStore: Sendable {
     public init(service: String? = nil) {
         self.service = service
             ?? ProcessInfo.processInfo.environment["BARKDESK_KEYCHAIN_SERVICE"]
-            ?? "app.barkdesk.shared"
+            ?? BarkRuntimeEnvironment.keychainService
     }
 
     public func read(account: String) throws -> String {
