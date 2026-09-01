@@ -28,23 +28,6 @@ test("installs supported JSON hooks without replacing existing settings", async 
   assert.equal(codexText.match(/agent-hook receive codex/g)?.length, 1);
 });
 
-test("reports an invalid pnpm allowBuilds selector before changing a DeepSeek profile", async () => {
-  const home = await mkdtemp(join(tmpdir(), "barkdesk-dsh-pnpm-"));
-  const profile = join(home, ".dsh", "profiles", "web");
-  const bin = join(home, "bin");
-  await mkdir(profile, { recursive: true });
-  await mkdir(bin, { recursive: true });
-  await writeFile(join(profile, "package.json"), "{}");
-  await writeFile(join(profile, "cordis.patch.yml"), "[]\n");
-  await writeFile(join(profile, "pnpm-workspace.yaml"), "packages:\n- .\nallowBuilds:\n  package@https://example.com/package.tgz: true\n");
-  await writeFile(join(bin, "dsh"), "#!/bin/sh\nexit 0\n");
-  await chmod(join(bin, "dsh"), 0o755);
-
-  const results = await installAgentHooks(["deepseek"], false, { BARKDESK_AGENT_HOME: home, PATH: bin });
-  assert.match(results.find((item) => item.error)?.error ?? "", /Change it to package: true/);
-  assert.equal(await readFile(join(profile, "cordis.patch.yml"), "utf8"), "[]\n");
-});
-
 test("DeepSeek scan only returns actual profile directories", async () => {
   const dshHome = await mkdtemp(join(tmpdir(), "barkdesk-dsh-scan-"));
   await mkdir(join(dshHome, "profiles", "node_modules"), { recursive: true });
@@ -53,24 +36,46 @@ test("DeepSeek scan only returns actual profile directories", async () => {
   assert.deepEqual(await deepSeekProfiles(dshHome), ["web"]);
 });
 
-test("installs the DeepSeek bridge configuration idempotently", async () => {
+test("installs a dependency-free native DeepSeek plugin idempotently", async () => {
   const home = await mkdtemp(join(tmpdir(), "barkdesk-dsh-install-"));
   const profile = join(home, ".dsh", "profiles", "cli");
   await mkdir(profile, { recursive: true });
-  await writeFile(join(profile, "package.json"), JSON.stringify({ dependencies: { "@deepseek-ai/dsh-hooks-claude-code": "1.0.0" } }));
-  await mkdir(join(profile, "node_modules", "@deepseek-ai", "dsh-hooks-claude-code"), { recursive: true });
-  await writeFile(join(profile, "node_modules", "@deepseek-ai", "dsh-hooks-claude-code", "package.json"), "{}");
+  await writeFile(join(profile, "package.json"), "{}");
   await writeFile(join(profile, "cordis.patch.yml"), "[]\n");
-  const environment = { BARKDESK_AGENT_HOME: home, PATH: "" };
+  const bin = await fakeDsh(home, 0);
+  const environment = { BARKDESK_AGENT_HOME: home, PATH: bin };
 
   const first = await installAgentHooks(["deepseek"], false, environment);
   assert(first.every((item) => item.changed));
   const patch = await readFile(join(profile, "cordis.patch.yml"), "utf8");
   assert.match(patch, /- insert:\n    - id: barkdesk-notify-agent-hook/);
-  assert.match(patch, /name: '@deepseek-ai\/dsh-hooks-claude-code'/);
-  assert.match(patch, /config:\n        configPath:/);
-  assert.match(await readFile(join(home, ".dsh", "barkdesk-notify-hooks.json"), "utf8"), /agent-hook receive deepseek/);
+  assert.match(patch, /name: '.*barkdesk-notify-plugin\.mjs'/);
+  const plugin = await readFile(join(home, ".dsh", "barkdesk-notify-plugin.mjs"), "utf8");
+  assert.match(plugin, /agent\/turn-stopping/);
+  assert.match(plugin, /"agent-hook","receive","deepseek"/);
 
   const second = await installAgentHooks(["deepseek"], false, environment);
   assert(second.every((item) => !item.changed));
 });
+
+test("restores a DeepSeek profile when DSH rejects the native plugin", async () => {
+  const home = await mkdtemp(join(tmpdir(), "barkdesk-dsh-rollback-"));
+  const profile = join(home, ".dsh", "profiles", "web");
+  await mkdir(profile, { recursive: true });
+  await writeFile(join(profile, "package.json"), "{}");
+  await writeFile(join(profile, "cordis.patch.yml"), "# original\n[]\n");
+  const bin = await fakeDsh(home, 1);
+
+  const results = await installAgentHooks(["deepseek"], false, { BARKDESK_AGENT_HOME: home, PATH: bin });
+  assert.match(results.find((item) => item.error)?.error ?? "", /original patch was restored/);
+  assert.equal(await readFile(join(profile, "cordis.patch.yml"), "utf8"), "# original\n[]\n");
+});
+
+async function fakeDsh(home: string, exitCode: number): Promise<string> {
+  const bin = join(home, "bin");
+  await mkdir(bin, { recursive: true });
+  const path = join(bin, "dsh");
+  await writeFile(path, `#!/bin/sh\nexit ${exitCode}\n`);
+  await chmod(path, 0o755);
+  return bin;
+}

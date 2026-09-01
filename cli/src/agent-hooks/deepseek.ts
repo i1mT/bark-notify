@@ -1,11 +1,10 @@
 import { spawn } from "node:child_process";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { commandHandler, managedMarker } from "./generated.js";
-import { exists, readJson, writeJson, writeText } from "./filesystem.js";
+import { deepSeekPlugin } from "./generated.js";
+import { exists, writeText } from "./filesystem.js";
 import type { InstallResult } from "./model.js";
 
-const packageName = "@deepseek-ai/dsh-hooks-claude-code";
 const markerStart = "# barkdesk-notify agent-hook start";
 const markerEnd = "# barkdesk-notify agent-hook end";
 
@@ -29,14 +28,12 @@ export async function installDeepSeek(dshHome: string, executable: string | unde
     changed: false,
     error: "No DeepSeek Harness profiles were found.",
   }];
-  const hookPath = join(dshHome, "barkdesk-notify-hooks.json");
-  const hookConfig = {
-    description: managedMarker,
-    hooks: { Stop: [{ hooks: [commandHandler("deepseek", 10)] }] },
-  };
-  const hookChanged = JSON.stringify(await readJson(hookPath)) !== JSON.stringify(hookConfig);
-  if (hookChanged) await writeJson(hookPath, hookConfig, dryRun);
-  const results: InstallResult[] = [{ agent: "deepseek", path: hookPath, changed: hookChanged }];
+  const pluginPath = join(dshHome, "barkdesk-notify-plugin.mjs");
+  const plugin = deepSeekPlugin();
+  await validatePluginModule(plugin);
+  const pluginChanged = await readOptional(pluginPath) !== plugin;
+  if (pluginChanged && !dryRun) await writeText(pluginPath, plugin);
+  const results: InstallResult[] = [{ agent: "deepseek", path: pluginPath, changed: pluginChanged }];
   for (const profile of profiles) {
     const profilePath = join(dshHome, "profiles", profile);
     const patchPath = join(profilePath, "cordis.patch.yml");
@@ -46,14 +43,17 @@ export async function installDeepSeek(dshHome: string, executable: string | unde
         results.push({ agent: "deepseek", path: patchPath, changed: false, detail: profile });
         continue;
       }
-      if (!dryRun && !(await hasBridgePackage(profilePath))) {
-        if (!executable) throw new Error("The dsh command was not found, so the official hook bridge cannot be installed.");
-        await validatePnpmWorkspace(profilePath);
-        await run(executable, ["plugin", "--profile", profile, "add", packageName]);
-      }
-      const block = `${markerStart}\n- insert:\n    - id: barkdesk-notify-agent-hook\n      name: ${yamlQuote(packageName)}\n      config:\n        configPath: ${yamlQuote(hookPath)}\n${markerEnd}`;
+      const block = `${markerStart}\n- insert:\n    - id: barkdesk-notify-agent-hook\n      name: ${yamlQuote(pluginPath)}\n${markerEnd}`;
       const base = patchBase(current, patchPath);
-      if (!dryRun) await writeText(patchPath, `${base ? `${base}\n` : ""}${block}\n`);
+      if (!dryRun) {
+        if (!executable) throw new Error("The dsh command was not found, so the plugin cannot be installed safely.");
+        await writeText(patchPath, `${base ? `${base}\n` : ""}${block}\n`);
+        try { await validateProfile(executable, profile); }
+        catch (error) {
+          await writeText(patchPath, current);
+          throw new Error(`DSH rejected the installed plugin and the original patch was restored: ${messageOf(error)}`);
+        }
+      }
       results.push({ agent: "deepseek", path: patchPath, changed: true, detail: profile });
     } catch (error) {
       results.push({ agent: "deepseek", path: patchPath, changed: false, detail: profile, error: messageOf(error) });
@@ -69,32 +69,27 @@ export async function deepSeekConfigured(dshHome: string): Promise<boolean> {
   return false;
 }
 
-async function hasBridgePackage(profilePath: string): Promise<boolean> {
-  const declared = (await readOptional(join(profilePath, "package.json"))).includes(`"${packageName}"`);
-  const installed = await exists(join(profilePath, "node_modules", "@deepseek-ai", "dsh-hooks-claude-code", "package.json"));
-  return declared && installed;
-}
-
-async function validatePnpmWorkspace(profilePath: string): Promise<void> {
-  const path = join(profilePath, "pnpm-workspace.yaml");
-  const invalid = (await readOptional(path)).split(/\r?\n/u).find((line) => line.includes("@http") && /:\s*(?:true|false)\s*$/u.test(line));
-  if (!invalid) return;
-  const selector = invalid.trim().replace(/^['"]|['"]?:\s*(?:true|false)\s*$/gu, "");
-  const packageOnly = selector.slice(0, selector.indexOf("@http"));
-  throw new Error(`${path} contains an allowBuilds selector that pnpm 11 rejects: ${selector}. Change it to ${packageOnly}: true, then run the installer again.`);
-}
-
 async function readOptional(path: string): Promise<string> {
   try { return await readFile(path, "utf8"); } catch { return ""; }
 }
 
-function run(command: string, arguments_: string[]): Promise<void> {
+async function validatePluginModule(source: string): Promise<void> {
+  const url = `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`;
+  const module: unknown = await import(url);
+  if (module === null || typeof module !== "object" || typeof (module as { apply?: unknown }).apply !== "function") {
+    throw new Error("Generated DeepSeek plugin does not export an apply function.");
+  }
+}
+
+function validateProfile(executable: string, profile: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, arguments_, { stdio: "inherit", shell: false });
+    const child = spawn(executable, ["--profile", profile, "--help"], { stdio: ["ignore", "ignore", "pipe"], shell: false });
+    const errors: Buffer[] = [];
+    child.stderr.on("data", (chunk: Buffer) => errors.push(chunk));
     child.once("error", reject);
     child.once("exit", (code, signal) => {
       if (code === 0 && signal === null) resolve();
-      else reject(new Error(`${command} ${arguments_.join(" ")} failed with ${signal ?? `exit code ${code ?? 1}`}.`));
+      else reject(new Error(Buffer.concat(errors).toString("utf8").trim() || `${executable} exited with ${signal ?? code ?? 1}.`));
     });
   });
 }

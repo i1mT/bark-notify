@@ -116,9 +116,9 @@ notify agent-hook install --all --dry-run
 | Gemini CLI | `AfterAgent` | `~/.gemini/settings.json` |
 | OpenCode | `session.idle` plugin event | `~/.config/opencode/plugins/barkdesk-notify.js` |
 | GitHub Copilot CLI | `agentStop` | `~/.copilot/hooks/barkdesk-notify.json` |
-| DeepSeek Harness | Claude Code hook bridge 的 `Stop` | `$DSH_HOME`（默认 `~/.dsh`）中的 profile |
+| DeepSeek Harness | 原生 `agent/turn-stopping` plugin | `$DSH_HOME`（默认 `~/.dsh`）中的 profile |
 
-安装器不会替换原有 hook；再次执行会识别已经添加的配置。OpenCode 和独立 hook 文件由 `notify` 管理；如果同名 OpenCode plugin 不是由 `notify` 创建，安装器会拒绝覆盖。DeepSeek Harness 会为检测到的每个 profile 安装官方 Claude Code hook bridge，因此首次配置可能需要访问 npm registry。
+安装器不会替换原有 hook；再次执行会识别已经添加的配置。OpenCode 和独立 hook 文件由 `notify` 管理；如果同名 OpenCode plugin 不是由 `notify` 创建，安装器会拒绝覆盖。DeepSeek Harness 使用 `notify` 生成的无第三方 dependency 原生 plugin，不会修改 profile 的 npm dependencies；安装后会通过 DSH CLI 验证 plugin tree，验证失败会自动恢复原 patch。
 
 各家 hook 输入最终会转换成统一的 Bark 通知：标题包含 Agent 名称、项目目录和完成状态，正文优先使用 Agent 提供的最后一条回复。部分 Agent 的完成事件不提供回复内容，此时正文会使用状态和目录说明。发送失败只会写入 stderr，hook 始终返回成功，避免通知服务影响 Coding Agent 结束会话。
 

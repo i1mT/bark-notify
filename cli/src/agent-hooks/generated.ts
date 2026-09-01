@@ -52,3 +52,41 @@ export const BarkDeskNotify = async ({ client, directory }) => ({
 })
 `;
 }
+
+export function deepSeekPlugin(): string {
+  const invocation = hookInvocation("deepseek");
+  return `// ${managedMarker}. Re-run "notify agent-hook install" to update this file.
+import { spawn } from "node:child_process"
+
+const node = ${JSON.stringify(invocation.node)}
+const entry = ${JSON.stringify(invocation.entry)}
+const args = ${JSON.stringify(invocation.arguments)}
+
+export const name = "barkdesk-notify-agent-hook"
+
+export function apply(ctx) {
+  ctx.on("agent/turn-stopping", async ({ agent, turn }) => {
+    const lastAssistantMessage = agent.session.events
+      .filter((event) => event.type === "assistant/message" && event.data.turn === turn)
+      .flatMap((event) => event.data.message.content)
+      .filter((block) => block.type === "text")
+      .map((block) => block.text)
+      .join("\\n")
+    const payload = JSON.stringify({
+      session_id: agent.session.header.id,
+      turn_id: String(turn),
+      cwd: agent.session.header.cwd,
+      last_assistant_message: lastAssistantMessage,
+    })
+    await new Promise((resolve) => {
+      const child = spawn(node, [entry, ...args], { stdio: ["pipe", "ignore", "ignore"] })
+      const timer = setTimeout(() => child.kill(), 10_000)
+      child.once("error", () => { clearTimeout(timer); resolve() })
+      child.once("exit", () => { clearTimeout(timer); resolve() })
+      child.stdin.on("error", () => {})
+      child.stdin.end(payload)
+    })
+  })
+}
+`;
+}
