@@ -60,8 +60,8 @@ struct NotificationsView: View {
                 if searchVisible { searchFocused = true }
             } label: {
                 Image(systemName: "magnifyingglass")
-                    .frame(width: 42, height: 42)
-                    .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 11))
+                    .foregroundStyle(.secondary)
+                    .barkIconButtonSurface()
             }
             .buttonStyle(.plain)
             .keyboardShortcut("f", modifiers: .command)
@@ -70,11 +70,11 @@ struct NotificationsView: View {
                 Button("刷新记录") { Task { await model.refreshHistory() } }
             } label: {
                 Image(systemName: "ellipsis")
-                    .frame(width: 42, height: 42)
-                    .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 11))
+                    .foregroundStyle(.secondary)
             }
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
+            .barkIconButtonSurface()
             .fixedSize()
             Button { model.selection = .compose } label: {
                 ViewThatFits(in: .horizontal) {
@@ -209,7 +209,7 @@ private struct HistoryRow: View {
             HStack(alignment: .top, spacing: 12) {
                 Text(record.createdAt.formatted(.dateTime.hour().minute().second()))
                     .font(.system(size: 17, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(selected ? Color.barkAccent : Color.barkInk)
+                    .foregroundStyle(Color.barkInk)
                     .lineLimit(1).fixedSize(horizontal: true, vertical: false)
                     .frame(width: 88, alignment: .leading)
                 VStack(alignment: .leading, spacing: 4) {
@@ -235,7 +235,7 @@ private struct HistoryRow: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 11)
-            .background(selected ? Color.barkAccentSoft : .clear, in: RoundedRectangle(cornerRadius: 9))
+            .background(selected ? Color.barkSelection : .clear, in: RoundedRectangle(cornerRadius: 9))
             .contentShape(RoundedRectangle(cornerRadius: 9))
         }
         .buttonStyle(.plain)
@@ -356,14 +356,18 @@ private struct HistoryDetail: View {
             Button("重新发送") { Task { await model.resend(record) } }
                 .buttonStyle(.barkPrimary)
             Button("复制内容") { model.copy(record.body) }
-            if let raw = record.url, let url = URL(string: raw) { Link("打开链接", destination: url) }
+                .buttonStyle(.barkSecondary)
+            if let raw = record.url, let url = URL(string: raw) { Link("打开链接", destination: url).buttonStyle(.barkSecondary) }
             Spacer()
             Menu {
                 Button("删除记录", role: .destructive) { confirmDelete = true }
             } label: {
                 Image(systemName: "ellipsis")
+                    .foregroundStyle(.secondary)
             }
             .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .barkIconButtonSurface()
             .fixedSize()
         }
         .padding(.horizontal, 28)

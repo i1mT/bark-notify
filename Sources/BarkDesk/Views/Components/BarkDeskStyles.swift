@@ -5,12 +5,15 @@ extension Color {
     // Dropbox core colors: Blue, Coconut, Graphite, Cloud, Navy, and its warm grey scale.
     static let barkAccent = adaptive(light: 0x0061FE, dark: 0x0061FE)
     static let barkAccentInk = adaptive(light: 0xFFFFFF, dark: 0xFFFFFF)
-    static let barkAccentSoft = adaptive(light: 0xB4C8E1, dark: 0x283750)
+    static let barkAction = adaptive(light: 0x0061FE, dark: 0xF7F5F2)
+    static let barkActionInk = adaptive(light: 0xFFFFFF, dark: 0x1E1919)
+    static let barkAccentSoft = adaptive(light: 0xB4C8E1, dark: 0x393633)
+    static let barkSelection = adaptive(light: 0xEBE9E6, dark: 0x393633)
     static let barkCanvas = adaptive(light: 0xF7F5F2, dark: 0x1A1918)
     static let barkSurface = adaptive(light: 0xFFFFFF, dark: 0x242321)
     static let barkField = adaptive(light: 0xF7F6F5, dark: 0x2D2B29)
     static let barkSidebar = adaptive(light: 0xF7F5F2, dark: 0x242321)
-    static let barkMist = adaptive(light: 0xB4C8E1, dark: 0x283750)
+    static let barkMist = adaptive(light: 0xB4C8E1, dark: 0x2D2B29)
     static let barkInk = adaptive(light: 0x1E1919, dark: 0xF7F5F2)
     static let barkBorder = adaptive(light: 0xD3CEC9, dark: 0x4F4A46)
 
@@ -94,10 +97,10 @@ struct BarkPrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .fontWeight(.semibold)
-            .foregroundStyle(Color.barkAccentInk)
+            .foregroundStyle(Color.barkActionInk)
             .padding(.horizontal, 19)
             .frame(minHeight: 46)
-            .background(Color.barkAccent, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .background(Color.barkAction, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             .opacity(configuration.isPressed ? 0.88 : 1)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .animation(.easeOut(duration: 0.14), value: configuration.isPressed)
@@ -106,6 +109,28 @@ struct BarkPrimaryButtonStyle: ButtonStyle {
 
 extension ButtonStyle where Self == BarkPrimaryButtonStyle {
     static var barkPrimary: BarkPrimaryButtonStyle { BarkPrimaryButtonStyle() }
+}
+
+struct BarkSecondaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .fontWeight(.semibold)
+            .foregroundStyle(Color.barkInk)
+            .padding(.horizontal, 18)
+            .frame(minHeight: 46)
+            .background(Color.barkField, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color.barkBorder.opacity(0.8), lineWidth: 1)
+            }
+            .opacity(configuration.isPressed ? 0.72 : 1)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .animation(.easeOut(duration: 0.14), value: configuration.isPressed)
+    }
+}
+
+extension ButtonStyle where Self == BarkSecondaryButtonStyle {
+    static var barkSecondary: BarkSecondaryButtonStyle { BarkSecondaryButtonStyle() }
 }
 
 private struct BarkControlSurface: ViewModifier {
@@ -125,6 +150,15 @@ private struct BarkControlSurface: ViewModifier {
 
 extension View {
     func barkControlSurface() -> some View { modifier(BarkControlSurface()) }
+
+    func barkIconButtonSurface() -> some View {
+        frame(width: 46, height: 46)
+            .background(Color.barkField, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(Color.barkBorder.opacity(0.65), lineWidth: 1)
+            }
+    }
 }
 
 struct FieldCaption: View {

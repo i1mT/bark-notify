@@ -109,7 +109,7 @@ private struct SidebarNavigationButton: View {
                 Image(systemName: item.icon)
                     .font(.system(size: 14, weight: .semibold))
                     .symbolVariant(selected ? .fill : .none)
-                    .foregroundStyle(selected ? Color.barkAccent : Color.secondary)
+                    .foregroundStyle(selected ? Color.barkInk : Color.secondary)
                     .frame(width: 20)
                 Text(item.title)
                     .font(.callout.weight(selected ? .semibold : .medium))
@@ -198,7 +198,7 @@ private struct ConnectionPanel: View {
 
     private var statusColor: Color {
         if model.connectionTestPassed { return .green }
-        return model.configurationInputIsValid ? .barkAccent : .orange
+        return model.configurationInputIsValid ? .secondary : .orange
     }
 
     private var serverName: String {

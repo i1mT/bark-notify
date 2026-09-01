@@ -9,6 +9,8 @@
 - Xcode 开发必须打开 `BarkDesk.xcodeproj` 并运行 `BarkDesk` scheme，确保 GUI 使用真正的 macOS App target；不得把 Swift Package 的裸可执行目标当作 GUI App 运行。
 - 本地 Debug App 必须显示为 `BarkDesk Dev`，并且使用独立的 bundle identifier、Application Support 目录和 Keychain service，避免与已经安装的正式版冲突；Release App 继续使用 `BarkDesk`。
 - BarkDesk UI 使用 Dropbox 官方配色体系，以 Dropbox Blue、Coconut、Graphite、Cloud、Navy 与官方暖灰阶为基础；布局调整不得擅自更换主题方向。
+- Dark Mode 必须以 Dropbox Graphite 暖灰阶为主体，Dropbox Blue 只用于 Logo、链接和少量焦点状态；不得使用大面积蓝色色块表达选中状态或主操作。
+- 常规主按钮与次按钮统一使用 46pt 高度和 12pt 圆角，纯图标操作统一使用 46×46pt，不得在同一操作栏混用系统默认小按钮。
 - 导航与记录卡片的选中状态通过背景、图标或文字颜色表达，不得叠加装饰性竖线；通知发送状态使用紧凑圆点或图标表达。
 - Swift 动态代码文件应当尽量少于 400 行，每层目录应当尽量不超过 8 个文件。
 

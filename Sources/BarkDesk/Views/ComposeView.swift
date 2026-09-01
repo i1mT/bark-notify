@@ -256,13 +256,13 @@ private struct NotificationKindButton: View {
         Button(action: action) {
             Label(kind.title, systemImage: kind.icon)
                 .font(.system(size: 14, weight: selected ? .semibold : .medium))
-                .foregroundStyle(selected ? Color.barkAccentInk : Color.barkInk)
+                .foregroundStyle(Color.barkInk)
                 .padding(.horizontal, 14)
                 .frame(minHeight: 42)
-                .background(selected ? Color.barkAccent : Color.barkSurface, in: RoundedRectangle(cornerRadius: 11))
+                .background(selected ? Color.barkSelection : Color.barkSurface, in: RoundedRectangle(cornerRadius: 11))
                 .overlay {
                     RoundedRectangle(cornerRadius: 11)
-                        .stroke(selected ? Color.barkAccent : Color.barkBorder, lineWidth: 1)
+                        .stroke(selected ? Color.barkInk.opacity(0.18) : Color.barkBorder, lineWidth: 1)
                 }
         }
         .buttonStyle(.plain)

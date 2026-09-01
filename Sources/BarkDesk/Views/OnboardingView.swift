@@ -75,6 +75,7 @@ struct OnboardingView: View {
         HStack {
             if step > 0 {
                 Button("上一步") { withAnimation(.easeOut(duration: 0.18)) { step -= 1 } }
+                    .buttonStyle(.barkSecondary)
             }
             Spacer()
             if step == 0 {
@@ -193,6 +194,7 @@ struct OnboardingView: View {
                 }
                 .buttonStyle(.barkPrimary)
                 Button("发送测试通知") { Task { await model.sendTest() } }
+                    .buttonStyle(.barkSecondary)
                     .disabled(!model.connectionTestPassed || model.isWorking)
                 Spacer()
                 if model.isWorking { ProgressView().controlSize(.small) }

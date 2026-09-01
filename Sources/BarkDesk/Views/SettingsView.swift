@@ -86,6 +86,7 @@ struct SettingsView: View {
                     guard model.saveConfiguration() else { return }
                     Task { await model.testConnection() }
                 }
+                .buttonStyle(.barkSecondary)
                 Button("发送测试通知") {
                     guard model.saveConfiguration() else { return }
                     Task { await model.sendTest() }
@@ -142,7 +143,9 @@ struct SettingsView: View {
                     .background(Color.barkAccentSoft, in: RoundedRectangle(cornerRadius: 9))
                 HStack {
                     Button("复制安装命令") { model.copy("npm install -g barkdesk-notify") }
+                        .buttonStyle(.barkSecondary)
                     Link("查看 npm package", destination: URL(string: "https://www.npmjs.com/package/barkdesk-notify")!)
+                        .buttonStyle(.barkSecondary)
                 }
             }
         }
