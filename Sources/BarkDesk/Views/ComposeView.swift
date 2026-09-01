@@ -15,13 +15,13 @@ struct ComposeView: View {
                 editorLayout
                 options
             }
-            .frame(maxWidth: 920)
+            .frame(maxWidth: 960)
             .padding(.horizontal, 34)
             .padding(.top, 28)
             .padding(.bottom, 34)
             .frame(maxWidth: .infinity)
         }
-        .background(Color(nsColor: .windowBackgroundColor))
+        .background(Color.barkCanvas)
         .navigationTitle("发送通知")
         .safeAreaInset(edge: .bottom) { sendBar }
     }
@@ -56,7 +56,7 @@ struct ComposeView: View {
         ViewThatFits(in: .horizontal) {
             HStack(alignment: .top, spacing: 18) {
                 editor.frame(minWidth: 470)
-                NotificationPreview(draft: model.draft).frame(width: 250)
+                NotificationPreview(draft: model.draft).frame(width: 280)
             }
             VStack(spacing: 18) {
                 editor
@@ -138,17 +138,16 @@ struct ComposeView: View {
             } label: {
                 Label("发送通知", systemImage: "paperplane.fill").frame(minWidth: 96)
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
+            .buttonStyle(.barkPrimary)
             .keyboardShortcut(.return, modifiers: .command)
             .disabled(model.isWorking || !model.draft.isValid)
         }
-        .frame(maxWidth: 920)
+        .frame(maxWidth: 960)
         .padding(.horizontal, 34)
         .padding(.vertical, 13)
         .frame(maxWidth: .infinity)
-        .background(.bar)
-        .overlay(alignment: .top) { Divider() }
+        .background(Color.barkSurface)
+        .overlay(alignment: .top) { Divider().overlay(Color.barkBorder) }
     }
 
     @ViewBuilder
@@ -222,8 +221,8 @@ struct ComposeView: View {
                     .padding(5)
             }
             .frame(minHeight: model.draft.kind == .markdown ? 170 : 112)
-            .background(Color(nsColor: .textBackgroundColor), in: RoundedRectangle(cornerRadius: 11))
-            .overlay { RoundedRectangle(cornerRadius: 11).stroke(Color(nsColor: .separatorColor)) }
+            .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 11))
+            .overlay { RoundedRectangle(cornerRadius: 11).stroke(Color.barkBorder) }
         }
     }
 
@@ -248,11 +247,14 @@ private struct NotificationKindButton: View {
         Button(action: action) {
             Label(kind.title, systemImage: kind.icon)
                 .font(.callout.weight(selected ? .semibold : .medium))
-                .foregroundStyle(selected ? Color.white : Color.primary)
+                .foregroundStyle(selected ? Color.barkBlue : Color.barkInk)
                 .padding(.horizontal, 13)
                 .padding(.vertical, 9)
-                .background(selected ? Color.barkRed : Color(nsColor: .controlBackgroundColor), in: Capsule())
-                .overlay { Capsule().stroke(selected ? .clear : Color(nsColor: .separatorColor)) }
+                .background(selected ? Color.barkBlueSoft : Color.barkSurface, in: RoundedRectangle(cornerRadius: 8))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(selected ? Color.barkBlue : Color.barkBorder, lineWidth: selected ? 1.5 : 1)
+                }
         }
         .buttonStyle(.plain)
     }
@@ -266,12 +268,12 @@ private struct NotificationPreview: View {
             HStack {
                 Text("发送预览").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                 Spacer()
-                Image(systemName: draft.kind.icon).foregroundStyle(Color.barkRed)
+                Image(systemName: draft.kind.icon).foregroundStyle(Color.barkBlue)
             }
             VStack(alignment: .leading, spacing: 9) {
                 HStack(spacing: 8) {
                     RoundedRectangle(cornerRadius: 7)
-                        .fill(Color.barkRed)
+                        .fill(Color.barkBlue)
                         .frame(width: 29, height: 29)
                         .overlay { Image(systemName: "bell.fill").font(.caption).foregroundStyle(.white) }
                     Text("BARK").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
@@ -287,9 +289,9 @@ private struct NotificationPreview: View {
                     .lineLimit(5)
                 if draft.kind == .image {
                     RoundedRectangle(cornerRadius: 9)
-                        .fill(Color.barkRedSoft)
+                        .fill(Color.barkBlueSoft)
                         .frame(height: 74)
-                        .overlay { Image(systemName: "photo").font(.title2).foregroundStyle(Color.barkRed) }
+                        .overlay { Image(systemName: "photo").font(.title2).foregroundStyle(Color.barkBlue) }
                 }
             }
             .padding(14)
@@ -301,7 +303,7 @@ private struct NotificationPreview: View {
         }
         .padding(17)
         .frame(minHeight: 255, alignment: .top)
-        .background(Color.barkRedSoft, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .background(Color.barkMist, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private var previewBody: String {

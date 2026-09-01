@@ -6,19 +6,9 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
-            List(SidebarItem.allCases, selection: $model.selection) { item in
-                SidebarRow(item: item, selected: model.selection == item)
-                    .tag(item)
-            }
-            .listStyle(.sidebar)
-            .navigationTitle("BarkDesk")
-            .navigationSplitViewColumnWidth(min: 205, ideal: 222, max: 250)
-            .safeAreaInset(edge: .bottom) {
-                SidebarConnectionCard()
-                    .environmentObject(model)
-                    .padding(.horizontal, 10)
-                    .padding(.bottom, 8)
-            }
+            AppSidebar()
+                .environmentObject(model)
+                .navigationSplitViewColumnWidth(min: 190, ideal: 218, max: 238)
         } detail: {
             detail
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -33,12 +23,12 @@ struct ContentView: View {
                             }
                     }
                 }
-                .animation(.easeInOut(duration: 0.2), value: model.banner)
+                .animation(.easeInOut(duration: 0.18), value: model.banner)
         }
         .navigationSplitViewStyle(.balanced)
-        .tint(.barkRed)
+        .tint(.barkBlue)
         .sheet(isPresented: $model.isOnboardingPresented) {
-            OnboardingView().environmentObject(model).tint(.barkRed)
+            OnboardingView().environmentObject(model).tint(.barkBlue)
         }
     }
 
@@ -53,56 +43,170 @@ struct ContentView: View {
     }
 }
 
-private struct SidebarRow: View {
-    let item: SidebarItem
-    let selected: Bool
+private struct AppSidebar: View {
+    @EnvironmentObject private var model: AppModel
+
+    private let mainItems: [SidebarItem] = [.notifications, .compose, .integrations]
 
     var body: some View {
-        Label {
-            Text(item.title).fontWeight(selected ? .semibold : .regular)
-        } icon: {
-            Image(systemName: item.icon)
-                .symbolVariant(selected ? .fill : .none)
-                .foregroundStyle(selected ? Color.barkRed : Color.secondary)
+        VStack(alignment: .leading, spacing: 0) {
+            brand
+            VStack(spacing: 6) {
+                ForEach(mainItems) { item in
+                    SidebarNavigationButton(
+                        item: item,
+                        selected: model.selection == item,
+                        count: item == .notifications ? model.records.count : nil
+                    ) {
+                        withAnimation(.easeOut(duration: 0.15)) { model.selection = item }
+                    }
+                }
+            }
+            .padding(.horizontal, 12)
+            Spacer(minLength: 24)
+            ConnectionPanel()
+                .environmentObject(model)
+                .padding(12)
         }
-        .padding(.vertical, 5)
+        .background(Color.barkSidebar.ignoresSafeArea())
+    }
+
+    private var brand: some View {
+        HStack(spacing: 11) {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color.barkBlue)
+                .frame(width: 36, height: 36)
+                .overlay {
+                    Image(systemName: "bell.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+            Text("BarkDesk")
+                .font(.system(size: 19, weight: .bold))
+                .tracking(-0.35)
+                .foregroundStyle(Color.barkInk)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 18)
+        .padding(.bottom, 25)
     }
 }
 
-private struct SidebarConnectionCard: View {
+private struct SidebarNavigationButton: View {
+    let item: SidebarItem
+    let selected: Bool
+    let count: Int?
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: item.icon)
+                    .font(.system(size: 14, weight: .semibold))
+                    .symbolVariant(selected ? .fill : .none)
+                    .foregroundStyle(selected ? Color.barkBlue : Color.secondary)
+                    .frame(width: 20)
+                Text(item.title)
+                    .font(.callout.weight(selected ? .semibold : .medium))
+                    .foregroundStyle(Color.barkInk)
+                Spacer(minLength: 6)
+                if let count {
+                    Text(count, format: .number)
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.horizontal, 13)
+            .frame(height: 43)
+            .background(selected ? Color.barkSurface : .clear, in: RoundedRectangle(cornerRadius: 10))
+            .overlay(alignment: .leading) {
+                if selected {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Color.barkBlue)
+                        .frame(width: 3, height: 21)
+                        .padding(.leading, 1)
+                }
+            }
+            .shadow(color: selected ? Color.barkBlue.opacity(0.08) : .clear, radius: 8, y: 3)
+            .contentShape(RoundedRectangle(cornerRadius: 10))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct ConnectionPanel: View {
     @EnvironmentObject private var model: AppModel
 
     var body: some View {
         Button {
             model.selection = .settings
         } label: {
-            HStack(spacing: 10) {
-                Circle()
-                    .fill(model.configurationInputIsValid ? Color.green : Color.orange)
-                    .frame(width: 8, height: 8)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(model.configurationInputIsValid ? "Bark 已连接" : "需要完成设置")
-                        .font(.caption.weight(.semibold))
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 8) {
+                    Circle().fill(statusColor).frame(width: 8, height: 8)
+                    Text(statusTitle).font(.caption.weight(.semibold))
+                    Spacer(minLength: 4)
+                    Image(systemName: "chevron.right")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.tertiary)
+                }
+                VStack(alignment: .leading, spacing: 3) {
                     Text(serverName)
-                        .font(.caption2)
+                        .font(.caption)
+                        .foregroundStyle(Color.barkInk)
+                        .lineLimit(1)
+                    Text(deviceLabel)
+                        .font(.caption2.monospaced())
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
-                Spacer(minLength: 4)
-                Image(systemName: "chevron.right")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(.tertiary)
+                Text("连接与设置")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(Color.barkBlue)
             }
-            .padding(11)
-            .contentShape(Rectangle())
-            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay {
+                if model.selection == .settings {
+                    RoundedRectangle(cornerRadius: 14).stroke(Color.barkBlue, lineWidth: 1.5)
+                }
+            }
+            .shadow(color: Color.barkBlue.opacity(0.07), radius: 12, y: 5)
+            .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
+        .contextMenu {
+            Button("检查连接") {
+                guard model.saveConfiguration() else { return }
+                Task { await model.testConnection() }
+            }
+            Button("发送测试通知") {
+                guard model.saveConfiguration() else { return }
+                Task { await model.sendTest() }
+            }
+            .disabled(!model.configurationInputIsValid)
+        }
+    }
+
+    private var statusTitle: String {
+        if model.connectionTestPassed { return "Bark 已连接" }
+        return model.configurationInputIsValid ? "Bark 已配置" : "需要完成设置"
+    }
+
+    private var statusColor: Color {
+        if model.connectionTestPassed { return .green }
+        return model.configurationInputIsValid ? .barkBlue : .orange
     }
 
     private var serverName: String {
-        guard let host = URL(string: model.configuration.serverURL)?.host else { return "填写 Server 与 Device Key" }
-        return host
+        URL(string: model.configuration.serverURL)?.host ?? "填写 Bark Server"
+    }
+
+    private var deviceLabel: String {
+        let key = model.credentials.deviceKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !key.isEmpty else { return "Device Key 未填写" }
+        return "Device •••• \(key.suffix(4))"
     }
 }
 
@@ -115,10 +219,10 @@ private struct BannerView: View {
             systemImage: banner.style == .success ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"
         )
         .font(.callout.weight(.medium))
-        .foregroundStyle(banner.style == .success ? .green : .red)
+        .foregroundStyle(banner.style == .success ? Color.green : Color.orange)
         .padding(.horizontal, 15)
         .padding(.vertical, 10)
-        .background(.ultraThickMaterial, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-        .shadow(color: .black.opacity(0.14), radius: 12, y: 5)
+        .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .shadow(color: Color.barkBlue.opacity(0.12), radius: 14, y: 6)
     }
 }

@@ -97,7 +97,9 @@ final class AppModel: ObservableObject {
         guard let history else { return }
         do {
             records = try await history.records(search: searchText.nilIfEmpty)
-            if selectedRecordID == nil { selectedRecordID = records.first?.id }
+            if selectedRecordID == nil || !records.contains(where: { $0.id == selectedRecordID }) {
+                selectedRecordID = records.first?.id
+            }
         } catch { showError(error) }
     }
 
@@ -140,6 +142,8 @@ final class AppModel: ObservableObject {
             var next = ComposeDraft()
             next.applyDefaults(configuration)
             draft = next
+            selectedRecordID = records.first?.id
+            selection = .notifications
         }
     }
 
@@ -234,7 +238,10 @@ final class AppModel: ObservableObject {
             try await service.send(request, source: source)
             banner = Banner(style: .success, message: "通知已经发送")
             await refreshHistory()
-        } catch { showError(error) }
+        } catch {
+            showError(error)
+            await refreshHistory()
+        }
     }
 
     private func resolvedConfiguration() throws -> ResolvedConfiguration {

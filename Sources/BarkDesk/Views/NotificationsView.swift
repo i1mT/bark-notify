@@ -3,116 +3,152 @@ import SwiftUI
 
 struct NotificationsView: View {
     @EnvironmentObject private var model: AppModel
-
+    @FocusState private var searchFocused: Bool
+    @State private var searchVisible = false
     var body: some View {
         VStack(spacing: 0) {
             header
-            Divider()
-            Group {
-                if model.records.isEmpty { emptyState } else { historyBrowser }
+            Divider().overlay(Color.barkBorder)
+            if model.records.isEmpty {
+                emptyState
+            } else {
+                historyBrowser
             }
         }
-        .background(Color(nsColor: .windowBackgroundColor))
+        .background(Color.barkCanvas)
         .navigationTitle("通知记录")
-        .toolbar {
-            Button { Task { await model.refreshHistory() } } label: {
-                Label("刷新", systemImage: "arrow.clockwise")
-            }
+        .onAppear {
+            if model.selectedRecordID == nil { model.selectedRecordID = model.records.first?.id }
         }
     }
-
     private var header: some View {
-        HStack(alignment: .bottom, spacing: 20) {
+        HStack(alignment: .center, spacing: 18) {
             VStack(alignment: .leading, spacing: 5) {
                 Text("通知记录")
-                    .font(.system(size: 27, weight: .semibold, design: .rounded))
-                Text("这台 Mac 发送过的成功与失败记录。")
+                    .font(.system(size: 31, weight: .bold))
+                    .tracking(-0.8)
+                    .foregroundStyle(Color.barkInk)
+                Text(summary)
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
-            Spacer()
+            Spacer(minLength: 12)
+            if searchVisible || !model.searchText.isEmpty {
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                    TextField("搜索标题、内容或分组", text: $model.searchText)
+                        .textFieldStyle(.plain)
+                        .focused($searchFocused)
+                    if !model.searchText.isEmpty {
+                        Button {
+                            model.searchText = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill").foregroundStyle(.tertiary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 12)
+                .frame(width: 220, height: 38)
+                .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 9))
+                .overlay { RoundedRectangle(cornerRadius: 9).stroke(Color.barkBorder) }
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+            }
+            Button {
+                withAnimation(.easeOut(duration: 0.18)) { searchVisible.toggle() }
+                if searchVisible { searchFocused = true }
+            } label: {
+                Image(systemName: "magnifyingglass")
+                    .frame(width: 36, height: 36)
+                    .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 9))
+            }
+            .buttonStyle(.plain)
+            .keyboardShortcut("f", modifiers: .command)
+            .help("搜索通知")
+            Menu {
+                Button("刷新记录") { Task { await model.refreshHistory() } }
+            } label: {
+                Image(systemName: "ellipsis")
+                    .frame(width: 36, height: 36)
+                    .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 9))
+            }
+            .menuStyle(.borderlessButton)
+            .fixedSize()
             Button {
                 model.selection = .compose
             } label: {
-                Label("发送新通知", systemImage: "plus")
+                Label("新建通知", systemImage: "plus")
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.barkPrimary)
         }
         .padding(.horizontal, 26)
         .padding(.top, 22)
         .padding(.bottom, 18)
+        .onChange(of: model.searchText) { _, _ in
+            Task {
+                try? await Task.sleep(for: .milliseconds(250))
+                await model.refreshHistory()
+            }
+        }
     }
-
     @ViewBuilder
     private var emptyState: some View {
         if model.searchText.isEmpty {
-            VStack(spacing: 17) {
-                Image(systemName: "bell.badge")
-                    .font(.system(size: 34))
-                    .foregroundStyle(Color.barkRed)
-                    .frame(width: 72, height: 72)
-                    .background(Color.barkRedSoft, in: RoundedRectangle(cornerRadius: 22))
-                VStack(spacing: 6) {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("00:00:00")
+                    .font(.system(size: 42, weight: .bold, design: .monospaced))
+                    .foregroundStyle(Color.barkBlue.opacity(0.3))
+                VStack(alignment: .leading, spacing: 7) {
                     Text("还没有发送记录").font(.title2.weight(.semibold))
-                    Text("从 BarkDesk 发送的通知会保存在这里，方便搜索和再次发送。")
+                    Text("发送的成功与失败记录会按照时间出现在这里。")
                         .foregroundStyle(.secondary)
                 }
                 Button("发送第一条通知") { model.selection = .compose }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
+                    .buttonStyle(.barkPrimary)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(30)
+            .frame(maxWidth: 540, maxHeight: .infinity, alignment: .leading)
+            .padding(46)
+            .frame(maxWidth: .infinity, alignment: .leading)
         } else {
             ContentUnavailableView.search(text: model.searchText)
         }
     }
-
     private var historyBrowser: some View {
         HSplitView {
-            VStack(spacing: 0) {
-                HStack {
-                    Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-                    TextField("搜索标题、内容或分组", text: $model.searchText)
-                        .textFieldStyle(.plain)
-                }
-                .padding(.horizontal, 12)
-                .frame(height: 36)
-                .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 10))
-                .padding(12)
-                List(selection: $model.selectedRecordID) {
-                    ForEach(groupedRecords, id: \.title) { group in
-                        Section(group.title) {
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                    ForEach(groupedRecords, id: \.day) { group in
+                        Section {
                             ForEach(group.records) { record in
-                                HistoryRow(record: record)
-                                    .tag(record.id)
-                                    .contextMenu { rowMenu(record) }
+                                HistoryRow(record: record, selected: model.selectedRecordID == record.id) {
+                                    model.selectedRecordID = record.id
+                                }
+                                .contextMenu { rowMenu(record) }
                             }
+                        } header: {
+                            DateSectionHeader(date: group.day)
                         }
                     }
                 }
-                .listStyle(.inset)
+                .padding(.horizontal, 12)
+                .padding(.bottom, 18)
             }
-            .frame(minWidth: 270, idealWidth: 315, maxWidth: 390)
-            .onSubmit(of: .text) { Task { await model.refreshHistory() } }
-            .onChange(of: model.searchText) { _, _ in
-                Task {
-                    try? await Task.sleep(for: .milliseconds(250))
-                    await model.refreshHistory()
-                }
-            }
+            .background(Color.barkSurface)
+            .frame(minWidth: 340, idealWidth: 400, maxWidth: 450)
 
             Group {
                 if let record = model.selectedRecord {
                     HistoryDetail(record: record)
+                        .id(record.id)
+                        .transition(.opacity)
                 } else {
-                    ContentUnavailableView("选择一条通知查看详情", systemImage: "bell")
+                    ContentUnavailableView("选择一条通知查看详情", systemImage: "clock")
                 }
             }
+            .animation(.easeOut(duration: 0.12), value: model.selectedRecordID)
             .frame(minWidth: 350, maxWidth: .infinity, maxHeight: .infinity)
         }
     }
-
     @ViewBuilder
     private func rowMenu(_ record: NotificationRecord) -> some View {
         Button("复制内容") { model.copy(record.body) }
@@ -121,46 +157,99 @@ struct NotificationsView: View {
         Divider()
         Button("删除", role: .destructive) { Task { await model.delete(record) } }
     }
-
-    private var groupedRecords: [(title: String, records: [NotificationRecord])] {
+    private var summary: String {
+        let today = model.records.filter { Calendar.current.isDateInToday($0.createdAt) }
+        let failures = today.filter { $0.deliveryStatus != .success }.count
+        if today.isEmpty { return "今天还没有发送通知" }
+        if failures == 0 { return "今天发送 " + String(today.count) + " 条，全部成功" }
+        return "今天发送 " + String(today.count) + " 条，其中 " + String(failures) + " 条失败"
+    }
+    private var groupedRecords: [(day: Date, records: [NotificationRecord])] {
         let calendar = Calendar.current
-        let groups = Dictionary(grouping: model.records) { record -> String in
-            if calendar.isDateInToday(record.createdAt) { return "今天" }
-            if calendar.isDateInYesterday(record.createdAt) { return "昨天" }
-            return "更早"
+        let groups = Dictionary(grouping: model.records) { calendar.startOfDay(for: $0.createdAt) }
+        return groups.keys.sorted(by: >).map { day in
+            (day, groups[day, default: []].sorted { $0.createdAt > $1.createdAt })
         }
-        return ["今天", "昨天", "更早"].compactMap { title in groups[title].map { (title, $0) } }
+    }
+}
+
+private struct DateSectionHeader: View {
+    let date: Date
+
+    var body: some View {
+        HStack {
+            Text(label).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+            Spacer()
+        }
+        .padding(.horizontal, 10)
+        .padding(.top, 14)
+        .padding(.bottom, 7)
+        .background(Color.barkSurface)
+    }
+
+    private var label: String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) { return "今天" }
+        if calendar.isDateInYesterday(date) { return "昨天" }
+        return date.formatted(.dateTime.month(.wide).day().weekday(.wide))
     }
 }
 
 private struct HistoryRow: View {
     let record: NotificationRecord
+    let selected: Bool
+    let action: () -> Void
 
     var body: some View {
-        HStack(alignment: .top, spacing: 11) {
-            Image(systemName: record.deliveryStatus == .success ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .foregroundStyle(record.deliveryStatus == .success ? .green : .red)
-                .padding(.top, 2)
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
+        Button(action: action) {
+            HStack(alignment: .top, spacing: 12) {
+                Text(record.createdAt.formatted(.dateTime.hour().minute().second()))
+                    .font(.system(size: 16, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(selected ? Color.barkBlue : Color.barkInk)
+                    .frame(width: 82, alignment: .leading)
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(record.deliveryStatus == .success ? Color.green : Color.orange)
+                    .frame(width: 3, height: 38)
+                    .padding(.top, 2)
+                VStack(alignment: .leading, spacing: 4) {
                     Text(record.title?.nilIfEmpty ?? "无标题通知")
-                        .fontWeight(.medium)
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(Color.barkInk)
                         .lineLimit(1)
-                    Spacer(minLength: 5)
-                    Text(record.createdAt, style: .time)
+                    Text(record.body)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                    Text(metadata)
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
+                        .lineLimit(1)
                 }
-                Text(record.body)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-                if let group = record.group {
-                    Text(group).font(.caption2).foregroundStyle(Color.barkRed)
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 11)
+            .background(selected ? Color.barkBlueSoft : .clear, in: RoundedRectangle(cornerRadius: 9))
+            .overlay(alignment: .leading) {
+                if selected {
+                    RoundedRectangle(cornerRadius: 2).fill(Color.barkBlue).frame(width: 3, height: 44)
                 }
             }
+            .contentShape(RoundedRectangle(cornerRadius: 9))
         }
-        .padding(.vertical, 5)
+        .buttonStyle(.plain)
+    }
+
+    private var metadata: String {
+        [record.group, sourceName].compactMap { $0?.nilIfEmpty }.joined(separator: " · ")
+    }
+
+    private var sourceName: String? {
+        switch record.source {
+        case .gui: "BarkDesk"
+        case .cli: "notify CLI"
+        case .command: "命令结束提醒"
+        }
     }
 }
 
@@ -170,40 +259,23 @@ private struct HistoryDetail: View {
     let record: NotificationRecord
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
-                detailHeader
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 9) {
-                        Text("通知内容").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-                        Text(record.body).font(.body).textSelection(.enabled)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 28) {
+                    timeHeader
+                    notificationContent
+                    sendingDetails
                 }
-                SurfaceCard {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("发送信息").font(.headline)
-                        detailRow("发送时间", record.createdAt.formatted(date: .abbreviated, time: .standard))
-                        detailRow("来源", sourceName(record.source))
-                        detailRow("分组", record.group ?? "—")
-                        detailRow("提醒方式", record.level?.displayName ?? "—")
-                        detailRow("提示音", record.sound ?? "默认")
-                        if let code = record.httpStatusCode { detailRow("HTTP", String(code)) }
-                        if let error = record.errorMessage { detailRow("错误", error) }
-                        if let command = record.metadata?.command { detailRow("命令", command) }
-                        if let duration = record.metadata?.duration {
-                            detailRow("耗时", duration.formatted(.number.precision(.fractionLength(1))) + " 秒")
-                        }
-                    }
-                }
-                Button("删除这条记录", role: .destructive) { confirmDelete = true }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(.red)
+                .frame(maxWidth: 660, alignment: .leading)
+                .padding(.horizontal, 34)
+                .padding(.top, 30)
+                .padding(.bottom, 34)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
             }
-            .frame(maxWidth: 660, alignment: .leading)
-            .padding(26)
-            .frame(maxWidth: .infinity, alignment: .topLeading)
+            Divider().overlay(Color.barkBorder)
+            actionBar
         }
+        .background(Color.barkCanvas)
         .confirmationDialog("确定删除这条通知记录？", isPresented: $confirmDelete) {
             Button("删除", role: .destructive) { Task { await model.delete(record) } }
         } message: {
@@ -211,38 +283,110 @@ private struct HistoryDetail: View {
         }
     }
 
-    private var detailHeader: some View {
+    private var timeHeader: some View {
+        HStack(alignment: .top, spacing: 18) {
+            VStack(alignment: .leading, spacing: 5) {
+                Text(record.createdAt.formatted(.dateTime.hour().minute().second()))
+                    .font(.system(size: 34, weight: .bold, design: .monospaced))
+                    .tracking(-1)
+                    .foregroundStyle(Color.barkInk)
+                Text(record.createdAt.formatted(.dateTime.year().month(.wide).day().weekday(.wide)))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 12)
+            Label(
+                record.deliveryStatus == .success ? "发送成功" : "发送失败",
+                systemImage: record.deliveryStatus == .success ? "checkmark.circle.fill" : "exclamationmark.circle.fill"
+            )
+            .font(.callout.weight(.semibold))
+            .foregroundStyle(record.deliveryStatus == .success ? Color.green : Color.orange)
+        }
+    }
+
+    private var notificationContent: some View {
         VStack(alignment: .leading, spacing: 13) {
-            HStack(alignment: .top, spacing: 14) {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(record.title?.nilIfEmpty ?? "无标题通知")
-                        .font(.system(size: 27, weight: .semibold, design: .rounded))
-                    if let subtitle = record.subtitle {
-                        Text(subtitle).font(.callout).foregroundStyle(.secondary)
+            Text(record.title?.nilIfEmpty ?? "无标题通知")
+                .font(.system(size: 25, weight: .bold))
+                .tracking(-0.4)
+                .foregroundStyle(Color.barkInk)
+            if let subtitle = record.subtitle?.nilIfEmpty {
+                Text(subtitle).font(.callout).foregroundStyle(.secondary)
+            }
+            Text(record.body)
+                .font(.system(size: 16))
+                .lineSpacing(5)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(20)
+                .background(Color.barkBlueSoft, in: RoundedRectangle(cornerRadius: 12))
+            if let rawImage = record.image, let url = URL(string: rawImage) {
+                AsyncImage(url: url) { phase in
+                    if case .success(let image) = phase {
+                        image.resizable().scaledToFit()
+                    } else if case .failure = phase {
+                        Label("无法加载图片", systemImage: "photo.badge.exclamationmark")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ProgressView()
                     }
                 }
-                Spacer(minLength: 10)
-                StatusPill(
-                    label: record.deliveryStatus == .success ? "发送成功" : "发送失败",
-                    systemImage: record.deliveryStatus == .success ? "checkmark.circle.fill" : "xmark.circle.fill",
-                    color: record.deliveryStatus == .success ? .green : .red
-                )
-            }
-            HStack(spacing: 9) {
-                Button("重新发送") { Task { await model.resend(record) } }
-                    .buttonStyle(.borderedProminent)
-                Button("复制内容") { model.copy(record.body) }
-                if let raw = record.url, let url = URL(string: raw) { Link("打开链接", destination: url) }
+                .frame(maxWidth: .infinity, minHeight: 100, maxHeight: 260)
+                .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
     }
 
-    private func detailRow(_ label: String, _ value: String) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 16) {
-            Text(label).foregroundStyle(.secondary).frame(width: 68, alignment: .leading)
-            Text(value).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading)
+    private var sendingDetails: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("发送信息")
+                .font(.headline)
+                .padding(.bottom, 12)
+            detailRow("来源", sourceName(record.source))
+            detailRow("分组", record.group ?? "—")
+            detailRow("提醒方式", record.level?.displayName ?? "—")
+            detailRow("提示音", record.sound ?? "默认")
+            if let code = record.httpStatusCode { detailRow("HTTP", String(code), monospaced: true) }
+            if let error = record.errorMessage { detailRow("错误", error) }
+            if let command = record.metadata?.command { detailRow("命令", command, monospaced: true) }
+            if let duration = record.metadata?.duration {
+                detailRow("耗时", duration.formatted(.number.precision(.fractionLength(1))) + " 秒", monospaced: true)
+            }
+        }
+    }
+
+    private var actionBar: some View {
+        HStack(spacing: 10) {
+            Button("重新发送") { Task { await model.resend(record) } }
+                .buttonStyle(.barkPrimary)
+            Button("复制内容") { model.copy(record.body) }
+            if let raw = record.url, let url = URL(string: raw) { Link("打开链接", destination: url) }
+            Spacer()
+            Menu {
+                Button("删除记录", role: .destructive) { confirmDelete = true }
+            } label: {
+                Image(systemName: "ellipsis")
+            }
+            .menuStyle(.borderlessButton)
+            .fixedSize()
+        }
+        .padding(.horizontal, 28)
+        .padding(.vertical, 13)
+        .background(Color.barkSurface)
+    }
+
+    private func detailRow(_ label: String, _ value: String, monospaced: Bool = false) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 18) {
+            Text(label).foregroundStyle(.secondary).frame(width: 72, alignment: .leading)
+            Text(value)
+                .fontDesign(monospaced ? .monospaced : .default)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .font(.callout)
+        .padding(.vertical, 9)
+        .overlay(alignment: .bottom) { Divider().overlay(Color.barkBorder) }
     }
 
     private func sourceName(_ source: NotificationSource) -> String {

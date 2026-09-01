@@ -12,6 +12,8 @@
 ## 行为
 
 - 所有发送尝试都需要写入本地历史，包括 Bark Server 返回失败和网络失败的情况。
+- macOS App 默认进入通知记录；记录列表应当优先展示发送时间，选中记录后需要显示完整详情。
+- macOS App 保留具有产品视觉的侧边栏；连接与设置入口固定在侧边栏底部，并且只展示掩码后的 Device Key。
 - `notify run` 必须返回被执行命令原本的退出码；通知发送失败不得覆盖命令退出码。
 - macOS App 的 Device Key、Basic Auth 用户名和密码必须存储在 macOS Keychain，不得写入普通配置文件。
 - npm CLI 在服务器环境中应当优先支持 `BARK_*` 环境变量和 secret file；写入本机配置时必须限制文件权限。

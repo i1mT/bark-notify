@@ -20,7 +20,7 @@ struct IntegrationsView: View {
             .padding(.vertical, 28)
             .frame(maxWidth: .infinity)
         }
-        .background(Color(nsColor: .windowBackgroundColor))
+        .background(Color.barkCanvas)
         .navigationTitle("开发者接入")
     }
 
@@ -81,9 +81,9 @@ struct IntegrationsView: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.title3)
-                .foregroundStyle(Color.barkRed)
+                .foregroundStyle(Color.barkBlue)
                 .frame(width: 40, height: 40)
-                .background(Color.barkRedSoft, in: RoundedRectangle(cornerRadius: 12))
+                .background(Color.barkBlueSoft, in: RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 3) {
                 Text(title).font(.headline)
                 Text(detail).font(.caption).foregroundStyle(.secondary)
@@ -111,14 +111,14 @@ struct IntegrationsView: View {
             HStack {
                 Text(title).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                 Spacer()
-                Button("复制") { model.copy(value) }.buttonStyle(.plain).foregroundStyle(Color.barkRed)
+                Button("复制") { model.copy(value) }.buttonStyle(.plain).foregroundStyle(Color.barkBlue)
             }
             Text(value)
                 .font(.system(.callout, design: .monospaced))
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(12)
-                .background(Color(nsColor: .windowBackgroundColor), in: RoundedRectangle(cornerRadius: 11))
+                .background(Color.barkBlueSoft, in: RoundedRectangle(cornerRadius: 9))
         }
     }
 
