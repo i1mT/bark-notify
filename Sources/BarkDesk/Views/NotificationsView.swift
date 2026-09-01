@@ -22,7 +22,7 @@ struct NotificationsView: View {
         }
     }
     private var header: some View {
-        HStack(alignment: .center, spacing: 18) {
+        HStack(alignment: .center, spacing: 14) {
             VStack(alignment: .leading, spacing: 5) {
                 Text("通知记录")
                     .font(.system(size: 34, weight: .semibold))
@@ -32,7 +32,8 @@ struct NotificationsView: View {
                     .font(.system(size: 15))
                     .foregroundStyle(.secondary)
             }
-            Spacer(minLength: 12)
+            .layoutPriority(1)
+            Spacer(minLength: 8)
             if searchVisible || !model.searchText.isEmpty {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
@@ -49,7 +50,7 @@ struct NotificationsView: View {
                     }
                 }
                 .padding(.horizontal, 12)
-                .frame(width: 240, height: 42)
+                .frame(width: 210, height: 42)
                 .background(Color.barkField, in: RoundedRectangle(cornerRadius: 11))
                 .overlay { RoundedRectangle(cornerRadius: 11).stroke(Color.barkBorder) }
                 .transition(.move(edge: .trailing).combined(with: .opacity))
@@ -73,9 +74,13 @@ struct NotificationsView: View {
                     .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 11))
             }
             .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
             .fixedSize()
             Button { model.selection = .compose } label: {
-                Label("新建通知", systemImage: "plus")
+                ViewThatFits(in: .horizontal) {
+                    Label("新建通知", systemImage: "plus")
+                    Image(systemName: "plus").frame(width: 18)
+                }
             }
             .buttonStyle(.barkPrimary)
         }
@@ -112,7 +117,7 @@ struct NotificationsView: View {
         }
     }
     private var historyBrowser: some View {
-        HSplitView {
+        HStack(spacing: 0) {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
                     ForEach(groupedRecords, id: \.day) { group in
@@ -132,7 +137,10 @@ struct NotificationsView: View {
                 .padding(.bottom, 18)
             }
             .background(Color.barkSurface)
-            .frame(minWidth: 340, idealWidth: 400, maxWidth: 450)
+            .frame(width: 330)
+            Rectangle()
+                .fill(Color.barkBorder)
+                .frame(width: 1)
 
             Group {
                 if let record = model.selectedRecord {
@@ -144,8 +152,9 @@ struct NotificationsView: View {
                 }
             }
             .animation(.easeOut(duration: 0.12), value: model.selectedRecordID)
-            .frame(minWidth: 350, maxWidth: .infinity, maxHeight: .infinity)
+            .frame(minWidth: 0, maxWidth: .infinity, maxHeight: .infinity)
         }
+        .clipped()
     }
     @ViewBuilder
     private func rowMenu(_ record: NotificationRecord) -> some View {
@@ -173,7 +182,6 @@ struct NotificationsView: View {
 
 private struct DateSectionHeader: View {
     let date: Date
-
     var body: some View {
         HStack {
             Text(label).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
@@ -184,7 +192,6 @@ private struct DateSectionHeader: View {
         .padding(.bottom, 7)
         .background(Color.barkSurface)
     }
-
     private var label: String {
         let calendar = Calendar.current
         if calendar.isDateInToday(date) { return "今天" }
@@ -197,7 +204,6 @@ private struct HistoryRow: View {
     let record: NotificationRecord
     let selected: Bool
     let action: () -> Void
-
     var body: some View {
         Button(action: action) {
             HStack(alignment: .top, spacing: 12) {
@@ -205,7 +211,7 @@ private struct HistoryRow: View {
                     .font(.system(size: 17, weight: .semibold, design: .monospaced))
                     .foregroundStyle(selected ? Color.barkAccent : Color.barkInk)
                     .lineLimit(1).fixedSize(horizontal: true, vertical: false)
-                    .frame(width: 94, alignment: .leading)
+                    .frame(width: 88, alignment: .leading)
                 RoundedRectangle(cornerRadius: 2)
                     .fill(record.deliveryStatus == .success ? Color.green : Color.orange)
                     .frame(width: 3, height: 38)
@@ -217,9 +223,8 @@ private struct HistoryRow: View {
                         .lineLimit(1)
                     Text(record.body)
                         .font(.system(size: 14))
-                        .lineSpacing(2)
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
+                        .lineLimit(1)
                     Text(metadata)
                         .font(.system(size: 12))
                         .foregroundStyle(.tertiary)
@@ -239,17 +244,8 @@ private struct HistoryRow: View {
         }
         .buttonStyle(.plain)
     }
-
     private var metadata: String {
-        [record.group, sourceName].compactMap { $0?.nilIfEmpty }.joined(separator: " · ")
-    }
-
-    private var sourceName: String? {
-        switch record.source {
-        case .gui: "BarkDesk"
-        case .cli: "notify CLI"
-        case .command: "命令结束提醒"
-        }
+        [record.group, record.source.historyLabel].compactMap { $0?.nilIfEmpty }.joined(separator: " · ")
     }
 }
 
@@ -257,7 +253,6 @@ private struct HistoryDetail: View {
     @EnvironmentObject private var model: AppModel
     @State private var confirmDelete = false
     let record: NotificationRecord
-
     var body: some View {
         VStack(spacing: 0) {
             ScrollView {
@@ -266,8 +261,8 @@ private struct HistoryDetail: View {
                     notificationContent
                     sendingDetails
                 }
-                .frame(maxWidth: 660, alignment: .leading)
-                .padding(.horizontal, 34)
+                .frame(maxWidth: 720, alignment: .leading)
+                .padding(.horizontal, 28)
                 .padding(.top, 30)
                 .padding(.bottom, 34)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -282,17 +277,19 @@ private struct HistoryDetail: View {
             Text("删除后无法恢复，但不会删除 iPhone Bark 中的通知。")
         }
     }
-
     private var timeHeader: some View {
         HStack(alignment: .top, spacing: 18) {
             VStack(alignment: .leading, spacing: 5) {
                 Text(record.createdAt.formatted(.dateTime.hour().minute().second()))
-                .font(.system(size: 38, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 36, weight: .semibold, design: .monospaced))
                     .tracking(-1)
                     .foregroundStyle(Color.barkInk)
-                Text(record.createdAt.formatted(.dateTime.year().month(.wide).day().weekday(.wide)))
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+                Text(record.createdAt.formatted(.dateTime.year().month(.abbreviated).day().weekday(.abbreviated)))
                     .font(.callout)
                     .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
             Spacer(minLength: 12)
             Label(
@@ -301,9 +298,10 @@ private struct HistoryDetail: View {
             )
             .font(.callout.weight(.semibold))
             .foregroundStyle(record.deliveryStatus == .success ? Color.green : Color.orange)
+            .lineLimit(1)
+            .fixedSize()
         }
     }
-
     private var notificationContent: some View {
         VStack(alignment: .leading, spacing: 13) {
             Text(record.title?.nilIfEmpty ?? "无标题通知")
@@ -344,7 +342,7 @@ private struct HistoryDetail: View {
             Text("发送信息")
                 .font(.headline)
                 .padding(.bottom, 12)
-            detailRow("来源", sourceName(record.source))
+            detailRow("来源", record.source.historyLabel)
             detailRow("分组", record.group ?? "—")
             detailRow("提醒方式", record.level?.displayName ?? "—")
             detailRow("提示音", record.sound ?? "默认")
@@ -389,9 +387,11 @@ private struct HistoryDetail: View {
         .padding(.vertical, 9)
         .overlay(alignment: .bottom) { Divider().overlay(Color.barkBorder) }
     }
+}
 
-    private func sourceName(_ source: NotificationSource) -> String {
-        switch source {
+private extension NotificationSource {
+    var historyLabel: String {
+        switch self {
         case .gui: "BarkDesk"
         case .cli: "notify CLI"
         case .command: "命令结束提醒"

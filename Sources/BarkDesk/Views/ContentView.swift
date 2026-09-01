@@ -64,11 +64,14 @@ private struct AppSidebar: View {
                 }
             }
             .padding(.horizontal, 12)
+            .frame(maxWidth: .infinity)
             Spacer(minLength: 24)
             ConnectionPanel()
                 .environmentObject(model)
                 .padding(12)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipped()
         .background(Color.barkSidebar.ignoresSafeArea())
     }
 
@@ -90,6 +93,7 @@ private struct AppSidebar: View {
         .padding(.horizontal, 16)
         .padding(.top, 18)
         .padding(.bottom, 25)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -119,6 +123,7 @@ private struct SidebarNavigationButton: View {
             }
             .padding(.horizontal, 13)
             .frame(height: 43)
+            .frame(maxWidth: .infinity)
             .background(selected ? Color.barkSurface : .clear, in: RoundedRectangle(cornerRadius: 10))
             .overlay(alignment: .leading) {
                 if selected {
@@ -132,6 +137,7 @@ private struct SidebarNavigationButton: View {
             .contentShape(RoundedRectangle(cornerRadius: 10))
         }
         .buttonStyle(.plain)
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -156,10 +162,12 @@ private struct ConnectionPanel: View {
                         .font(.system(size: 13))
                         .foregroundStyle(Color.barkInk)
                         .lineLimit(1)
+                        .truncationMode(.middle)
                     Text(deviceLabel)
                         .font(.caption2.monospaced())
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
+                        .truncationMode(.middle)
                 }
                 Text("连接与设置")
                     .font(.caption.weight(.medium))
@@ -177,6 +185,7 @@ private struct ConnectionPanel: View {
             .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
+        .frame(maxWidth: .infinity)
         .contextMenu {
             Button("检查连接") {
                 guard model.saveConfiguration() else { return }
