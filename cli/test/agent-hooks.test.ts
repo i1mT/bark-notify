@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { normalizeEvent, notificationOptions } from "../src/agent-hooks/model.js";
+import { formatInstallSummary } from "../src/agent-hooks/command.js";
 
 test("normalizes Codex Stop input into a completion notification", () => {
   const event = normalizeEvent("codex", {
@@ -29,4 +30,15 @@ test("marks failed agent events as time-sensitive", () => {
   const event = normalizeEvent("cursor", { status: "failed", error_message: "Build failed" }, {});
   assert(event);
   assert.equal(notificationOptions(event, "Cursor").level, "timeSensitive");
+});
+
+test("installation summary distinguishes installed, incomplete, and unselected agents", () => {
+  const lines = formatInstallSummary(["codex", "deepseek"], ["codex", "claude", "deepseek"], [
+    { agent: "codex", path: "/tmp/codex", changed: true },
+    { agent: "deepseek", path: "/tmp/hooks", changed: true },
+    { agent: "deepseek", path: "/tmp/profile", changed: false, error: "pnpm failed" },
+  ], false);
+  assert.match(lines.join("\n"), /Installed now: Codex/);
+  assert.match(lines.join("\n"), /Incomplete or failed: DeepSeek Harness/);
+  assert.match(lines.join("\n"), /Not selected: Claude Code/);
 });

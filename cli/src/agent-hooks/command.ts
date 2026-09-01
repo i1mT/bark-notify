@@ -24,8 +24,33 @@ export async function installCommand(agentNames: string[] | undefined, all: bool
     const action = dryRun ? (result.changed ? "would configure" : "already configured") : (result.changed ? "configured" : "already configured");
     console.log(`${result.changed ? "✓" : "="} ${label}: ${action} ${result.path}${result.detail ? ` (${result.detail})` : ""}`);
   }
+  for (const line of formatInstallSummary(ids, detected.map((item) => item.definition.id), results, dryRun)) console.log(line);
   if (dryRun) console.log("Dry run complete; no files were changed.");
   return results.some((result) => result.error) ? 1 : 0;
+}
+
+export function formatInstallSummary(
+  selected: AgentId[],
+  detected: AgentId[],
+  results: Awaited<ReturnType<typeof installAgentHooks>>,
+  dryRun: boolean,
+): string[] {
+  const groups = { changed: [] as string[], unchanged: [] as string[], incomplete: [] as string[] };
+  for (const id of selected) {
+    const agentResults = results.filter((result) => result.agent === id);
+    const label = definitionFor(id).label;
+    if (agentResults.some((result) => result.error)) groups.incomplete.push(label);
+    else if (agentResults.some((result) => result.changed)) groups.changed.push(label);
+    else groups.unchanged.push(label);
+  }
+  const notSelected = detected.filter((id) => !selected.includes(id)).map((id) => definitionFor(id).label);
+  return [
+    "Installation summary:",
+    `  ${dryRun ? "Would configure" : "Installed now"}: ${names(groups.changed)}`,
+    `  Already configured: ${names(groups.unchanged)}`,
+    `  Incomplete or failed: ${names(groups.incomplete)}`,
+    `  Not selected: ${names(notSelected)}`,
+  ];
 }
 
 export async function receiveCommand(
@@ -62,4 +87,5 @@ async function readStandardInput(): Promise<string> {
 }
 
 function unique<T>(values: T[]): T[] { return [...new Set(values)]; }
+function names(values: string[]): string { return values.length ? values.join(", ") : "none"; }
 function messageOf(error: unknown): string { return error instanceof Error ? error.message : String(error); }
