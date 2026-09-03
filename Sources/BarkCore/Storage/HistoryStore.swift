@@ -4,9 +4,14 @@ import Foundation
 public actor HistoryStore {
     nonisolated(unsafe) private var database: OpaquePointer?
     private let databaseURL: URL
+    private let sharedHistory: SharedHistoryFile?
 
-    public init(databaseURL: URL = SharedStorage.databaseURL) throws {
+    public init(
+        databaseURL: URL = SharedStorage.databaseURL,
+        sharedHistoryURL: URL? = SharedStorage.cliHistoryURL
+    ) throws {
         self.databaseURL = databaseURL
+        self.sharedHistory = sharedHistoryURL.map(SharedHistoryFile.init(url:))
         try FileManager.default.createDirectory(
             at: databaseURL.deletingLastPathComponent(),
             withIntermediateDirectories: true,
@@ -38,8 +43,14 @@ public actor HistoryStore {
     }
 
     public func insert(_ record: NotificationRecord) throws {
+        try insertIntoDatabase(record)
+        try sharedHistory?.append(record)
+    }
+
+    private func insertIntoDatabase(_ record: NotificationRecord, ignoreExisting: Bool = false) throws {
+        let operation = ignoreExisting ? "INSERT OR IGNORE" : "INSERT"
         let sql = """
-        INSERT INTO notifications (
+        \(operation) INTO notifications (
           id, title, subtitle, body, group_name, level, sound, icon, image, url,
           source, created_at, delivery_status, http_status_code, error_message, metadata
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -73,6 +84,11 @@ public actor HistoryStore {
     }
 
     public func records(search: String? = nil, limit: Int = 500) throws -> [NotificationRecord] {
+        try synchronizeSharedHistory()
+        return try queryRecords(search: search, limit: limit)
+    }
+
+    private func queryRecords(search: String? = nil, limit: Int = 500) throws -> [NotificationRecord] {
         let hasSearch = !(search?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
         let predicate = hasSearch
             ? "WHERE title LIKE ? ESCAPE '\\' OR subtitle LIKE ? ESCAPE '\\' OR body LIKE ? ESCAPE '\\' OR group_name LIKE ? ESCAPE '\\'"
@@ -113,6 +129,42 @@ public actor HistoryStore {
         }
         defer { sqlite3_finalize(statement) }
         bind(id.uuidString, at: 1, to: statement)
+        guard sqlite3_step(statement) == SQLITE_DONE else {
+            throw HistoryStoreError.query(message: databaseMessage)
+        }
+        try sharedHistory?.remove(id: id)
+    }
+
+    private func synchronizeSharedHistory() throws {
+        guard let sharedHistory else { return }
+        if try metadataValue(for: "shared_history_exported") != "1" {
+            try sharedHistory.merge(try queryRecords(limit: 10_000))
+            try setMetadataValue("1", for: "shared_history_exported")
+        }
+        for record in try sharedHistory.records() {
+            try insertIntoDatabase(record, ignoreExisting: true)
+        }
+    }
+
+    private func metadataValue(for key: String) throws -> String? {
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(database, "SELECT value FROM history_metadata WHERE key = ?;", -1, &statement, nil) == SQLITE_OK else {
+            throw HistoryStoreError.query(message: databaseMessage)
+        }
+        defer { sqlite3_finalize(statement) }
+        bind(key, at: 1, to: statement)
+        return sqlite3_step(statement) == SQLITE_ROW ? text(statement, 0) : nil
+    }
+
+    private func setMetadataValue(_ value: String, for key: String) throws {
+        var statement: OpaquePointer?
+        let sql = "INSERT OR REPLACE INTO history_metadata (key, value) VALUES (?, ?);"
+        guard sqlite3_prepare_v2(database, sql, -1, &statement, nil) == SQLITE_OK else {
+            throw HistoryStoreError.query(message: databaseMessage)
+        }
+        defer { sqlite3_finalize(statement) }
+        bind(key, at: 1, to: statement)
+        bind(value, at: 2, to: statement)
         guard sqlite3_step(statement) == SQLITE_DONE else {
             throw HistoryStoreError.query(message: databaseMessage)
         }
@@ -168,6 +220,7 @@ public actor HistoryStore {
       http_status_code INTEGER, error_message TEXT, metadata TEXT
     );
     CREATE INDEX IF NOT EXISTS notifications_created_at ON notifications(created_at DESC);
+    CREATE TABLE IF NOT EXISTS history_metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
     """
 }
 

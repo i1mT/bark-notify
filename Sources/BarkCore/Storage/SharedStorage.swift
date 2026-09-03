@@ -23,6 +23,10 @@ public enum SharedStorage {
         rootDirectory.appendingPathComponent("barkdesk.sqlite")
     }
 
+    public static var cliHistoryURL: URL {
+        rootDirectory.appendingPathComponent("CLI/history.jsonl")
+    }
+
     public static var configurationURL: URL {
         rootDirectory.appendingPathComponent("configuration.json")
     }

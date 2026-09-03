@@ -35,7 +35,9 @@ test("run preserves the child exit code and still sends a notification", async (
   assert.equal(result.code, 3);
   assert.equal(received?.device_key, "test-device");
   assert.equal(received?.title, "Command failed");
-  assert.match(await readFile(join(directory, "history.jsonl"), "utf8"), /"status":"success"/);
+  const history = JSON.parse((await readFile(join(directory, "history.jsonl"), "utf8")).trim()) as Record<string, unknown>;
+  assert.equal(history.status, "success");
+  assert.match(String(history.id), /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 });
 
 function runProcess(command: string, arguments_: string[], environment: NodeJS.ProcessEnv): Promise<{ code: number | null }> {

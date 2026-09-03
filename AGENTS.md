@@ -4,7 +4,7 @@
 
 - `BarkCore` 是 macOS App 的业务实现入口；SwiftUI View 不得重复实现网络、配置、Keychain、历史记录或 Bark 参数编码。
 - `cli` 是独立发布的 Node.js package，不得依赖 Swift、macOS App bundle、Keychain 或 Apple 专属框架，并且必须支持 Linux、macOS 与 Windows。
-- macOS App 与 npm CLI 分别管理配置和本机历史，不得假设两者安装在同一台设备上。
+- macOS App 与 npm CLI 分别管理配置，不得假设两者安装在同一台设备上；在同一台 Mac 上运行时，两者必须通过兼容的本机交换记录互通通知历史，同时保留 CLI 在 Linux 与 Windows 上独立工作的能力。
 - BarkDesk 只调用现有 Bark Server，不实现推送接收、代理服务、服务器历史同步或新的后端。
 - Xcode 开发必须打开 `BarkDesk.xcodeproj` 并运行 `BarkDesk` scheme，确保 GUI 使用真正的 macOS App target；不得把 Swift Package 的裸可执行目标当作 GUI App 运行。
 - 本地 Debug App 必须显示为 `BarkDesk Dev`，并且使用独立的 bundle identifier、Application Support 目录和 Keychain service，避免与已经安装的正式版冲突；Release App 继续使用 `BarkDesk`。

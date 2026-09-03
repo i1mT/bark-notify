@@ -4,6 +4,7 @@ public enum NotificationSource: String, Codable, Sendable {
     case gui
     case cli
     case command
+    case agentHook = "agent-hook"
 }
 
 public enum DeliveryStatus: String, Codable, Sendable {

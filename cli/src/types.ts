@@ -88,9 +88,10 @@ export interface BarkPayload {
 }
 
 export interface HistoryRecord {
+  id?: string;
   createdAt: string;
   status: "success" | "failure";
-  source: "send" | "run" | "agent-hook";
+  source: "send" | "run" | "agent-hook" | "gui";
   title?: string;
   body: string;
   group?: string;

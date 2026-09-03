@@ -10,6 +10,7 @@
 		08AF0F9BB095DCCCA9075C45 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43885481861822159162BA3D /* AppModel.swift */; };
 		1485A293AB7721A460165DF6 /* BarkModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633089E2E9F023E43BF9762B /* BarkModels.swift */; };
 		150956A536EF636B101EDACC /* SharedStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D33B52FE6B59A9762691134 /* SharedStorage.swift */; };
+		B1C2D3E4F5061728394A5B6C /* SharedHistoryFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* SharedHistoryFile.swift */; };
 		189E744E6F15C6DEED8DC36F /* BarkModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BF9FE29AACC2BD676ECE6B8 /* BarkModelsTests.swift */; };
 		1A22E2C4241B71FB554FC083 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0DD422E1702FB104B8007E /* AppConfiguration.swift */; };
 		2971CF15D14B3892E60F7800 /* ComposeDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAD4EB61AB64F71062FD059 /* ComposeDraft.swift */; };
@@ -91,6 +92,7 @@
 		807B647AE9D6E9214BDC6DDF /* ComposeDraftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposeDraftTests.swift; sourceTree = "<group>"; };
 		8F7613796EEAE1EBE4373656 /* BarkDesk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarkDesk.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C6798A179BDA020DC9985D4 /* BarkDeskApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarkDeskApp.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5C /* SharedHistoryFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedHistoryFile.swift; sourceTree = "<group>"; };
 		B08C8E661EFF6DA46067F738 /* OnboardingInputUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingInputUITests.swift; sourceTree = "<group>"; };
 		BC4B390B7E178B59C5F14291 /* BarkDeskUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarkDeskUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C257DDD48209F94FBE6D64F9 /* BarkCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BarkCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -179,6 +181,7 @@
 			isa = PBXGroup;
 			children = (
 				75EBD4C2BA77E749DAB7D205 /* HistoryStore.swift */,
+				A1B2C3D4E5F60718293A4B5C /* SharedHistoryFile.swift */,
 				0D33B52FE6B59A9762691134 /* SharedStorage.swift */,
 			);
 			path = Storage;
@@ -475,6 +478,7 @@
 				FEA3104B5F0015C576D8335F /* HistoryStore.swift in Sources */,
 				F644EE98E6439AD80A186180 /* KeychainStore.swift in Sources */,
 				7A3762CB8C856A39127B7E16 /* NotificationService.swift in Sources */,
+				B1C2D3E4F5061728394A5B6C /* SharedHistoryFile.swift in Sources */,
 				150956A536EF636B101EDACC /* SharedStorage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

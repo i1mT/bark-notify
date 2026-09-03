@@ -393,6 +393,7 @@ private extension NotificationSource {
         case .gui: "BarkDesk"
         case .cli: "notify CLI"
         case .command: "命令结束提醒"
+        case .agentHook: "Coding Agent"
         }
     }
 }

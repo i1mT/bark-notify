@@ -80,14 +80,14 @@ notify run -g deploy -- ./deploy.sh --production
 
 `notify run` 始终返回原命令的退出码。Bark 发送失败只会输出警告，不会把失败命令改成成功。
 
-查看 CLI 自己的本机历史：
+查看本机历史：
 
 ```bash
 notify history
 notify history --search deploy --limit 50
 ```
 
-CLI 历史与 BarkDesk macOS App 历史相互独立，不会跨设备或跨系统同步。
+在同一台 Mac 上，CLI 与 BarkDesk 通过本机历史文件互通记录；CLI、Coding Agent hook 和 BarkDesk 发送的通知可以从两边查看。Linux 与 Windows 继续独立保存 CLI 历史，历史记录不会跨设备同步。
 
 ## Coding Agent 完成通知
 

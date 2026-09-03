@@ -9,7 +9,7 @@ BarkDesk 是一套面向 [Bark](https://github.com/Finb/Bark) 的桌面与命令
 - **BarkDesk for macOS**：使用原生 SwiftUI 编写，用于配置 Bark、发送不同类型的通知，并且查看本机发送历史。
 - **`notify` CLI**：通过 npm 独立发布，可在 Linux、macOS 与 Windows 上使用，适合终端、服务器、脚本和 CI。
 
-两者都会直接连接你自己的 Bark Server，不需要代理服务。它们分别保存配置与本机历史，因此 CLI 不需要安装 BarkDesk App，也不依赖 macOS。
+两者都会直接连接你自己的 Bark Server，不需要代理服务。它们分别保存配置；在同一台 Mac 上会互通本机历史。CLI 不需要安装 BarkDesk App，也不依赖 macOS。
 
 [下载 BarkDesk](https://github.com/i1mT/bark-notify/releases/latest) · [安装 CLI](https://www.npmjs.com/package/barkdesk-notify) · [查看源码](https://github.com/i1mT/bark-notify)
 
@@ -86,13 +86,15 @@ notify -t "Build" "构建完成"
 echo "备份完成" | notify -t "Server"
 ```
 
-查看当前配置与 CLI 自己的本机历史：
+查看当前配置与本机历史：
 
 ```bash
 notify config show
 notify history
 notify history --search deploy --limit 50
 ```
+
+在同一台 Mac 上，`notify` 与 BarkDesk 共用历史交换记录；CLI、Coding Agent hook 和 BarkDesk 发送的通知都会显示在 BarkDesk 中，也可以通过 `notify history` 查看。历史记录不会跨设备同步。
 
 在 Linux 服务器、容器或 CI 中，推荐使用环境变量，不把 Device Key 写入配置文件：
 

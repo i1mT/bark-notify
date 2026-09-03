@@ -1,4 +1,4 @@
-import { appendFile, chmod, mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
+import { appendFile, chmod, mkdir, open, readFile, rename, stat, unlink, writeFile } from "node:fs/promises";
 import { homedir, platform } from "node:os";
 import { dirname, join } from "node:path";
 import { randomUUID } from "node:crypto";
@@ -17,9 +17,11 @@ export function getHistoryPath(environment: NodeJS.ProcessEnv = process.env): st
 
 export async function appendHistory(record: HistoryRecord, path = getHistoryPath()): Promise<void> {
   await mkdir(dirname(path), { recursive: true, mode: 0o700 });
-  await appendFile(path, `${JSON.stringify(record)}\n`, { mode: 0o600 });
-  if (platform() !== "win32") await chmod(path, 0o600);
-  if ((await stat(path)).size > maximumBytes) await compact(path);
+  await withHistoryLock(path, async () => {
+    await appendFile(path, `${JSON.stringify(record)}\n`, { mode: 0o600 });
+    if (platform() !== "win32") await chmod(path, 0o600);
+    if ((await stat(path)).size > maximumBytes) await compact(path);
+  });
 }
 
 export async function readHistory(search: string | undefined, limit: number, path = getHistoryPath()): Promise<HistoryRecord[]> {
@@ -41,4 +43,23 @@ async function compact(path: string): Promise<void> {
 
 function isErrorCode(error: unknown, code: string): boolean {
   return error instanceof Error && "code" in error && error.code === code;
+}
+
+async function withHistoryLock<T>(path: string, operation: () => Promise<T>): Promise<T> {
+  const lockPath = `${path}.lock`;
+  let handle;
+  for (let attempt = 0; ; attempt += 1) {
+    try { handle = await open(lockPath, "wx", 0o600); break; }
+    catch (error) {
+      if (!isErrorCode(error, "EEXIST") || attempt >= 80) throw error;
+      const details = await stat(lockPath).catch(() => undefined);
+      if (details && Date.now() - details.mtimeMs > 30_000) await unlink(lockPath).catch(() => undefined);
+      await new Promise((resolve) => setTimeout(resolve, 25));
+    }
+  }
+  try { return await operation(); }
+  finally {
+    await handle.close();
+    await unlink(lockPath).catch(() => undefined);
+  }
 }

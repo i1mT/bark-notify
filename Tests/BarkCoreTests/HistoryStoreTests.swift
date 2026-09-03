@@ -8,7 +8,7 @@ func historyLifecycle() async throws {
         .appendingPathComponent(UUID().uuidString, isDirectory: true)
     defer { try? FileManager.default.removeItem(at: directory) }
     let url = directory.appendingPathComponent("history.sqlite")
-    let store = try HistoryStore(databaseURL: url)
+    let store = try HistoryStore(databaseURL: url, sharedHistoryURL: nil)
     let matching = NotificationRecord(
         request: BarkPushRequest(deviceKey: "key", title: "Build", body: "Deployment completed", group: "release"),
         source: .cli, createdAt: Date(timeIntervalSince1970: 200),
@@ -49,7 +49,10 @@ func failedDeliveryIsRecorded() async throws {
     let directory = FileManager.default.temporaryDirectory
         .appendingPathComponent(UUID().uuidString, isDirectory: true)
     defer { try? FileManager.default.removeItem(at: directory) }
-    let store = try HistoryStore(databaseURL: directory.appendingPathComponent("history.sqlite"))
+    let store = try HistoryStore(
+        databaseURL: directory.appendingPathComponent("history.sqlite"),
+        sharedHistoryURL: nil
+    )
     let service = NotificationService(client: FailingClient(), history: store)
     let request = BarkPushRequest(deviceKey: "key", body: "Hello")
 
@@ -60,4 +63,49 @@ func failedDeliveryIsRecorded() async throws {
     #expect(records.count == 1)
     #expect(records[0].deliveryStatus == .failed)
     #expect(records[0].httpStatusCode == 401)
+}
+
+@Test("BarkDesk and CLI history synchronize through JSONL")
+func sharedHistorySynchronization() async throws {
+    let directory = FileManager.default.temporaryDirectory
+        .appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    let databaseURL = directory.appendingPathComponent("history.sqlite")
+    let sharedURL = directory.appendingPathComponent("CLI/history.jsonl")
+    let legacyAppRecord = NotificationRecord(
+        request: BarkPushRequest(deviceKey: "key", title: "Legacy BarkDesk", body: "Existing app history"),
+        source: .gui, createdAt: Date(timeIntervalSince1970: 100), deliveryStatus: .success
+    )
+    do {
+        let legacyStore = try HistoryStore(databaseURL: databaseURL, sharedHistoryURL: nil)
+        try await legacyStore.insert(legacyAppRecord)
+    }
+    try FileManager.default.createDirectory(at: sharedURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+    let cliLine = """
+    {"createdAt":"2026-09-03T08:56:57.123Z","status":"success","source":"agent-hook","title":"Codex · demo · 任务完成","body":"All tests passed.","group":"terminal"}
+    """
+    try Data("\(cliLine)\n".utf8).write(to: sharedURL)
+
+    let store = try HistoryStore(databaseURL: databaseURL, sharedHistoryURL: sharedURL)
+    let firstRead = try await store.records()
+    #expect(firstRead.count == 2)
+    let importedCLIRecord = try #require(firstRead.first { $0.source == .agentHook })
+    #expect(importedCLIRecord.title == "Codex · demo · 任务完成")
+    #expect(try String(contentsOf: sharedURL, encoding: .utf8).contains(legacyAppRecord.id.uuidString))
+
+    let secondRead = try await store.records()
+    #expect(secondRead.map(\.id) == firstRead.map(\.id))
+
+    let appRecord = NotificationRecord(
+        request: BarkPushRequest(deviceKey: "key", title: "BarkDesk", body: "Sent from app"),
+        source: .gui, deliveryStatus: .success, httpStatusCode: 200
+    )
+    try await store.insert(appRecord)
+    let sharedContent = try String(contentsOf: sharedURL, encoding: .utf8)
+    #expect(sharedContent.contains("\"id\":\"\(appRecord.id.uuidString)\""))
+    #expect(sharedContent.contains("\"source\":\"gui\""))
+
+    try await store.delete(id: importedCLIRecord.id)
+    #expect(Set(try await store.records().map(\.id)) == Set([appRecord.id, legacyAppRecord.id]))
 }

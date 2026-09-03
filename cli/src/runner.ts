@@ -1,4 +1,5 @@
 import { constants } from "node:os";
+import { randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
 import { appendHistory, getHistoryPath, readHistory } from "./history.js";
 import { getConfigPath, loadStoredConfig, masked, resolveConfig, saveStoredConfig } from "./config.js";
@@ -71,7 +72,7 @@ async function deliver(
   const config = await resolveConfig();
   const payload = makePayload(options, config);
   const base = {
-    createdAt: new Date().toISOString(), source, body: payload.body,
+    id: randomUUID(), createdAt: new Date().toISOString(), source, body: payload.body,
     ...(payload.title ? { title: payload.title } : {}),
     ...(payload.group ? { group: payload.group } : {}), ...metadata,
   };
