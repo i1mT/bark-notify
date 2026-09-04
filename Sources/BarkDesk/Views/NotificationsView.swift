@@ -15,7 +15,7 @@ struct NotificationsView: View {
             }
         }
         .background(Color.barkCanvas)
-        .navigationTitle("通知记录")
+        .toolbar(.hidden, for: .windowToolbar)
         .onAppear {
             if model.selectedRecordID == nil { model.selectedRecordID = model.records.first?.id }
         }
@@ -24,11 +24,11 @@ struct NotificationsView: View {
         HStack(alignment: .center, spacing: 14) {
             VStack(alignment: .leading, spacing: 5) {
                 Text("通知记录")
-                    .font(.system(size: 34, weight: .semibold))
+                    .font(.system(size: 28, weight: .semibold))
                     .tracking(-1.1)
                     .foregroundStyle(Color.barkInk)
                 Text(summary)
-                    .font(.system(size: 15))
+                    .font(.system(size: 13))
                     .foregroundStyle(.secondary)
             }
             .layoutPriority(1)
@@ -65,16 +65,16 @@ struct NotificationsView: View {
             .buttonStyle(.plain)
             .keyboardShortcut("f", modifiers: .command)
             .help("搜索通知")
-            Menu {
-                Button("刷新记录") { Task { await model.refreshHistory() } }
+            Button {
+                Task { await model.refreshHistory() }
             } label: {
-                Image(systemName: "ellipsis")
+                Image(systemName: "arrow.clockwise")
                     .foregroundStyle(.secondary)
+                    .barkIconButtonSurface()
             }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .barkIconButtonSurface()
-            .fixedSize()
+            .buttonStyle(.plain)
+            .help("刷新记录")
+            .accessibilityLabel("刷新记录")
             Button { model.selection = .compose } label: {
                 ViewThatFits(in: .horizontal) {
                     Label("新建通知", systemImage: "plus")
@@ -135,7 +135,7 @@ struct NotificationsView: View {
                 .padding(.horizontal, 12)
                 .padding(.bottom, 18)
             }
-            .frame(width: 330)
+            .frame(width: 280)
             .barkPanelSurface(radius: 16)
 
             Group {
@@ -205,26 +205,26 @@ private struct HistoryRow: View {
         Button(action: action) {
             HStack(alignment: .top, spacing: 12) {
                 Text(record.createdAt.formatted(.dateTime.hour().minute().second()))
-                    .font(.system(size: 17, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
                     .foregroundStyle(Color.barkInk)
                     .lineLimit(1).fixedSize(horizontal: true, vertical: false)
-                    .frame(width: 88, alignment: .leading)
+                    .frame(width: 72, alignment: .leading)
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 7) {
                         Circle()
                             .fill(record.deliveryStatus == .success ? Color.green : Color.orange)
                             .frame(width: 7, height: 7)
                         Text(record.title?.nilIfEmpty ?? "无标题通知")
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(Color.barkInk)
                             .lineLimit(1)
                     }
                     Text(record.body)
-                        .font(.system(size: 14))
+                        .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                     Text(metadata)
-                        .font(.system(size: 12))
+                        .font(.system(size: 11))
                         .foregroundStyle(.tertiary)
                         .lineLimit(1)
                 }
@@ -255,7 +255,7 @@ private struct HistoryDetail: View {
                     sendingDetails
                 }
                 .frame(maxWidth: 720, alignment: .leading)
-                .padding(.horizontal, 28)
+                .padding(.horizontal, 20)
                 .padding(.top, 30)
                 .padding(.bottom, 34)
                 .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -273,7 +273,7 @@ private struct HistoryDetail: View {
         HStack(alignment: .top, spacing: 18) {
             VStack(alignment: .leading, spacing: 5) {
                 Text(record.createdAt.formatted(.dateTime.hour().minute().second()))
-                    .font(.system(size: 36, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 28, weight: .semibold, design: .monospaced))
                     .tracking(-1)
                     .foregroundStyle(Color.barkInk)
                     .lineLimit(1)
@@ -297,18 +297,18 @@ private struct HistoryDetail: View {
     private var notificationContent: some View {
         VStack(alignment: .leading, spacing: 13) {
             Text(record.title?.nilIfEmpty ?? "无标题通知")
-                .font(.system(size: 27, weight: .semibold))
+                .font(.system(size: 21, weight: .semibold))
                 .tracking(-0.4)
                 .foregroundStyle(Color.barkInk)
             if let subtitle = record.subtitle?.nilIfEmpty {
                 Text(subtitle).font(.callout).foregroundStyle(.secondary)
             }
             Text(record.body)
-                .font(.system(size: 17))
-                .lineSpacing(6)
+                .font(.system(size: 14))
+                .lineSpacing(4)
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(22)
+                .padding(16)
                 .background(Color.barkSurface, in: RoundedRectangle(cornerRadius: 14))
                 .overlay { RoundedRectangle(cornerRadius: 14).stroke(Color.barkBorder.opacity(0.75)) }
             if let rawImage = record.image, let url = URL(string: rawImage) {
@@ -355,18 +355,18 @@ private struct HistoryDetail: View {
                 .buttonStyle(.barkSecondary)
             if let raw = record.url, let url = URL(string: raw) { Link("打开链接", destination: url).buttonStyle(.barkSecondary) }
             Spacer()
-            Menu {
-                Button("删除记录", role: .destructive) { confirmDelete = true }
+            Button(role: .destructive) {
+                confirmDelete = true
             } label: {
-                Image(systemName: "ellipsis")
-                    .foregroundStyle(.secondary)
+                Image(systemName: "trash")
+                    .foregroundStyle(.red)
+                    .barkIconButtonSurface()
             }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .barkIconButtonSurface()
-            .fixedSize()
+            .buttonStyle(.plain)
+            .help("删除记录")
+            .accessibilityLabel("删除记录")
         }
-        .padding(.horizontal, 28)
+        .padding(.horizontal, 12)
         .padding(.vertical, 13)
         .barkPanelSurface(radius: 16)
         .padding(.horizontal, 12)

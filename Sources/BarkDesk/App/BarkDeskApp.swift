@@ -13,6 +13,7 @@ struct BarkDeskApp: App {
                 .task { await model.start() }
         }
         .defaultSize(width: 1050, height: 700)
+        .windowStyle(.hiddenTitleBar)
         .commands {
             CommandGroup(after: .newItem) {
                 Button("发送新通知") { model.selection = .compose }
