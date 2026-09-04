@@ -12,6 +12,8 @@ struct ContentView: View {
         } detail: {
             detail
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea(.container, edges: .top)
+                .toolbar(.hidden, for: .windowToolbar)
                 .overlay(alignment: .bottom) {
                     if let banner = model.banner {
                         BannerView(banner: banner)

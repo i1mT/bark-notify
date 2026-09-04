@@ -21,7 +21,6 @@ struct IntegrationsView: View {
             .frame(maxWidth: .infinity)
         }
         .background(Color.barkCanvas)
-        .navigationTitle("开发者接入")
     }
 
     private var cliSetup: some View {

@@ -22,7 +22,6 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity)
         }
         .background(Color.barkCanvas)
-        .navigationTitle("设置")
         .safeAreaInset(edge: .bottom) { saveBar }
     }
 

@@ -21,7 +21,6 @@ struct ComposeView: View {
             .frame(maxWidth: .infinity)
         }
         .background(Color.barkCanvas)
-        .navigationTitle("发送通知")
         .safeAreaInset(edge: .bottom) { sendBar }
     }
 
