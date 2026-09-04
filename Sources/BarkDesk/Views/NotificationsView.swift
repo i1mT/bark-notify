@@ -15,6 +15,7 @@ struct NotificationsView: View {
             }
         }
         .background(Color.barkCanvas)
+        .ignoresSafeArea(.container, edges: .top)
         .toolbar(.hidden, for: .windowToolbar)
         .onAppear {
             if model.selectedRecordID == nil { model.selectedRecordID = model.records.first?.id }
