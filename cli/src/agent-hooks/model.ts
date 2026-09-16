@@ -44,6 +44,8 @@ export function parseAgentId(value: string): AgentId {
 
 export function normalizeEvent(agent: AgentId, value: unknown, environment: NodeJS.ProcessEnv): NormalizedAgentEvent | undefined {
   const input = record(value);
+  // Grok also loads Claude/Cursor hooks. Only its native hook should notify.
+  if ((agent === "claude" || agent === "cursor") && isGrokStop(input, environment)) return undefined;
   if (agent === "grok" && text(input.reason) && input.reason !== "end_turn") return undefined;
   const status = normalizeStatus(input);
   const cwd = firstText(input.cwd, input.workspaceRoot, input.workspace_root, environment.GROK_WORKSPACE_ROOT, environment.GEMINI_CWD, environment.CURSOR_PROJECT_DIR, environment.CLAUDE_PROJECT_DIR);
@@ -67,6 +69,13 @@ export function normalizeEvent(agent: AgentId, value: unknown, environment: Node
     ...(firstText(input.turn_id, input.turnId, input.prompt_id, input.promptId, input["turn-id"]) ?
       { turnId: firstText(input.turn_id, input.turnId, input.prompt_id, input.promptId, input["turn-id"])! } : {}),
   };
+}
+
+function isGrokStop(input: Record<string, unknown>, environment: NodeJS.ProcessEnv): boolean {
+  if (input.hookEventName === "stop") return true;
+  // Match the session as well, so inherited Grok variables cannot suppress a nested agent.
+  const session = firstText(input.sessionId, input.session_id);
+  return environment.GROK_HOOK_EVENT === "stop" && Boolean(session) && session === environment.GROK_SESSION_ID;
 }
 
 export function notificationOptions(event: NormalizedAgentEvent, label: string): SendOptions {

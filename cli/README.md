@@ -122,6 +122,8 @@ notify agent-hook install --all --dry-run
 
 各家 hook 输入最终会转换成统一的 Bark 通知：标题包含 Agent 名称、项目目录和完成状态，正文优先使用 Agent 提供的最后一条回复。部分 Agent 的完成事件不提供回复内容，此时正文会使用状态和目录说明。发送失败只会写入 stderr，hook 始终返回成功，避免通知服务影响 Coding Agent 结束会话。
 
+Grok Build 会兼容加载 Claude Code 和 Cursor 的 hook。`notify` 会识别这些入口收到的 Grok 事件并且跳过发送，由 Grok 专用 hook 发送通知，避免标题错误和重复通知。使用 Grok 时请执行 `notify agent-hook install --agents grok`；已有配置在更新 CLI 后自动使用新的事件处理逻辑。
+
 ## 自动发布 package
 
 正式版本由仓库根目录的 GitHub Actions Release workflow 发布。先更新 `cli/package.json` 的版本并且提交，然后创建完全一致的版本 tag：

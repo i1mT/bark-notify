@@ -27,11 +27,12 @@
 - npm CLI 在服务器环境中应当优先支持 `BARK_*` 环境变量和 secret file；写入本机配置时必须限制文件权限。
 - 新增 Bark 参数时，应当先在 `BarkPushRequest` 中实现，再由 GUI 或 CLI 调用。
 - Coding Agent 的完成通知集成由 `notify agent-hook` 负责扫描、安装和统一解析，不要求用户手工维护各家的 hook 命令；安装时必须保留现有用户配置并支持重复执行，通知失败不得影响 Agent 原本的结束流程。
+- Agent 兼容加载其他产品的 hook 时，必须识别实际的事件来源，避免使用其他 Agent 的名称或重复发送通知；验证需要覆盖原生 hook 与兼容 hook 同时启用的情况。
 - Agent hook 安装器必须先验证生成物，再启用会被 Agent 启动过程加载的配置；能够通过 CLI 验证加载时必须执行真实加载检查，失败后自动恢复原配置，禁止把无法加载的 plugin 或 hook 留在生效状态。
 
 ## 验证与 Git
 
-- 修改代码后至少执行 `swift test` 和 `swift build`；修改 npm CLI 后还必须执行 `npm --prefix cli test`、`npm --prefix cli run typecheck` 和 `npm --prefix cli pack --dry-run`。
+- 修改代码后至少执行 `swift test` 和 `swift build`；修改 npm CLI 后还必须执行 `npm --prefix cli test`、`npm --prefix cli run typecheck`，并且在 `cli` 目录执行 `npm pack --dry-run`（`npm pack` 不使用 `--prefix` 切换打包目录）。
 - 修复输入、焦点或键盘交互问题时，必须使用真实键盘事件验证绑定值或者界面文本确实发生变化；只看到光标或焦点边框不算验证通过。
 - 修改多栏界面后，必须使用窗口允许的最小宽度检查侧边栏选中背景、长文本和操作按钮，确保任何内容都不会超出窗口边界。
 - 面向其他用户分发 macOS App 时，必须使用 `Developer ID Application` 签名、`notarytool` 公证和 `stapler` 附加票据；ad-hoc 签名的 DMG 仅用于本机或内部测试。
